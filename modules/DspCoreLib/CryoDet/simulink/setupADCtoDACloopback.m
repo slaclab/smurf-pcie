@@ -5,4 +5,4 @@
 format compact
  Fs = 185e6;  
  Ts = 1/Fs; 
- Fgen=10e6
+ Fgen = 20e6
