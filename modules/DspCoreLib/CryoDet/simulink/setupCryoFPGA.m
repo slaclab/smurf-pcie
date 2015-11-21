@@ -13,7 +13,7 @@ FIR1length = 30
 FIR1BW = 0.25
 
 %single channel downconverter FIR
-FIR2len = 256
+FIR2len = 320
 FIR2BW = 0.5e6;
 FIR2 = fir1(FIR2len, FIR2BW/Fclk*8);  %factor of 8 since data rate at this point is Fclk/8
 figure(20),plot(FIR2),grid
