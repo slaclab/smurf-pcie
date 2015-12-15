@@ -1,6 +1,7 @@
 % script   setupCryoDet
 % set up parameters for CryoDet.slx
 format compact
+setupVers = 3; % just a number that goes into a status register
 
 Fadc = 370e6  % ADC clock  frequency
 Ts = 1/Fadc  % ADC sample rate
