@@ -8,6 +8,9 @@ Ts = 1/Fadc  % ADC sample rate
 Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
 Tclk = 1/Fclk
 
+FBsampleRate = 64 % downsample tone amplitudes and phases by this factor
+% and run FB loop filter at this rate
+
 % Cryo Mux transfer function simulatation parameters
 
 %FIR1length = 30
@@ -26,10 +29,16 @@ Tclk = 1/Fclk
 %  185/64/2 = 1.445 MHz
 %  185/64/3 = 0.964 MHz
 %FIR2 = conv([1 2 3 4 5 6 7 8 7 6 5 4 3 2 1]/64, conv(ones(1,16)/16, ones(1,24)/24)); %notches @ 2.89 MHz, 1.445 MHz, 0.964 MHz
-FIR2 = conv([1 2 3 4 5 6 7 8 7 6 5 4 3 2 1]/64, ones(1,16)/16); %notches @ 2.89 MHz & 1.445 MHz
+%FIR2 = conv([1 2 3 4 5 6 7 8 7 6 5 4 3 2 1]/64, ones(1,16)/16); %notches @ 2.89 MHz & 1.445 MHz
+FIR2 = conv(conv(ones(1,12)/12, ones(1,8)/8), [1 2 3 4 4 3 2 1]/4/5); %Notch at ~2MHZ and ~3 MHz
 figure(20),plot(FIR2),grid
 y =FIR2; Nx=4; y(185*Nx) = 0; Nfir = length(y); nfir=1:Nfir; ffir = (nfir-1)/8/Nx;
 figure(21), plot(ffir, 20*log10(abs(fft(y)))),grid
+
+%IIR bandwidth
+F1 = 50e3; w1 = 2*pi*F1;
+Ts1 = 16/185e6;
+wTs1 = w1*Ts1
 
 %white noise generator paramters
 noiseLen = 128
@@ -65,4 +74,10 @@ a = 0.05  % transmission at minimum
 notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(22), bode(notch); grid, title('Simulted resonator transfer function')
 
+
+% Simulate another resonator notch in simulink
+Fnotch2 = 70.5e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch2
+a = 0.1  % transmission at minimum
+notch2 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+figure(23), bode([notch; notch2]); grid, title('Simulted resonator transfer functions')
 
