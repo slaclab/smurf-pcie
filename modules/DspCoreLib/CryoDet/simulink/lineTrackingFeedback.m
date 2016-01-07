@@ -3,7 +3,7 @@ function [freq] = lineTrackingFeedback( deltaF, controlReg, Finitial, dFmax, fpg
 % updates the transmission frequency for a resonant line
 % presently only runs a single loop, FB0
 
-persistent Df, Df = xl_state(0,{xlSigned, 20, 20});
+persistent Df, Df = xl_state(0,{xlSigned, 24, 23});
 
 %decode feedback bits from Control register
 FBen = xfix({xlBoolean}, xl_slice(controlReg, 4, 4)); % overall FB enable (bit4) 

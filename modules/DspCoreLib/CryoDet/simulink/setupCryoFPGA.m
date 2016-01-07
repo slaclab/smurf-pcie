@@ -70,14 +70,14 @@ noise = exp(1i*phi);
 
 % Simulate resonator notch in simulink
 Fnotch = 70e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch
-a = 0.05  % transmission at minimum
+a = 0.1  % transmission at minimum
 notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(22), bode(notch); grid, title('Simulted resonator transfer function')
 
 
 % Simulate another resonator notch in simulink
 Fnotch2 = 70.3e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch2
-a = 0.1  % transmission at minimum
+a = 0.2  % transmission at minimum
 notch2 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(23), bode([notch; notch2]); grid, title('Simulted resonator transfer functions')
 
