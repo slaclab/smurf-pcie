@@ -10,7 +10,8 @@ FBen = xfix({xlBoolean}, xl_slice(controlReg, 4, 4)); % overall FB enable (bit4)
 FBsign = xfix({xlBoolean}, xl_slice(controlReg, 5, 5)); %sign of feedback 
 en0 = xfix({xlBoolean}, xl_slice(controlReg, 8, 8)); % enable FB 0 (bit 8)
 en1 = xfix({xlBoolean}, xl_slice(controlReg, 9, 9)); % enable FB 1 (bit 9)
-FBgain = xl_force(xl_slice(controlReg, 31, 16), xlUnsigned, 8); % feedback gain factor in 16_8
+FBgain = xl_force(xl_slice(controlReg, 31, 16), xlUnsigned, 11); % feedback gain factor in 16_11
+% e.g gain range is 2^-10 to 2^5
 
 if  fpgaReset | ~FBen | ~en0 
     disp(FBgain)
