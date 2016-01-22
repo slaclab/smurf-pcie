@@ -11,6 +11,10 @@ Tclk = 1/Fclk
 FBsampleRate = 64 % downsample tone amplitudes and phases by this factor
 % and run FB loop filter at this rate
 
+
+DDSphaseBits = 24
+DDSoutputBits = 12  % parameterized output DDS setup for test of how many DDS' we can implement in FPGA
+
 % Cryo Mux transfer function simulatation parameters
 
 %FIR1length = 30
