@@ -18,14 +18,22 @@ a = 0.1  % transmission at minimum
 notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(22), bode(notch); grid, title('Simulted resonator transfer function')
 
-
 % Simulate another resonator notch in simulink
-Fnotch2 = 70.3e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch2
+Fnotch2 = 70.3e6, BW = 1e6, Q = Fnotch2/BW, wNotch = 2*pi*Fnotch2
 a = 0.2  % transmission at minimum
 notch2 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(23), bode([notch; notch2]); grid, title('Simulted resonator transfer functions')
 
-freqBits = 24  % number of bits for frquency
+% Simulate more resonator notches in simulink
+Fnotch3 = 80.0e6, BW = 1e6, Q = Fnotch3/BW, wNotch = 2*pi*Fnotch3
+a = 0.1  % transmission at minimum
+notch3 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+
+Fnotch4 = 80.2e6, BW = 1e6, Q = Fnotch4/BW, wNotch = 2*pi*Fnotch4
+a = 0.1  % transmission at minimum
+notch4 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+
+freqBits = 24  % number of bits for frequency
 %freqBits = 20  % number of bits for frequency (20 bits gives ~180 Hz freq resolution)
 IQbits = 16  %number of bits for DDS I&Q
 %IQbits = 15  % number of bits for DDS I&Q (16 bits takes up too much BRAM)
