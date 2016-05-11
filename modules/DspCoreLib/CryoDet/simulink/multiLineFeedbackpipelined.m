@@ -15,10 +15,15 @@ persistent chan2, chan2 = xl_state(15, {xlUnsigned, 4, 0});
 persistent Fp1, Fp1 = xl_state(0, {xlUnsigned, 24, 24});
 persistent Fp2, Fp2 = xl_state(0, {xlUnsigned, 24, 24});
 
-persistent int1DF, int1DF = xl_state(zeros(1,12), dfType); %first integrator
-persistent int2DF, int2DF = xl_state(zeros(1,12), dfType); %second integrator )not yet used)
+persistent int1DF, int1DF = xl_state(zeros(1,12), dfType, 12); %first integrator
+persistent int2DF, int2DF = xl_state(zeros(1,12), dfType, 12); %second integrator )not yet used)
 
-%query state variables
+%can't seem to make vector state work, try scalar states for offset
+%frequencies
+persistent intdf0, intdf0 = xl_state(0, dfType);
+persistent intdf1, intdf1 = xl_state(0, dfType);
+
+% query the state variables
 c1 = chan1;
 c2 = chan2;
 df1 = Df1;
@@ -30,13 +35,22 @@ if channelNo ==1  % unused conditional just for debugging breakpoint
     a=c1;%dummy code to hold a breakpoint
 end
 
-if channelNo <12
-    int1 = int1DF(channelNo);
-    int2 = int2DF(channelNo);
+%if channelNo <12  %%%% vector states don't appear to work
+%%next try chan = xfix({xlUnsigned, 4, 0}, channelNo); %then use as index,is Matlab confused about types?
+%    int1 = int1DF(channelNo);
+%    int2 = int2DF(channelNo);
+%else
+%    int1 = xfix(dfType, 0);
+%    int2 = xfix(dfType, 0);
+%end
+
+if channelNo == 0   %can't seem to make vector states work so punt to a few scalar states
+    int1 = intdf0;
+elseif channelNo ==1;
+    int1 = intdf1;
 else
     int1 = xfix(dfType, 0);
-    int2 = xfix(dfType, 0);
-end
+end  % end punting
 
 %pipeline stage 1 ______________________________________________________________________________________________
 %decode Finitial for this channel
@@ -72,8 +86,14 @@ else
 end
 
 % pipeline stage 3 ________________________________________________________
-if chan2 < 12    % test for valid channel number   
-    int1DF(c2) = df2;
+if c2 < 12    % test for valid channel number   
+%    int1DF(c2) = df2;
+    if channelNo == 0   %can't seem to make vector states work so punt to a few scalar states
+        intdf0 = df2;
+    elseif channelNo ==1;
+        intdf1 = df2;
+    end   % end punting
+
     freq = xfix({xlUnsigned, 24, 24, xlTruncate, xlSaturate}, df2 + fp2);  
 else
     freq = xfix({xlUnsigned, 24, 24, xlTruncate, xlSaturate}, 0); % invalid cannel number
