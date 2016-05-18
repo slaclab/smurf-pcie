@@ -22,6 +22,17 @@ persistent int2DF, int2DF = xl_state(zeros(1,12), dfType, 12); %second integrato
 %frequencies
 persistent intdf0, intdf0 = xl_state(0, dfType);
 persistent intdf1, intdf1 = xl_state(0, dfType);
+persistent intdf2, intdf2 = xl_state(0, dfType);
+persistent intdf3, intdf3 = xl_state(0, dfType);
+persistent intdf4, intdf4 = xl_state(0, dfType);
+persistent intdf5, intdf5 = xl_state(0, dfType);
+persistent intdf6, intdf6 = xl_state(0, dfType);
+persistent intdf7, intdf7 = xl_state(0, dfType);
+persistent intdf8, intdf8 = xl_state(0, dfType);
+persistent intdf9, intdf9 = xl_state(0, dfType);
+persistent intdf10, intdf10 = xl_state(0, dfType);
+persistent intdf11, intdf11 = xl_state(0, dfType);
+
 
 % query the state variables
 c1 = chan1;
@@ -44,12 +55,33 @@ end
 %    int2 = xfix(dfType, 0);
 %end
 
-if channelNo == 0   %can't seem to make vector states work so punt to a few scalar states
-    int1 = intdf0;
-elseif channelNo ==1;
-    int1 = intdf1;
-else
-    int1 = xfix(dfType, 0);
+switch channelNo    %can't seem to make vector states work so punt to a few scalar states
+    case 0  
+        int1 = intdf0;
+    case 1
+        int1 = intdf1;
+    case 2
+        int1 = intdf2;
+    case 3
+        int1 = intdf3;
+    case 4
+        int1 = intdf4;
+    case 5
+        int1 = intdf5;
+    case 6  
+        int1 = intdf0;
+    case 7
+        int1 = intdf1;
+    case 8
+        int1 = intdf2;
+    case 9
+        int1 = intdf3;
+    case 10
+        int1 = intdf4;
+    case 11
+        int1 = intdf5;
+    otherwise
+        int1 = xfix(dfType, 0);
 end  % end punting
 
 %pipeline stage 1 ______________________________________________________________________________________________
@@ -88,11 +120,34 @@ end
 % pipeline stage 3 ________________________________________________________
 if c2 < 12    % test for valid channel number   
 %    int1DF(c2) = df2;
-    if channelNo == 0   %can't seem to make vector states work so punt to a few scalar states
-        intdf0 = df2;
-    elseif channelNo ==1;
-        intdf1 = df2;
-    end   % end punting
+        
+    switch c2    %can't seem to make vector states work so punt to a few scalar states
+        case 0  
+            intdf0 = df2;
+        case 1
+            intdf1 = df2;
+        case 2
+            intdf2 = df2;
+        case 3
+            intdf3 = df2;
+        case 4
+            intdf4 = df2;
+        case 5
+            intdf5 = df2;
+        case 6
+            intdf6 = df2;
+        case 7
+            intdf7 = df2;
+        case 8
+            intdf8 = df2;
+        case 9
+            intdf9 = df2;
+        case 10
+            intdf10 = df2;
+        case 11
+            intdf11 = df2;
+        otherwise  % unused channel number
+    end  % end punting
 
     freq = xfix({xlUnsigned, 24, 24, xlTruncate, xlSaturate}, df2 + fp2);  
 else
