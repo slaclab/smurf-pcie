@@ -7,17 +7,10 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
-set format     "mcs"
-set inteface   "SPIx1"
-set size       "1024"
-set BIT_PATH   "$::env(IMPL_DIR)/$::env(PROJECT).bit"
 
-set LCLS_I_BIT  "0x02000000"
-set LCLS_II_BIT "0x04000000"
-set TEMP_BIT    "0x06000000"
+## Source the AMC Carrier Core's .TCL file
+source $::env(PROJ_DIR)/../../../modules/AmcCarrierCore/vivado/promgen.tcl
 
-set LCLS_I_GZ  "0x02F43EFC"
-set LCLS_II_GZ "0x04F43EFC"
-set TEMP_GZ    "0x06F43EFC"
-
+## Setup the .BIT file and user file configurations
 set loadbit    "up ${LCLS_II_BIT} ${BIT_PATH}"
+set loaddata   "up ${LCLS_II_GZ}  ${DATA_PATH}"
