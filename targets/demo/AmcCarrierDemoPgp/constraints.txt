@@ -1,1 +1,1 @@
-hdl/AmcRfDemoBoard.xdc
+hdl/AmcCarrierDemoPgp.xdc

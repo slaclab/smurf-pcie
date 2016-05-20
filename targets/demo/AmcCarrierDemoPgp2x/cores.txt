@@ -1,1 +1,1 @@
-cores/PgpGthCore/PgpGthCore.xci
+# cores/PgpGthCore/PgpGthCore.xci

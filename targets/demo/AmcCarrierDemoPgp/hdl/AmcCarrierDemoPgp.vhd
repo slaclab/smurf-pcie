@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcRfDemoBoard.vhd
+-- File       : AmcCarrierDemoPgp.vhd
 -- Author     : Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory (Cosylab)
 -- Created    : 2015-07-10
@@ -39,7 +39,7 @@ use work.TimingPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcRfDemoBoard is
+entity AmcCarrierDemoPgp is
    generic (
       TPD_G             : time    := 1 ns;
       SIM_SPEEDUP_G     : boolean := false;
@@ -202,9 +202,9 @@ entity AmcRfDemoBoard is
       -- -- -- SYSMON Ports
       -- -- vPIn          : in    sl;
       -- -- vNIn          : in    sl);
-end AmcRfDemoBoard;
+end AmcCarrierDemoPgp;
 
-architecture top_level of AmcRfDemoBoard is
+architecture top_level of AmcCarrierDemoPgp is
 
    -- AmcCarrierCore Configuration Constants
    constant TIMING_MODE_C       : boolean             := TIMING_MODE_186MHZ_C;
