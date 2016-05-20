@@ -1,0 +1,7 @@
+vhdl work Version.vhd
+vhdl work hdl/AmcRfDemoBoardMR.vhd
+vhdl work hdl/AmcRfDemoApp.vhd
+vhdl work hdl/PgpGthCoreWrapper.vhd
+vhdl work hdl/Pgp2bGthUltra.vhd
+vhdl work hdl/PgpFrontEnd.vhd
+#vhdl work cores/PgpGthCore/PgpGthCore.dcp
