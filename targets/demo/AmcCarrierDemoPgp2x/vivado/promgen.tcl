@@ -13,4 +13,4 @@ source $::env(PROJ_DIR)/../../../modules/AmcCarrierCore/vivado/promgen.tcl
 
 ## Setup the .BIT file and user file configurations
 set loadbit    "up ${LCLS_II_BIT} ${BIT_PATH}"
-set loaddata   "up ${LCLS_II_GZ}  ${DATA_PATH}"
+# set loaddata   "up ${LCLS_II_GZ}  ${DATA_PATH}"
