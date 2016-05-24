@@ -1,76 +1,16 @@
-% script   setupCryoDet
-% set up parameters for CryoDet.slx
+% script   setupCryoNew
+% set up parameters for CryoDetNew.slx
+
+%new as of Feb 3, 2016
+
 format compact
-setupVers = 5; % just a number that goes into a status register
+setupVers = 21; % just a number that goes into a status register
 
 Fadc = 370e6  % ADC clock  frequency
 Ts = 1/Fadc  % ADC sample rate
 Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
 Tclk = 1/Fclk
 
-FBsampleRate = 64 % downsample tone amplitudes and phases by this factor
-% and run FB loop filter at this rate
-
-
-DDSphaseBits = 24
-DDSoutputBits = 12  % parameterized output DDS setup for test of how many DDS' we can implement in FPGA
-
-% Cryo Mux transfer function simulatation parameters
-
-%FIR1length = 30
-%FIR1BW = 0.25
-
-%single channel downconverter FIR
-%FIR2len = 320
-%FIR2BW = 0.25e6;
-%FIR2 = fir1(FIR2len, FIR2BW/2/Fclk*8);  %factor of 8 since data rate at this point is Fclk/8
-
-%simple filter ~700kHz BW (should optimize later for given bandwidth and
-%sideband separation
-% Notches (suitable for sidband suppression) at:
-%  185/64   = 2.89 MHz
-%  185/32/3 = 1.93 MHz
-%  185/64/2 = 1.445 MHz
-%  185/64/3 = 0.964 MHz
-%FIR2 = conv([1 2 3 4 5 6 7 8 7 6 5 4 3 2 1]/64, conv(ones(1,16)/16, ones(1,24)/24)); %notches @ 2.89 MHz, 1.445 MHz, 0.964 MHz
-%FIR2 = conv([1 2 3 4 5 6 7 8 7 6 5 4 3 2 1]/64, ones(1,16)/16); %notches @ 2.89 MHz & 1.445 MHz
-FIR2 = conv(conv(ones(1,12)/12, ones(1,8)/8), [1 2 3 4 4 3 2 1]/4/5); %Notch at ~2MHZ and ~3 MHz
-figure(20),plot(FIR2),grid
-y =FIR2; Nx=4; y(185*Nx) = 0; Nfir = length(y); nfir=1:Nfir; ffir = (nfir-1)/8/Nx;
-figure(21), plot(ffir, 20*log10(abs(fft(y)))),grid
-
-%IIR bandwidth
-F1 = 50e3; w1 = 2*pi*F1;
-Ts1 = 16/185e6;
-wTs1 = w1*Ts1
-
-%white noise generator paramters
-noiseLen = 128
-noiseBW = 2e6
-noiseSteps = 32
-%noise = ifft(exp(2i*pi*rand(1, noiseLen)) .* fft(fir1(noiseLen-1, noiseBW/Fclk*noiseSteps)));
-%rmsnoise = sqrt(mean(abs(noise.*noise)));
-%noise = noise/1.4/rmsnoise;
-%for n=1:noiseLen
-%    if abs(noise(n)) > 1
-%        noise(n) = noise(n)/abs(noise(n)); %Clip noise peaks
-%    end
-%end
-dt = noiseSteps/Fclk; % time increment for noise phase modulation
-
-for n=1:noiseLen
-    if n <= (noiseLen/2)
-        f(n) = noiseBW*(4*n/noiseLen - 1); %rising chirp
-    else
-        f(n) = f(noiseLen + 1 - n); % descending chirp
-    end
-    if n==1
-        phi(n) = 2*pi*f(1)*dt;
-    else
-        phi(n) = phi(n-1) + 2*pi*f(n)*dt; %integrate freq to get phase
-    end
-end
-noise = exp(1i*phi);
 
 % Simulate resonator notch in simulink
 Fnotch = 70e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch
@@ -78,10 +18,30 @@ a = 0.1  % transmission at minimum
 notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(22), bode(notch); grid, title('Simulted resonator transfer function')
 
-
 % Simulate another resonator notch in simulink
-Fnotch2 = 70.3e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch2
+Fnotch2 = 70.3e6, BW = 1e6, Q = Fnotch2/BW, wNotch = 2*pi*Fnotch2
 a = 0.2  % transmission at minimum
 notch2 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(23), bode([notch; notch2]); grid, title('Simulted resonator transfer functions')
+
+% Simulate more resonator notches in simulink
+Fnotch3 = 80.0e6, BW = 1e6, Q = Fnotch3/BW, wNotch = 2*pi*Fnotch3
+a = 0.1  % transmission at minimum
+notch3 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+
+Fnotch4 = 80.2e6, BW = 1e6, Q = Fnotch4/BW, wNotch = 2*pi*Fnotch4
+a = 0.1  % transmission at minimum
+notch4 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+
+freqBits = 24  % number of bits for frequency
+%freqBits = 20  % number of bits for frequency (20 bits gives ~180 Hz freq resolution)
+IQbits = 16  %number of bits for DDS I&Q
+%IQbits = 15  % number of bits for DDS I&Q (16 bits takes up too much BRAM)
+Nlines = 12   % max number of resonator lines per ADC
+freqBusAddrBits = 4  %number of bits of address space for a frequency bus
+
+%white noise generator paramters
+noiseLen = 128   % length of vector of random phases for white noise generator
+noiseSteps = 32  %every noiseSteps clocks (of 185 MHz) change random phase shift (try 37 later)
+noise = exp(2i*pi*rand(1, noiseLen)); %complex random phases
 
