@@ -1,0 +1,44 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+include: AmcCarrierLlrfApp.yaml
+include: AmcCarrierCore.yaml
+
+Device: &AmcCarrierMrEth 
+  name: AmcCarrierMrEth
+  description: AMC 
+  size: 0x100000000
+  ########
+  MMIODev:
+  ########
+    - <<: *AmcCarrierCore
+      offset: 0x00000000  
+    ##################################################     
+    - <<: *AmcCarrierLlrfApp
+      offset: 0x80000000 
+    ##################################################     
+  #########
+  Commands:
+  #########
+    ##################################################
+    - name: TrigDaq
+      description: "Initialize DDR buffer and trigger data acquisition from software"
+      sequence:
+        - entry: AmcCarrierCore/AmcCarrierBsa/BsaRawDiagnosic/AxiStreamDmaRingWrite/Initialize
+          value: 0x1
+        # Trigger bay 0 
+        # Only Bay 0 triggered because the module triggers are interconnected in hw and
+        # Bay 1 gets triggered automatically        
+        - entry: AmcCarrierLlrfApp/AxisDaqMux[0]/TriggerDaq
+          value: 0x1
+        # In case we trigger bay 0 later
+        #- entry: AmcCarrierLlrfApp/AxisDaqMux[1]/TriggerDaq       
+        #  value: 0x1
+    ##################################################

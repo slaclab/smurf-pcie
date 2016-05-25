@@ -1,0 +1,4 @@
+../../../modules/AmcCarrierCore/xdc/AmcCarrierCore.xdc
+../../../modules/MissionReadinessCore/xdc/AmcBay0Pinout.xdc
+../../../modules/MissionReadinessCore/xdc/AmcBay1Pinout.xdc
+hdl/AmcCarrierMrEth.xdc
