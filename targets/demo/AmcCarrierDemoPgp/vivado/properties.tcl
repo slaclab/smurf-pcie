@@ -8,11 +8,5 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-## Check for version 2015.4 of Vivado
-if { [VersionCheck 2015.4] < 0 } {
-   close_project
-   exit -1
-}
-
 ## Source the AMC Carrier Core's .TCL file
 source $::env(PROJ_DIR)/../../../modules/AmcCarrierCore/vivado/debug_properties.tcl
