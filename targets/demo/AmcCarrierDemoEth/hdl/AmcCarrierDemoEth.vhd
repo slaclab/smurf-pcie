@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMrEth.vhd
+-- File       : AmcCarrierDemoEth.vhd
 -- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-05-25
@@ -33,7 +33,7 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 
-entity AmcCarrierMrEth is
+entity AmcCarrierDemoEth is
    generic (
       TPD_G         : time    := 1 ns;
       SIMULATION_G  : boolean := false;
@@ -154,9 +154,9 @@ entity AmcCarrierMrEth is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end AmcCarrierMrEth;
+end AmcCarrierDemoEth;
 
-architecture top_level of AmcCarrierMrEth is
+architecture top_level of AmcCarrierDemoEth is
 
    -- AmcCarrierCore Configuration Constants
    constant TIMING_MODE_C            : boolean                                                   := TIMING_MODE_119MHZ_C;

@@ -1,2 +1,2 @@
 vhdl work Version.vhd
-vhdl work hdl/AmcCarrierMrEth.vhd
+vhdl work hdl/AmcCarrierDemoEth.vhd
