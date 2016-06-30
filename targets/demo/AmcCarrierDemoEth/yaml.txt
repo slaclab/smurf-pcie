@@ -1,2 +1,4 @@
 manual yaml/000TopLevel.yaml
+manual yaml/DigFpga.yaml
+manual yaml/ApplicationCore.yaml
 manual yaml/AmcCarrierMrEth.yaml
