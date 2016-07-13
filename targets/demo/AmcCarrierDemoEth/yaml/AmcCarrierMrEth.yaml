@@ -31,7 +31,7 @@ Device: &AmcCarrierMrEth
     - name: TrigDaq
       description: "Initialize DDR buffer and trigger data acquisition from software"
       sequence:
-        - entry: AmcCarrierCore/AmcCarrierBsa/BsaRawDiagnosic/AxiStreamDmaRingWrite/Initialize
+        - entry: AmcCarrierCore/AmcCarrierBsa/BsaRawDiagnostic/AxiStreamDmaRingWrite/Initialize
           value: 0x1
         # Trigger bay 0 
         # Only Bay 0 triggered because the module triggers are interconnected in hw and
