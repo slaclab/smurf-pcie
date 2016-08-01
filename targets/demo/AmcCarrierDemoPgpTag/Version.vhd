@@ -29,5 +29,6 @@ end Version;
 -- 07/10/2015 (0x00000005): v4 + sysgen running on 185M.
 -- 07/10/2015 (0x00000006): Cryo.
 -- 07/10/2015 (0x00000007): Cryo and SysGen readout
+-- 08/01/2016 (0x00000008): Rebuilt with the latest firmware TagV1.0
 -------------------------------------------------------------------------------
 
