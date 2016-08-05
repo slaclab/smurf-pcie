@@ -197,7 +197,7 @@ architecture top_level of AmcCarrierDemoEth is
 
 begin
 
-   U_App : entity work.AmcCarrierLlrfApp
+   U_App : entity work.AmcCarrierMrLlrfApp
       generic map (
          TPD_G         => TPD_G,
          SIMULATION_G  => SIMULATION_G,
