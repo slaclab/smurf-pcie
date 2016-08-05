@@ -1,0 +1,104 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+include: JesdRx.yaml
+include: Lmk04828.yaml
+include: Adc16Dx370.yaml
+include: AttHMC624.yaml
+include: DacAD5541.yaml
+include: DacAD5541Mux.yaml
+
+Device: &AmcBay0Core 
+  name: AmcBay0Core
+  description: "AMC0 LLRF Module (SD-376-396-16)"
+  size: 0x00800000
+  ########
+  MMIODev:
+  ########
+    - <<: *JesdRx
+      offset: 0x00000000  
+    ##################################################     
+    - <<: *Adc16Dx370
+      name: "Adc16Dx370"
+      offset: 0x00100000 
+      nelms:  3
+      stride: 0x00100000 
+#    ##################################################     
+#    - <<: *Adc16Dx370
+#      offset: 0x00200000 
+#    ##################################################     
+#    - <<: *Adc16Dx370
+#      offset: 0x00300000 
+#    ##################################################     
+    - <<: *Lmk04828
+      offset: 0x00400000     
+    ##################################################     
+    - <<: *AttHMC624
+      offset: 0x00500000 
+      nelms: 6
+      stride: 0x10
+#    ##################################################     
+#    - <<: *AttHMC624
+#      offset: 0x00500010       
+#    ##################################################
+#    - <<: *AttHMC624
+#      offset: 0x00500020 
+#    ##################################################     
+#    - <<: *AttHMC624
+#      offset: 0x00500030       
+#    ##################################################
+#    - <<: *AttHMC624
+#      offset: 0x00500040       
+#    ##################################################
+#    - <<: *AttHMC624
+#      offset: 0x00500050      
+#    ##################################################
+    - <<: *DacAD5541
+      offset: 0x00600000 
+      nelms: 3
+      stride: 0x10
+#    ##################################################     
+#    - <<: *DacAD5541
+#      offset: 0x00600010       
+#    ##################################################
+#    - <<: *DacAD5541
+#      offset: 0x00600020 
+#    ################################################## 
+    - <<: *DacAD5541Mux
+      offset: 0x00600030
+    ##################################################
+  #########
+  Commands:
+  #########
+    ##################################################
+    - name: InitAmcBay0
+      description: "Initialization for AMC card's JESD modules"
+      sequence:
+        # Reset the RX's GTs
+        - entry: JesdRx/C_ResetGTs
+          value: 0x1       
+        # Calibrate the JESD ADCs
+        - entry: Adc16Dx370/CalibrateAdc
+          value: 0x1       
+        # 1000 ms sleep
+        - entry: usleep
+          value: 1000000       
+
+        # Power up the LMK's SYSREF
+        - entry: Lmk04828/PwrUpSysRef
+          value: 0x1       
+        # 1000 ms sleep
+        - entry: usleep
+          value: 1000000    
+
+        # Clear the Alarms
+        - entry: Lmk04828/InitLmk          
+          value: 0x1       
+    ##################################################

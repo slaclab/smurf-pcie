@@ -1,0 +1,28 @@
+# LLRF Platform common 
+vhdl work rtl/platform/AxiSerAttnMaster.vhd
+vhdl work rtl/platform/LvdsDacRegItf.vhd
+vhdl work rtl/platform/LvdsDacLane.vhd
+vhdl work rtl/platform/LvdsDacSigGen.vhd
+vhdl work rtl/platform/OutputTapDelay.vhd
+vhdl work rtl/platform/AmcBay0Core.vhd
+vhdl work rtl/platform/AmcBay1Core.vhd
+vhdl work rtl/platform/AmcBay0DacMux.vhd
+vhdl work rtl/platform/AmcBay0DacMuxReg.vhd
+vhdl work rtl/platform/PlatformLlrfJesdBay0.vhd
+vhdl work rtl/platform/PlatformLlrfJesdBay1.vhd
+
+# LLRF Demo board common 
+vhdl work rtl/demo/AxiLiteGenRegItf.vhd
+vhdl work rtl/demo/SigGenLane.vhd
+vhdl work rtl/demo/DacSignalGenerator.vhd
+vhdl work rtl/demo/Jesd204bGthWrapper.vhd
+vhdl work rtl/demo/SysGenWrapper.vhd
+vhdl work rtl/demo/SysGenWrapper370.vhd
+vhdl work rtl/demo/DebugAmcAdcDdrFifo.vhd
+
+vhdl work coregen/GthUltrascaleJesdCoregenBay0/GthUltrascaleJesdCoregenBay0.dcp
+vhdl work coregen/GthUltrascaleJesdCoregenBay1/GthUltrascaleJesdCoregenBay1.dcp
+
+vhdl work coregen/DebugMigCore/DebugMigCore.dcp
+vhdl work coregen/DebugAxiStreamDdrFifo/DebugAxiStreamDdrFifo.dcp
+vhdl work coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.dcp

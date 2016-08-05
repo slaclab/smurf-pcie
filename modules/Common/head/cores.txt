@@ -1,0 +1,5 @@
+#coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.xci
+#coregen/GthUltrascaleJesdCoregenBay0/GthUltrascaleJesdCoregenBay0.xci
+#coregen/GthUltrascaleJesdCoregenBay1/GthUltrascaleJesdCoregenBay1.xci
+#coregen/DebugMigCore/DebugMigCore.xci
+#coregen/DebugAxiStreamDdrFifo/DebugAxiStreamDdrFifo.xci 

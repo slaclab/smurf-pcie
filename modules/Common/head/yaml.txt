@@ -1,0 +1,8 @@
+manual yaml/AttHMC624.yaml
+manual yaml/DacAD5541.yaml
+manual yaml/DacAD5541Mux.yaml
+manual yaml/DacLtc2000.yaml
+manual yaml/LvdsSigGen.yaml
+manual yaml/SigGenRam.yaml
+manual yaml/AmcBay0Core.yaml
+manual yaml/AmcBay1Core.yaml
