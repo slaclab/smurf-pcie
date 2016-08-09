@@ -39,7 +39,7 @@ use work.TimingPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcCarrierDemoPgp is
+entity AmcCarrierDemoPgpTag is
    generic (
       TPD_G             : time    := 1 ns;
       SIM_SPEEDUP_G     : boolean := false;
@@ -202,9 +202,9 @@ entity AmcCarrierDemoPgp is
       -- -- -- SYSMON Ports
       -- -- vPIn          : in    sl;
       -- -- vNIn          : in    sl);
-end AmcCarrierDemoPgp;
+end AmcCarrierDemoPgpTag;
 
-architecture top_level of AmcCarrierDemoPgp is
+architecture top_level of AmcCarrierDemoPgpTag is
 
    -- AmcCarrierCore Configuration Constants
    constant TIMING_MODE_C       : boolean             := TIMING_MODE_186MHZ_C;
