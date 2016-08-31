@@ -112,15 +112,7 @@ architecture rtl of AxiSerAttnMaster is
    
    
 begin
-   
-   
-   
-   
-   
-   
-   
-   
-   
+
    comb : process (axiReadMaster, axiRst, axiWriteMaster, r, rdEn) is
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
