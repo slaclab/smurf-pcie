@@ -18,11 +18,9 @@ vhdl work rtl/demo/DacSignalGenerator.vhd
 vhdl work rtl/demo/Jesd204bGthWrapper.vhd
 vhdl work rtl/demo/SysGenWrapper.vhd
 vhdl work rtl/demo/SysGenWrapper370.vhd
-vhdl work rtl/demo/DebugAmcAdcDdrFifo.vhd
+vhdl work rtl/demo/AmcRfDemoBayCore.vhd
+vhdl work rtl/demo/AmcRfDemoApp.vhd
 
 vhdl work coregen/GthUltrascaleJesdCoregenBay0/GthUltrascaleJesdCoregenBay0.dcp
 vhdl work coregen/GthUltrascaleJesdCoregenBay1/GthUltrascaleJesdCoregenBay1.dcp
-
-vhdl work coregen/DebugMigCore/DebugMigCore.dcp
-vhdl work coregen/DebugAxiStreamDdrFifo/DebugAxiStreamDdrFifo.dcp
 vhdl work coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.dcp
