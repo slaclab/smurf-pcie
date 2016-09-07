@@ -13,12 +13,12 @@
 #######################
 
 # RTM Latency Measurement Debug Pulses
-set_property -dict {PACKAGE_PIN P21 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100} [get_ports {rtmLsN[32]}]
-set_property -dict {PACKAGE_PIN N22 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100} [get_ports {rtmLsP[33]}]
-set_property -dict {PACKAGE_PIN M22 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100} [get_ports {rtmLsN[33]}]
-set_property -dict {PACKAGE_PIN R23 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100} [get_ports {rtmLsP[34]}]
-set_property -dict {PACKAGE_PIN P23 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100} [get_ports {rtmLsN[34]}]
-set_property -dict {PACKAGE_PIN R25 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100} [get_ports {rtmLsP[35]}]
+set_property -dict {PACKAGE_PIN P21 IOSTANDARD LVDS_25} [get_ports {rtmLsN[32]}]
+set_property -dict {PACKAGE_PIN N22 IOSTANDARD LVDS_25} [get_ports {rtmLsP[33]}]
+set_property -dict {PACKAGE_PIN M22 IOSTANDARD LVDS_25} [get_ports {rtmLsN[33]}]
+set_property -dict {PACKAGE_PIN R23 IOSTANDARD LVDS_25} [get_ports {rtmLsP[34]}]
+set_property -dict {PACKAGE_PIN P23 IOSTANDARD LVDS_25} [get_ports {rtmLsN[34]}]
+set_property -dict {PACKAGE_PIN R25 IOSTANDARD LVDS_25} [get_ports {rtmLsP[35]}]
 
 # Ethernet
 set_property PACKAGE_PIN B6 [get_ports {ethTxP}]

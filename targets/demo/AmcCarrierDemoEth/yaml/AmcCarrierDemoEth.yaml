@@ -8,11 +8,11 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-include: AmcCarrierLlrfApp.yaml
+include: AmcCarrierDemoApp.yaml
 include: AmcCarrierCore.yaml
 
-Device: &AmcCarrierMrEth 
-  name: AmcCarrierMrEth
+Device: &AmcCarrierDemoEth 
+  name: AmcCarrierDemoEth
   description: AMC 
   size: 0x100000000
   ########
@@ -21,7 +21,7 @@ Device: &AmcCarrierMrEth
     - <<: *AmcCarrierCore
       offset: 0x00000000  
     ##################################################     
-    - <<: *AmcCarrierLlrfApp
+    - <<: *AmcCarrierDemoApp
       offset: 0x80000000 
     ##################################################     
   #########
@@ -34,11 +34,11 @@ Device: &AmcCarrierMrEth
         - entry: AmcCarrierCore/AmcCarrierBsa/BsaRawDiagnostic/AxiStreamDmaRingWrite/Initialize
           value: 0x1
         # Trigger bay 0 
-        # Only Bay 0 triggered because the module triggers are interconnected in hw and
-        # Bay 1 gets triggered automatically        
-        - entry: AmcCarrierLlrfApp/AxisDaqMux[0]/TriggerDaq
-          value: 0x1
-        # In case we trigger bay 0 later
-        #- entry: AmcCarrierLlrfApp/AxisDaqMux[1]/TriggerDaq       
-        #  value: 0x1
+        # Only Bay 1 triggered because the module triggers are interconnected in hw and
+        # Bay 1 gets triggered automatically if the cascade trigger is enabled     
+        - entry: AmcCarrierDemoApp/AxisDaqMux[0]/TriggerDaq       
+          value: 0x1        
+        # In case we trigger bay 1 later
+        #- entry: AmcCarrierDemoApp/AxisDaqMux[1]/TriggerDaq
+       #   value: 0x1
     ##################################################
