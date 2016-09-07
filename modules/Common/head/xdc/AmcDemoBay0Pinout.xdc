@@ -80,4 +80,4 @@ set_property -dict { PACKAGE_PIN AJ8 IOSTANDARD LVCMOS25 PULLUP true} [get_ports
  set_property -dict { PACKAGE_PIN AJ21 IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spiSdioDac_io[0]}] 
 
  # Hardware trigger
- set_property -dict { PACKAGE_PIN AK21 IOSTANDARD LVCMOS18 } [get_ports {trigHW[0]}]
+ set_property -dict { PACKAGE_PIN AK21 IOSTANDARD LVCMOS18 PULLDOWN true} [get_ports {trigHw[0]}]
