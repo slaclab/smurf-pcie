@@ -25,7 +25,6 @@
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
@@ -375,34 +374,11 @@ begin
 
          devClkActive_i => jesdMmcmLocked,
 
-         -- Remap the ports to match channel numbers on LLRF board
-         gtTxP(0) => jesdTxP(4),
-         gtTxP(1) => jesdTxP(5),
-         gtTxP(2) => jesdTxP(0),
-         gtTxP(3) => jesdTxP(1),
-         gtTxP(4) => jesdTxP(2),
-         gtTxP(5) => jesdTxP(3),
-
-         gtTxN(0) => jesdTxN(4),
-         gtTxN(1) => jesdTxN(5),
-         gtTxN(2) => jesdTxN(0),
-         gtTxN(3) => jesdTxN(1),
-         gtTxN(4) => jesdTxN(2),
-         gtTxN(5) => jesdTxN(3),
-
-         gtRxP(0) => jesdRxP(4),
-         gtRxP(1) => jesdRxP(5),
-         gtRxP(2) => jesdRxP(0),
-         gtRxP(3) => jesdRxP(1),
-         gtRxP(4) => jesdRxP(2),
-         gtRxP(5) => jesdRxP(3),
-
-         gtRxN(0) => jesdRxN(4),
-         gtRxN(1) => jesdRxN(5),
-         gtRxN(2) => jesdRxN(0),
-         gtRxN(3) => jesdRxN(1),
-         gtRxN(4) => jesdRxN(2),
-         gtRxN(5) => jesdRxN(3),
+         -----------------------------------
+         gtTxP  => jesdTxP,
+         gtTxN  => jesdTxN,
+         gtRxP  => jesdRxP,
+         gtRxN  => jesdRxN,
 
          axiClk => axilClk,
          axiRst => axilRst,

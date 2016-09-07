@@ -109,11 +109,11 @@ entity AmcRfDemoApp is
       ------------------------------------------------      
       -- RTM ports + Only one debug pulse output per bay from ADC Ch0
       ------------------------------------------------      
-      rtmLsP : out slv(35 downto 32);
-      rtmLsN : out slv(35 downto 32);
+      rtmLsP : out slv(33+2*AMC_MSB_G downto 32+2*AMC_LSB_G);
+      rtmLsN : out slv(33+2*AMC_MSB_G downto 32+2*AMC_LSB_G);
       
       -- External HW Acquisition trigger
-      trigHw : in sl
+      trigHw : in slv(AMC_MSB_G downto AMC_LSB_G)
    );
 end AmcRfDemoApp;
 
@@ -298,10 +298,10 @@ begin
          axiRst                        => axilRst,
          devClk_i                      => adcClk(i),
          devRst_i                      => adcRst(i),
-         trigHw_i                      => trigHw, -- Mask in configuration if not used
+         trigHw_i                      => trigHw(i), -- Mask in configuration if not used
          trigCasc_i                    => trigCascIn(i),
          trigCasc_o                    => trigCascOut(i),
-         freezeHw_i                    => trigHw, -- Mask in configuration if not used
+         freezeHw_i                    => trigHw(i), -- Mask in configuration if not used
          timeStamp_i                   => (others => '1'), -- Time stamp disconnected
          axilReadMaster                => readMasters(DAQ_MUX0_INDEX_C+i),
          axilReadSlave                 => readSlaves(DAQ_MUX0_INDEX_C+i),
