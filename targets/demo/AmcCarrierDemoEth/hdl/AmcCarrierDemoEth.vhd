@@ -2,10 +2,10 @@
 -- Title      : 
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierDemoEth.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
+-- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-05-25
--- Last update: 2016-05-25
+-- Created    : 2016-04-20
+-- Last update: 2016-04-20
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -35,65 +35,62 @@ use work.AmcCarrierPkg.all;
 
 entity AmcCarrierDemoEth is
    generic (
-      TPD_G         : time    := 1 ns;
-      SIMULATION_G  : boolean := false;
-      SIM_SPEEDUP_G : boolean := false);
+      TPD_G            : time    := 1 ns; 
+      SIM_SPEEDUP_G    : boolean := false;              -- True=Speedup the resets for simulation   
+      DSP_CLK_2X_G     : boolean := false;              -- True=370MHz SysGen DSP clock, False=185MHz SysGen DSP clock
+      ETH_10G_G        : boolean := false;              -- false = 1 GigE, true = 10 GigE
+      AMC_MSB_G        : integer range 0 to 1 := 1;     -- Select bays MSB: Dual core (1:0), Bay1 (1:1), Bay0 (0:0)
+      AMC_LSB_G        : integer range 0 to 1 := 0      -- Select bays MSB: Dual core (1:0), Bay1 (1:1), Bay0 (0:0)
+   );
    port (
       -----------------------
       -- Application Ports --
       -----------------------
       -- JESD High Speed Ports
-      jesdRxP          : in    Slv6Array(1 downto 0);
-      jesdRxN          : in    Slv6Array(1 downto 0);
-      jesdTxP          : out   Slv6Array(1 downto 0);
-      jesdTxN          : out   Slv6Array(1 downto 0);
+      jesdRxP              : in    Slv6Array(AMC_MSB_G downto AMC_LSB_G);
+      jesdRxN              : in    Slv6Array(AMC_MSB_G downto AMC_LSB_G);
+      jesdTxP              : out   Slv6Array(AMC_MSB_G downto AMC_LSB_G);
+      jesdTxN              : out   Slv6Array(AMC_MSB_G downto AMC_LSB_G);
       -- JESD Reference Ports
-      jesdClkP         : in    slv(1 downto 0);
-      jesdClkN         : in    slv(1 downto 0);
-      jesdSysRefP      : in    slv(1 downto 0);
-      jesdSysRefN      : in    slv(1 downto 0);
-      -- JESD ADC Sync Ports
-      jesdSyncP        : out   Slv3Array(1 downto 0);
-      jesdSyncN        : out   Slv3Array(1 downto 0);
+      jesdClkP             : in    slv(AMC_MSB_G downto AMC_LSB_G);
+      jesdClkN             : in    slv(AMC_MSB_G downto AMC_LSB_G);
+      jesdSysRefP          : in    slv(AMC_MSB_G downto AMC_LSB_G);
+      jesdSysRefN          : in    slv(AMC_MSB_G downto AMC_LSB_G);
+      -- JESD ADC ADC Sync Ports
+      jesdSyncOutP         : out   Slv3Array(AMC_MSB_G downto AMC_LSB_G);
+      jesdSyncOutN         : out   Slv3Array(AMC_MSB_G downto AMC_LSB_G);
+      jesdSyncInP          : in    slv(AMC_MSB_G downto AMC_LSB_G);
+      jesdSyncInN          : in    slv(AMC_MSB_G downto AMC_LSB_G);
       -- ADC and LMK SPI config interface
-      spiSclk_o        : out   slv(1 downto 0);
-      spiSdi_o         : out   slv(1 downto 0);
-      spiSdo_i         : in    slv(1 downto 0);
-      spiSdio_io       : inout slv(1 downto 0);
-      spiCsL_o         : out   Slv5Array(1 downto 0);
-      -- Attenuator serial ports
-      attSclk_o        : out   slv(1 downto 0);
-      attSdi_o         : out   slv(1 downto 0);
-      attLatchEn_o     : out   slv6Array(1 downto 0);
-      ------------------------------------------------
-      -- Bay 0 Only ports
-      ------------------------------------------------
-      -- SPI DAC ports
-      dacSclk_o        : out   sl;
-      dacSdi_o         : out   sl;
-      dacCsL_o         : out   slv(2 downto 0);
-      ------------------------------------------------
-      -- Bay 1 Only ports
-      ------------------------------------------------    
-      -- LVDS DAC data ports
-      dacDataP         : out   slv(15 downto 0);
-      dacDataN         : out   slv(15 downto 0);
-      -- LVDS DAC Sample clock (DAC samples data on both edges)
-      dacDckP          : out   sl;
-      dacDckN          : out   sl;
-      timingTrig       : out   sl;
-      fpgaInterlock    : out   sl;
+      spiSclk_o            : out   slv(AMC_MSB_G downto AMC_LSB_G);
+      spiSdi_o             : out   slv(AMC_MSB_G downto AMC_LSB_G);
+      spiSdo_i             : in    slv(AMC_MSB_G downto AMC_LSB_G);
+      spiSdio_io           : inout slv(AMC_MSB_G downto AMC_LSB_G);
+      spiCsL_o             : out   Slv4Array(AMC_MSB_G downto AMC_LSB_G);
+      -- DAC SPI config interface
+      spiSclkDac_o  : out   slv(AMC_MSB_G downto AMC_LSB_G);
+      spiSdioDac_io : inout slv(AMC_MSB_G downto AMC_LSB_G);
+      spiCsLDac_o   : out   slv(AMC_MSB_G downto AMC_LSB_G);
+
+      ------------------------------------------------      
+      -- RTM ports + Only one debug pulse output per bay from ADC Ch0
+      ------------------------------------------------      
+      rtmLsP : out slv(33+2*AMC_MSB_G downto 32+2*AMC_LSB_G);
+      rtmLsN : out slv(33+2*AMC_MSB_G downto 32+2*AMC_LSB_G);
+      
+      -- External HW Acquisition trigger
+      trigHw : in slv(AMC_MSB_G downto AMC_LSB_G);
       ----------------
       -- Core Ports --
       ----------------   
       -- Common Fabricate Clock
       fabClkP          : in    sl;
       fabClkN          : in    sl;
-      -- XAUI Ports
-      xauiRxP          : in    slv(3 downto 0);
-      xauiRxN          : in    slv(3 downto 0);
-      xauiTxP          : out   slv(3 downto 0);
-      xauiTxN          : out   slv(3 downto 0);
+      -- RTM Ethernet Ports
+      ethRxP           : in    sl;
+      ethRxN           : in    sl;
+      ethTxP           : out   sl;
+      ethTxN           : out   sl;
       xauiClkP         : in    sl;
       xauiClkN         : in    sl;
       -- Backplane MPS Ports
@@ -159,10 +156,7 @@ end AmcCarrierDemoEth;
 architecture top_level of AmcCarrierDemoEth is
 
    -- AmcCarrierCore Configuration Constants
-   constant TIMING_MODE_C            : boolean                                                   := TIMING_MODE_119MHZ_C;
-   constant APP_TYPE_C               : AppType                                                   := APP_LLRF_TYPE_C;
-   constant DIAGNOSTIC_RAW_STREAMS_C : positive                                                  := 4;
-   constant DIAGNOSTIC_RAW_CONFIGS_C : AxiStreamConfigArray(DIAGNOSTIC_RAW_STREAMS_C-1 downto 0) := (others => ssiAxiStreamConfig(4));
+   constant APP_TYPE_C    : AppType := APP_LLRF_TYPE_C;
 
    -- AXI-Lite Interface (appClk domain)
    signal regClk         : sl;
@@ -182,12 +176,13 @@ architecture top_level of AmcCarrierDemoEth is
    signal diagnosticRst : sl;
    signal diagnosticBus : DiagnosticBusType;
 
-   -- Raw Diagnostic Interface (diagnosticRawClks domains)
-   signal diagnosticRawClks    : slv(DIAGNOSTIC_RAW_STREAMS_C-1 downto 0);
-   signal diagnosticRawRsts    : slv(DIAGNOSTIC_RAW_STREAMS_C-1 downto 0);
-   signal diagnosticRawMasters : AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
-   signal diagnosticRawSlaves  : AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
-   signal diagnosticRawCtrl    : AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_C-1 downto 0)   := (others => AXI_STREAM_CTRL_UNUSED_C);
+   -- Waveform interface
+   signal waveformClk          : sl;
+   signal waveformRst          : sl;
+   signal obAppWaveformMasters : WaveformMasterArrayType;
+   signal obAppWaveformSlaves  : WaveformSlaveArrayType;
+   signal ibAppWaveformMasters : WaveformMasterArrayType;
+   signal ibAppWaveformSlaves  : WaveformSlaveArrayType;
 
    -- Reference Clocks and Resets
    signal recTimingClk : sl;
@@ -197,11 +192,13 @@ architecture top_level of AmcCarrierDemoEth is
 
 begin
 
-   U_App : entity work.AmcCarrierMrLlrfApp
+   U_App : entity work.AmcRfDemoApp
       generic map (
          TPD_G         => TPD_G,
-         SIMULATION_G  => SIMULATION_G,
-         TIMING_MODE_G => TIMING_MODE_C)
+         SIMULATION_G  => SIM_SPEEDUP_G,
+         DSP_CLK_2X_G  => DSP_CLK_2X_G,
+         AMC_MSB_G     => AMC_MSB_G,
+         AMC_LSB_G     => AMC_LSB_G)
       port map (
          ----------------------
          -- Top Level Interface
@@ -221,12 +218,13 @@ begin
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
-         -- Raw Diagnostic Interface (diagnosticRawClks domains)
-         diagnosticRawClks    => diagnosticRawClks,
-         diagnosticRawRsts    => diagnosticRawRsts,
-         diagnosticRawMasters => diagnosticRawMasters,
-         diagnosticRawSlaves  => diagnosticRawSlaves,
-         diagnosticRawCtrl    => diagnosticRawCtrl,
+         -- Waveform interface (waveformClk clock domain)
+         waveformClk          => waveformClk,
+         waveformRst          => waveformRst,
+         obAppWaveformMasters => obAppWaveformMasters,
+         obAppWaveformSlaves  => obAppWaveformSlaves,
+         ibAppWaveformMasters => ibAppWaveformMasters,
+         ibAppWaveformSlaves  => ibAppWaveformSlaves,
          -- Reference Clocks and Resets
          recTimingClk         => recTimingClk,
          recTimingRst         => recTimingRst,
@@ -235,51 +233,35 @@ begin
          -----------------------
          -- Application Ports --
          -----------------------
-         -- JESD High Speed Ports
          jesdRxP              => jesdRxP,
          jesdRxN              => jesdRxN,
          jesdTxP              => jesdTxP,
          jesdTxN              => jesdTxN,
-         -- JESD Reference Ports
          jesdClkP             => jesdClkP,
          jesdClkN             => jesdClkN,
          jesdSysRefP          => jesdSysRefP,
          jesdSysRefN          => jesdSysRefN,
-         -- JESD ADC Sync Ports
-         jesdSyncP            => jesdSyncP,
-         jesdSyncN            => jesdSyncN,
-         -- LMK and ADC SPI Ports
+         jesdSyncOutP         => jesdSyncOutP,
+         jesdSyncOutN         => jesdSyncOutN,
+         jesdSyncInP          => jesdSyncInP,
+         jesdSyncInN          => jesdSyncInN,
          spiSclk_o            => spiSclk_o,
          spiSdi_o             => spiSdi_o,
          spiSdo_i             => spiSdo_i,
          spiSdio_io           => spiSdio_io,
          spiCsL_o             => spiCsL_o,
-         -- Attenuator
-         attSclk_o            => attSclk_o,
-         attSdi_o             => attSdi_o,
-         attLatchEn_o         => attLatchEn_o,
-         -- Bay 0
-         -- SPI DAC
-         dacSclk_o            => dacSclk_o,
-         dacSdi_o             => dacSdi_o,
-         dacCsL_o             => dacCsL_o,
-         -- Bay 1
-         -- LVDS DAC data ports
-         dacDataP             => dacDataP,
-         dacDataN             => dacDataN,
-         -- LVDS DAC Sample clock (DAC samples data on both edges)
-         dacDckP              => dacDckP,
-         dacDckN              => dacDckN,
-         timingTrig           => timingTrig,
-         fpgaInterlock        => fpgaInterlock);   
+         spiSclkDac_o         => spiSclkDac_o,
+         spiSdioDac_io        => spiSdioDac_io,
+         spiCsLDac_o          => spiCsLDac_o,
+         rtmLsP               => rtmLsP,
+         rtmLsN               => rtmLsN,
+         trigHw               => trigHw);    
 
-   U_Core : entity work.AmcCarrierCore
+   U_Core : entity work.DebugRtmEthAmcCarrierCore
       generic map (
-         TPD_G                    => TPD_G,
-         SIM_SPEEDUP_G            => SIM_SPEEDUP_G,
-         TIMING_MODE_G            => TIMING_MODE_C,
-         DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_C,
-         DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_C)
+         TPD_G            => TPD_G,
+         SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
+         ETH_10G_G        => ETH_10G_G)
       port map (
          ----------------------
          -- Top Level Interface
@@ -299,12 +281,13 @@ begin
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
-         -- Raw Diagnostic Interface (diagnosticRawClks domains)
-         diagnosticRawClks    => diagnosticRawClks,
-         diagnosticRawRsts    => diagnosticRawRsts,
-         diagnosticRawMasters => diagnosticRawMasters,
-         diagnosticRawSlaves  => diagnosticRawSlaves,
-         diagnosticRawCtrl    => diagnosticRawCtrl,
+         -- Waveform interface (waveformClk clock domain)
+         waveformClk          => waveformClk,
+         waveformRst          => waveformRst,
+         obAppWaveformMasters => obAppWaveformMasters,
+         obAppWaveformSlaves  => obAppWaveformSlaves,
+         ibAppWaveformMasters => ibAppWaveformMasters,
+         ibAppWaveformSlaves  => ibAppWaveformSlaves,
          -- Reference Clocks and Resets
          recTimingClk         => recTimingClk,
          recTimingRst         => recTimingRst,
@@ -316,11 +299,11 @@ begin
          -- Common Fabricate Clock
          fabClkP              => fabClkP,
          fabClkN              => fabClkN,
-         -- XAUI Ports
-         xauiRxP              => xauiRxP,
-         xauiRxN              => xauiRxN,
-         xauiTxP              => xauiTxP,
-         xauiTxN              => xauiTxN,
+         -- RTM ETH Ports
+         ethRxP               => ethRxP,
+         ethRxN               => ethRxN,
+         ethTxP               => ethTxP,
+         ethTxN               => ethTxN,
          xauiClkP             => xauiClkP,
          xauiClkN             => xauiClkN,
          -- Backplane MPS Ports

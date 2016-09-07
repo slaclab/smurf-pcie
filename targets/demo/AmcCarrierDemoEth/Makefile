@@ -1,4 +1,3 @@
-
 # Define target output
 target: prom
 
@@ -6,18 +5,23 @@ target: prom
 export PRJ_PART = XCKU040-FFVA1156-2-E
 
 # Define the tags
-export STDLIB_TAG  = 1.1
-export AMC_TAG     = 1.1
-export MGT_TAG     = 1.0
-export PGP_TAG     = 1.0
-export SALT_TAG    = 1.0
+export STDLIB_TAG  = 1.2
+export AMC_TAG     = 1.2
+export MGT_TAG     = 1.1
+export PGP_TAG     = 1.1
+export SALT_TAG    = 1.1
 export N25Q_TAG    = 1.0
 export SY56040_TAG = 1.0
-export BSA_TAG     = 1.0
-export TIMING_TAG  = 1.0
-export ETH_TAG     = 1.0
+export BSA_TAG     = 1.1
+export TIMING_TAG  = 1.1
+export ETH_TAG     = 1.1
 export RSSI_TAG    = 1.0
 export JESD_TAG    = 1.1
+export MBLAZE_TAG  = 1.0
+# Local tags
+export COMMON_TAG     = head
+export MR_CORE_TAG    = head
+export SSRL_CORE_TAG  = 1.0
 
 # Using a non-standard StdLib directory structure, 
 # which requires me to define the VIVADO_BUILD_DIR path
@@ -52,9 +56,8 @@ export MODULE_DIRS = $(PROJ_DIR)/../../../modules/AmcCarrierCore/$(AMC_TAG)  \
                      $(PROJ_DIR)/../../../modules/EthernetLib/$(ETH_TAG)/EthMacCore \
                      $(PROJ_DIR)/../../../modules/RssiCore/$(RSSI_TAG) \
                      $(PROJ_DIR)/../../../modules/Jesd204bCore/$(JESD_TAG) \
-                     $(PROJ_DIR)/../../../modules/DspCoreLib/LlrfMissionReadiness \
-                     $(PROJ_DIR)/../../../modules/MissionReadinessCore \
-                     $(PROJ_DIR)/../../../modules/Common \
+                     $(PROJ_DIR)/../../../modules/MissionReadinessCore/$(MR_CORE_TAG) \
+                     $(PROJ_DIR)/../../../modules/Common/$(COMMON_TAG) \
                      $(PROJ_DIR)
 
 # Use top level makefile
