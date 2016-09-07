@@ -1,0 +1,74 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+include: JesdRx.yaml
+include: JesdTx.yaml
+include: Lmk04828.yaml
+include: Adc16Dx370.yaml
+include: Dac38J84.yaml
+#include: DacSigGen.yaml
+
+Device: &AmcRfDemoCore 
+  name: AmcRfDemoCore
+  description: "Rf demo board Module (Any bay)"
+  size: 0x00A00000
+  ########
+  MMIODev:
+  ########
+    - <<: *JesdRx
+      offset: 0x00100000  
+    ##################################################
+    - <<: *JesdTx
+      offset: 0x00200000  
+    ##################################################
+    # - <<: *DacSigGen
+      # offset: 0x00300000
+    ##################################################    
+    - <<: *Adc16Dx370
+      name: "Adc16Dx370"
+      offset: 0x00400000 
+      nelms:  3
+      stride: 0x00100000 
+    ##################################################
+    - <<: *Lmk04828
+      offset: 0x00700000   
+    ##################################################
+    - <<: *Dac38J84
+      offset: 0x00800000       
+    ##################################################     
+  #########
+  Commands:
+  #########
+    ##################################################
+    - name: InitAmcBay0
+      description: "Initialization for AMC card's JESD modules"
+      sequence:
+        # Init LMK
+        - entry: Lmk04828/InitLmk          
+          value: 0x1
+        # 100 ms sleep        
+        - entry: usleep
+          value: 1000000       
+        # Calibrate the JESD ADCs
+        - entry: Adc16Dx370/CalibrateAdc
+          value: 0x1       
+        # 100 ms sleep
+        - entry: usleep
+          value: 1000000       
+        # Reset the RX's GTs
+        - entry: JesdRx/C_ResetGTs
+          value: 0x1
+        # 100 ms sleep
+        - entry: usleep
+          value: 1000000
+        # Init DAC Jesd
+        - entry: Dac38J84/InitDac
+          value: 0x1          
+    ##################################################
