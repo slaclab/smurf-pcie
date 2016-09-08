@@ -6,5 +6,6 @@ manual yaml/LvdsSigGen.yaml
 manual yaml/SigGenRam.yaml
 manual yaml/AmcBay0Core.yaml
 manual yaml/AmcBay1Core.yaml
+manual yaml/DacSigGen.yaml
 manual yaml/AmcRfDemoCore.yaml
 manual yaml/AmcCarrierDemoApp.yaml
