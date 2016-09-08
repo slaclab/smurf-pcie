@@ -7,69 +7,69 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include JesdRx.yaml
+#include Lmk04828.yaml
+#include Adc16Dx370.yaml
+#include AttHMC624.yaml
+#include DacLtc2000.yaml
+#include LvdsSigGen.yaml
+#include SigGenRam.yaml
 
-include: JesdRx.yaml
-include: Lmk04828.yaml
-include: Adc16Dx370.yaml
-include: AttHMC624.yaml
-include: DacLtc2000.yaml
-include: LvdsSigGen.yaml
-include: SigGenRam.yaml
-
-Device: &AmcBay1Core 
-  name: AmcBay1Core
+AmcBay1Core: &AmcBay1Core 
   description: "AMC1 LLRF Module (SD-376-396-17)"
   size: 0x00800000
+  class: MMIODev
+  configPrio: 1
   ########
-  MMIODev:
+  children:
   ########
-    - <<: *JesdRx
-      offset: 0x00000000  
+    JesdRx:
+      <<: *JesdRx
+      at:
+        offset: 0x00000000  
     ##################################################     
-    - <<: *Adc16Dx370
+    Adc16Dx370:
+      <<: *Adc16Dx370
       name: "Adc16Dx370"
-      offset: 0x00100000 
-      nelms:  3
-      stride: 0x00100000 
-#    ##################################################     
-#    - <<: *Adc16Dx370
-#      offset: 0x00200000 
-#    ##################################################     
-#    - <<: *Adc16Dx370
-#      offset: 0x00300000 
-#    ##################################################     
-    - <<: *Lmk04828
-      offset: 0x00400000     
+      at:
+        offset: 0x00100000 
+        nelms:  3
+        stride: 0x00100000 
     ##################################################     
-    - <<: *DacLtc2000
-      offset: 0x00500000     
+    Lmk04828:
+      <<: *Lmk04828
+      at:
+        offset: 0x00400000     
+    ##################################################     
+    DacLtc200:
+      <<: *DacLtc2000
+      at:
+        offset: 0x00500000     
     ##################################################
-    - <<: *AttHMC624
-      nelms: 4
-      stride: 0x10
-      offset: 0x00600000 
-#    ##################################################     
-#    - <<: *AttHMC624
-#      offset: 0x00600010       
-#    ##################################################
-#    - <<: *AttHMC624
-#      offset: 0x00600020 
-#    ################################################## 
-#    - <<: *AttHMC624
-#      offset: 0x00600030
-#    ##################################################
-    - <<: *LvdsSigGen
-      offset: 0x00700000 
+    AttHMC624:
+      <<: *AttHMC624
+      at:
+        offset: 0x00600000 
+        nelms: 4
+        stride: 0x10
+    ##################################################
+    LvdsSigGen:
+      <<: *LvdsSigGen
+      at:
+        offset: 0x00700000 
     ################################################## 
-    - <<: *SigGenRam
-      offset: 0x00710000
+    SigGenRam:
+      <<: *SigGenRam
+      at:
+        offset: 0x00710000
     ##################################################
-  #########
-  Commands:
-  #########
-    ##################################################
-    - name: InitAmcBay1
+    InitAmcBay1:
       description: "Initialization for AMC card's JESD modules"
+      class: SequenceCommand
+      at:
+        offset: 0x0
       sequence:
         # Reset the RX's GTs
         - entry: JesdRx/C_ResetGTs
