@@ -7,34 +7,43 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#
+#include: AmcRfDemoCore.yaml
+#include: DaqMuxV2.yaml
+##include: SysgenDemo.yaml
 
-include: AmcRfDemoCore.yaml
-include: DaqMuxV2.yaml
-#include: SysgenDemo.yaml
-
-Device: &AmcCarrierDemoApp
-  name: AmcCarrierDemoApp
+AmcCarrierDemoApp: &AmcCarrierDemoApp
+  class: MMIODev
+  configPrio: 1
   description: AMC Carrier Demo board Application
   size: 0x80000000
   ########
-  MMIODev:
+  children:
   ########
-    - <<: *AmcRfDemoCore
-      name: "AmcRfDemoCoreBay0"
-      offset: 0x00000000  
+    AmcRfDemoCoreBay0:
+      <<: *AmcRfDemoCore
+      at:
+        offset: 0x00000000  
     ##################################################     
-    - <<: *AmcRfDemoCore
-      name: "AmcRfDemoCoreBay1"
-      offset: 0x01000000 
+    AmcRfDemoCoreBay1:
+      <<: *AmcRfDemoCore
+      at:
+        offset: 0x01000000 
     ##################################################     
-    - <<: *DaqMuxV2
-      name: "DaqMuxV2Bay0"
-      offset: 0x02000000 
+    DaqMuxV2Bay0:
+      <<: *DaqMuxV2
+      at:
+        offset: 0x02000000 
     ##################################################
-    - <<: *DaqMuxV2
-      name: "DaqMuxV2Bay1"
-      offset: 0x03000000 
+    DaqMuxV2Bay1:
+      <<: *DaqMuxV2
+      at: 
+        offset: 0x03000000 
     ##################################################    
-    #- <<: *SysgenDemo
-    #  offset: 0x04000000
+    #SysgenDemo:
+    #  <<: *SysgenDemo
+    #  at:
+    #    offset: 0x04000000
     ##################################################

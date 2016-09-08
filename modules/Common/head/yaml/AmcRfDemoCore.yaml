@@ -7,47 +7,60 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include: JesdRx.yaml
+#include: JesdTx.yaml
+#include: Lmk04828.yaml
+#include: Adc16Dx370.yaml
+#include: Dac38J84.yaml
+##include: DacSigGen.yaml
 
-include: JesdRx.yaml
-include: JesdTx.yaml
-include: Lmk04828.yaml
-include: Adc16Dx370.yaml
-include: Dac38J84.yaml
-#include: DacSigGen.yaml
-
-Device: &AmcRfDemoCore 
-  name: AmcRfDemoCore
+AmcRfDemoCore: &AmcRfDemoCore 
+  class: MMIODev
+  configPrio: 1
   description: "Rf demo board Module (Any bay)"
   size: 0x00A00000
   ########
-  MMIODev:
+  children:
   ########
-    - <<: *JesdRx
-      offset: 0x00100000  
+    JesdRx:
+      <<: *JesdRx
+      at:
+        offset: 0x00100000  
     ##################################################
-    - <<: *JesdTx
-      offset: 0x00200000  
+    JesdTx:
+      <<: *JesdTx
+      at: 
+        offset: 0x00200000  
     ##################################################
-    # - <<: *DacSigGen
-      # offset: 0x00300000
+    DacSigGen:
+       <<: *DacSigGen
+       at: 
+         offset: 0x00300000
     ##################################################    
-    - <<: *Adc16Dx370
-      name: "Adc16Dx370"
-      offset: 0x00400000 
-      nelms:  3
-      stride: 0x00100000 
+    Adc16Dx370:
+      <<: *Adc16Dx370
+      at:
+        offset: 0x00400000 
+        nelms:  3
+        stride: 0x00100000 
     ##################################################
-    - <<: *Lmk04828
-      offset: 0x00700000   
+    Lmk04828:
+      <<: *Lmk04828
+      at:
+        offset: 0x00700000   
     ##################################################
-    - <<: *Dac38J84
-      offset: 0x00800000       
+    Dac38J84:
+      <<: *Dac38J84
+      at:
+        offset: 0x00800000       
     ##################################################     
-  #########
-  Commands:
-  #########
     ##################################################
-    - name: InitAmcBay0
+    InitAmcBay0:
+      class: SequenceCommand
+      at:
+        offset: 0x0
       description: "Initialization for AMC card's JESD modules"
       sequence:
         # Init LMK

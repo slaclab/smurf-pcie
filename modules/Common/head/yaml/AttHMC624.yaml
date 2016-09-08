@@ -7,17 +7,21 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
 
-Device: &AttHMC624 
-  name: AttHMC624
+AttHMC624: &AttHMC624 
   description: Serial Attenuator
+  class: MMIODev
   size: 0x010
   #########
-  IntField:
+  children:
   #########
     #########################################################
-    - offset: 0x000
-      name: SetValue
+    SetValue:
+      at:
+        offset: 0x000
+      class: IntField
       sizeBits: 16
       mode: RW
       description: "Attenuation Level Active low: D0-0.5bB D1-1dB D2-2dB D3-4dB D4-8dB D5-16dB"

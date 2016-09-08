@@ -7,17 +7,22 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
 
-Device: &DacAD5541 
-  name: DacAD5541
+DacAd5541: &DacAD5541 
+  class: MMIODev
+  configPrio: 1
   description: Serial DAC interface
   size: 0x010
   #########
-  IntField:
+  children:
   #########
     #########################################################
-    - offset: 0x000
-      name: SetValue
+    SetValue:
+      at:
+        offset: 0x000
+      class: IntField
       sizeBits: 16
       mode: RW
       description: 16 bit DAC output value
