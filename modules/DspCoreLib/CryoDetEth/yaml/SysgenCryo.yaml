@@ -8,8 +8,8 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-Device: &SysgenCryo.yaml 
-  name: SysgenCryo.yaml
+Device: &SysgenCryo
+  name: SysgenCryo
   description: "Sysgen Cryo Module"
   size: 0x1000 
   #########
