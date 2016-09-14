@@ -58,6 +58,7 @@ export MODULE_DIRS = $(PROJ_DIR)/../../../modules/AmcCarrierCore/$(AMC_TAG)  \
                      $(PROJ_DIR)/../../../modules/Jesd204bCore/$(JESD_TAG) \
                      $(PROJ_DIR)/../../../modules/MissionReadinessCore/$(MR_CORE_TAG) \
                      $(PROJ_DIR)/../../../modules/Common/$(COMMON_TAG) \
+                     $(PROJ_DIR)/../../../modules/DspCoreLib/CryoDetEth  \
                      $(PROJ_DIR)
 
 # Use top level makefile

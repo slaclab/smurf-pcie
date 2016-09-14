@@ -20,12 +20,6 @@ set_property -dict {PACKAGE_PIN R23 IOSTANDARD LVDS_25} [get_ports {rtmLsP[34]}]
 set_property -dict {PACKAGE_PIN P23 IOSTANDARD LVDS_25} [get_ports {rtmLsN[34]}]
 set_property -dict {PACKAGE_PIN R25 IOSTANDARD LVDS_25} [get_ports {rtmLsP[35]}]
 
-# Ethernet
-set_property PACKAGE_PIN B6 [get_ports {ethTxP}]
-set_property PACKAGE_PIN B5 [get_ports {ethTxN}]
-set_property PACKAGE_PIN A4 [get_ports {ethRxP}]
-set_property PACKAGE_PIN A3 [get_ports {ethRxN}]
-
 ####################################
 ## Application Timing Constraints ##
 ####################################
@@ -61,11 +55,4 @@ set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_cl
 set_clock_groups -asynchronous -group [get_clocks {ddrIntClk0}] -group [get_clocks {jesd0_185MHz}] 
 set_clock_groups -asynchronous -group [get_clocks {ddrIntClk0}] -group [get_clocks {jesd1_185MHz}]
 
-# 1Gb Ethernet clock constraints
-create_generated_clock -name ethClk125MHz  [get_pins {U_Core/U_Eth/GEN_1GigE.U_1GigE/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0}] 
-create_generated_clock -name ethClk62p5MHz [get_pins {U_Core/U_Eth/GEN_1GigE.U_1GigE/U_MMCM/MmcmGen.U_Mmcm/CLKOUT1}] 
-set_clock_groups -asynchronous -group [get_clocks {xauiRef}] -group [get_clocks {ethClk125MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {xauiRef}] -group [get_clocks {ethClk62p5MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethClk125MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethClk62p5MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {xauiRef}] 
+ 

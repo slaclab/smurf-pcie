@@ -86,11 +86,11 @@ entity AmcCarrierDemoEth is
       -- Common Fabricate Clock
       fabClkP          : in    sl;
       fabClkN          : in    sl;
-      -- RTM Ethernet Ports
-      ethRxP           : in    sl;
-      ethRxN           : in    sl;
-      ethTxP           : out   sl;
-      ethTxN           : out   sl;
+      -- XAUI Ports
+      xauiRxP          : in    slv(3 downto 0);
+      xauiRxN          : in    slv(3 downto 0);
+      xauiTxP          : out   slv(3 downto 0);
+      xauiTxN          : out   slv(3 downto 0);
       xauiClkP         : in    sl;
       xauiClkN         : in    sl;
       -- Backplane MPS Ports
@@ -257,11 +257,10 @@ begin
          rtmLsN               => rtmLsN,
          trigHw               => trigHw);    
 
-   U_Core : entity work.DebugRtmEthAmcCarrierCore
+   U_Core : entity work.AmcCarrierCore
       generic map (
-         TPD_G            => TPD_G,
-         SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
-         ETH_10G_G        => ETH_10G_G)
+         TPD_G                    => TPD_G,
+         SIM_SPEEDUP_G            => SIM_SPEEDUP_G)
       port map (
          ----------------------
          -- Top Level Interface
@@ -281,7 +280,7 @@ begin
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
-         -- Waveform interface (waveformClk clock domain)
+        -- Waveform interface
          waveformClk          => waveformClk,
          waveformRst          => waveformRst,
          obAppWaveformMasters => obAppWaveformMasters,
@@ -299,11 +298,11 @@ begin
          -- Common Fabricate Clock
          fabClkP              => fabClkP,
          fabClkN              => fabClkN,
-         -- RTM ETH Ports
-         ethRxP               => ethRxP,
-         ethRxN               => ethRxN,
-         ethTxP               => ethTxP,
-         ethTxN               => ethTxN,
+         -- XAUI Ports
+         xauiRxP              => xauiRxP,
+         xauiRxN              => xauiRxN,
+         xauiTxP              => xauiTxP,
+         xauiTxN              => xauiTxN,
          xauiClkP             => xauiClkP,
          xauiClkN             => xauiClkN,
          -- Backplane MPS Ports
