@@ -22,4 +22,5 @@ vhdl work rtl/demo/AmcRfDemoApp.vhd
 
 vhdl work coregen/GthUltrascaleJesdCoregenBay0/GthUltrascaleJesdCoregenBay0.dcp
 vhdl work coregen/GthUltrascaleJesdCoregenBay1/GthUltrascaleJesdCoregenBay1.dcp
-vhdl work coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.dcp
+# The rf demo board has to include .xci not .dcp (GthUltrascaleJesdCoregen.xci)
+#vhdl work coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.dcp
