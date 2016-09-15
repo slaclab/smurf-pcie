@@ -49,6 +49,7 @@ entity DacSignalGenerator is
       ADDR_WIDTH_G : integer range 1 to (2**24) := 9;
       DATA_WIDTH_G : integer range 1 to 32      := 32;
       
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := X"0040_0000";      
      --Number of data lanes
       L_G : positive := 2
    );
@@ -96,13 +97,13 @@ architecture rtl of DacSignalGenerator is
    constant LANE_INDEX_C           : natural   := 1;
    
    
-   constant DAC_ADDR_C     : slv(31 downto 0)   := X"0040_0000"+ APP_REG_BASE_ADDR_C;
-   constant LANE0_C        : slv(31 downto 0)   := X"0041_0000"+ APP_REG_BASE_ADDR_C;
-   constant LANE1_C        : slv(31 downto 0)   := X"0042_0000"+ APP_REG_BASE_ADDR_C;
-   constant LANE2_C        : slv(31 downto 0)   := X"0043_0000"+ APP_REG_BASE_ADDR_C; 
-   constant LANE3_C        : slv(31 downto 0)   := X"0045_0000"+ APP_REG_BASE_ADDR_C;
-   constant LANE4_C        : slv(31 downto 0)   := X"0046_0000"+ APP_REG_BASE_ADDR_C;
-   constant LANE5_C        : slv(31 downto 0)   := X"0047_0000"+ APP_REG_BASE_ADDR_C;
+   constant DAC_ADDR_C     : slv(31 downto 0)   := X"0000_0000"+ AXI_BASE_ADDR_G;
+   constant LANE0_C        : slv(31 downto 0)   := X"0001_0000"+ AXI_BASE_ADDR_G;
+   constant LANE1_C        : slv(31 downto 0)   := X"0002_0000"+ AXI_BASE_ADDR_G;
+   constant LANE2_C        : slv(31 downto 0)   := X"0003_0000"+ AXI_BASE_ADDR_G; 
+   constant LANE3_C        : slv(31 downto 0)   := X"0005_0000"+ AXI_BASE_ADDR_G;
+   constant LANE4_C        : slv(31 downto 0)   := X"0006_0000"+ AXI_BASE_ADDR_G;
+   constant LANE5_C        : slv(31 downto 0)   := X"0007_0000"+ AXI_BASE_ADDR_G;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       DAC_AXIL_INDEX_C => (

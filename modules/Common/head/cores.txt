@@ -1,3 +1,3 @@
-coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.xci
+#coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.xci
 #coregen/GthUltrascaleJesdCoregenBay0/GthUltrascaleJesdCoregenBay0.xci
 #coregen/GthUltrascaleJesdCoregenBay1/GthUltrascaleJesdCoregenBay1.xci

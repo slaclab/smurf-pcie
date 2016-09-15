@@ -10,9 +10,9 @@
 #schemaversion 3.0.0
 #once
 #
-#include: AmcRfDemoCore.yaml
-#include: DaqMuxV2.yaml
-##include: SysgenDemo.yaml
+#include AmcRfDemoCore.yaml
+#include DaqMuxV2.yaml
+#include SysgenCryo.yaml
 
 AmcCarrierDemoApp: &AmcCarrierDemoApp
   class: MMIODev
@@ -42,8 +42,8 @@ AmcCarrierDemoApp: &AmcCarrierDemoApp
       at: 
         offset: 0x03000000 
     ##################################################    
-    #SysgenDemo:
-    #  <<: *SysgenDemo
-    #  at:
-    #    offset: 0x04000000
+    SysgenDemo:
+      <<: *SysgenCryo
+      at:
+        offset: 0x04000000
     ##################################################

@@ -16,11 +16,10 @@ vhdl work rtl/demo/AxiLiteGenRegItf.vhd
 vhdl work rtl/demo/SigGenLane.vhd
 vhdl work rtl/demo/DacSignalGenerator.vhd
 vhdl work rtl/demo/Jesd204bGthWrapper.vhd
-vhdl work rtl/demo/SysGenWrapper.vhd
-vhdl work rtl/demo/SysGenWrapper370.vhd
+vhdl work rtl/demo/DemoDspCoreWrapper.vhd
 vhdl work rtl/demo/AmcRfDemoBayCore.vhd
 vhdl work rtl/demo/AmcRfDemoApp.vhd
 
 vhdl work coregen/GthUltrascaleJesdCoregenBay0/GthUltrascaleJesdCoregenBay0.dcp
 vhdl work coregen/GthUltrascaleJesdCoregenBay1/GthUltrascaleJesdCoregenBay1.dcp
-#vhdl work coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.dcp
+vhdl work coregen/GthUltrascaleJesdCoregen/GthUltrascaleJesdCoregen.dcp

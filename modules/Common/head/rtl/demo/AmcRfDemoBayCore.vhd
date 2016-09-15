@@ -425,6 +425,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_RESP_SLVERR_C,
+         AXI_BASE_ADDR_G  => DISP_AXIL_BASE_ADDR_C,
          ADDR_WIDTH_G     => GEN_BRAM_ADDR_WIDTH_G,
          DATA_WIDTH_G     => (GT_WORD_SIZE_C*8),
          L_G              => L_TX_G)

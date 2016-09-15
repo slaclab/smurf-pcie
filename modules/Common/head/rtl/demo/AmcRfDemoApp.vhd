@@ -336,6 +336,93 @@ begin
       dataValid(i)(5 downto 0)  <= adcValids(i);
       dataValid(i)(11 downto 6) <= (others => adcValids(i)(0));
       --
+
    end generate GEN_AMC;
+   
+   -- If Both cores enabled
+   DUAL_CORE : if AMC_MSB_G = 1 and AMC_LSB_G = 0 generate
+   
+         -- Bay0: Loopback
+         dacValues(0,0) <= adcValues(0,0);
+         dacValues(0,1) <= adcValues(0,1);
+         debug(0,0)     <= (others => '0');
+         debug(0,1)     <= (others => '0');
+         debug(0,2)     <= (others => '0');
+         debug(0,3)     <= (others => '0');
+         
+         
+         -- Bay 1: Attach sysgen
+         U_DemoDspCoreWrapper: entity work.DemoDspCoreWrapper
+         generic map (
+            TPD_G        => TPD_G,
+            DSP_CLK_2X_G => DSP_CLK_2X_G)
+         port map (
+            jesdClk        => adcClk(1),
+            jesdRst        => adcRst(1),
+            jesdClk2x      => adcClk2x(1),
+            jesdRst2x      => adcRst2x(1),
+            adcHs(0)       => adcValues(1,0),
+            adcHs(1)       => adcValues(1,1),
+            adcHs(2)       => adcValues(1,2),
+            adcHs(3)       => adcValues(1,3),            
+            adcHs(4)       => adcValues(1,4),
+            adcHs(5)       => adcValues(1,5),            
+            dacHs(0)       => dacValues(1,0),
+            dacHs(1)       => dacValues(1,1),            
+            debug(0)       => debug(1,0),
+            debug(1)       => debug(1,1),
+            debug(2)       => debug(1,2),
+            debug(3)       => debug(1,3),
+            axiClk         => axilClk,
+            axiRst         => axilRst,
+            axiReadMaster  => readMasters(SYSGEN_INDEX_C),
+            axiReadSlave   => readSlaves(SYSGEN_INDEX_C),
+            axiWriteMaster => writeMasters(SYSGEN_INDEX_C),
+            axiWriteSlave  => writeSlaves(SYSGEN_INDEX_C));
+ 
+   end generate DUAL_CORE;  
+
+   -- If Bay 1 core enabled
+   BAY1_CORE : if AMC_MSB_G = 1 and AMC_LSB_G = 1 generate
+         -- Bay 1: Attach sysgen
+         U_DemoDspCoreWrapper: entity work.DemoDspCoreWrapper
+         generic map (
+            TPD_G        => TPD_G,
+            DSP_CLK_2X_G => DSP_CLK_2X_G)
+         port map (
+            jesdClk        => adcClk(1),
+            jesdRst        => adcRst(1),
+            jesdClk2x      => adcClk2x(1),
+            jesdRst2x      => adcRst2x(1),
+            adcHs(0)       => adcValues(1,0),
+            adcHs(1)       => adcValues(1,1),
+            adcHs(2)       => adcValues(1,2),
+            adcHs(3)       => adcValues(1,3),            
+            adcHs(4)       => adcValues(1,4),
+            adcHs(5)       => adcValues(1,5),            
+            dacHs(0)       => dacValues(1,0),
+            dacHs(1)       => dacValues(1,1),            
+            debug(0)       => debug(1,0),
+            debug(1)       => debug(1,1),
+            debug(2)       => debug(1,2),
+            debug(3)       => debug(1,3),
+            axiClk         => axilClk,
+            axiRst         => axilRst,
+            axiReadMaster  => readMasters(SYSGEN_INDEX_C),
+            axiReadSlave   => readSlaves(SYSGEN_INDEX_C),
+            axiWriteMaster => writeMasters(SYSGEN_INDEX_C),
+            axiWriteSlave  => writeSlaves(SYSGEN_INDEX_C));
+    end generate BAY1_CORE;   
+   
+   -- If Bay 0 core enabled
+   BAY0_CORE : if AMC_MSB_G = 0 and AMC_LSB_G = 0 generate
+         -- Bay0: Loopback
+         dacValues(0,0) <= adcValues(0,0);
+         dacValues(0,1) <= adcValues(0,1);
+         debug(0,0)     <= (others => '0');
+         debug(0,1)     <= (others => '0');
+         debug(0,2)     <= (others => '0');
+         debug(0,3)     <= (others => '0');   
+   end generate BAY0_CORE; 
 
 end mapping;
