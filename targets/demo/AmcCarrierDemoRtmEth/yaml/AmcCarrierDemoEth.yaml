@@ -7,38 +7,44 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include AmcCarrierCore.yaml
+#include AmcCarrierDemoApp.yaml
 
-include: AmcCarrierDemoApp.yaml
-include: AmcCarrierCore.yaml
-
-Device: &AmcCarrierDemoEth 
+AmcCarrierMrEth: &AmcCarrierDemoEth 
   name: AmcCarrierDemoEth
+  class: MMIODev
+  configPrio: 1
   description: AMC 
   size: 0x100000000
   ########
-  MMIODev:
+  children:
   ########
-    - <<: *AmcCarrierCore
-      offset: 0x00000000  
+    AmcCarrierCore:
+      <<: *AmcCarrierCore
+      at:
+        offset: 0x00000000  
     ##################################################     
-    - <<: *AmcCarrierDemoApp
-      offset: 0x80000000 
+    AmcCarrierMrLlrfApp:
+      <<: *AmcCarrierDemoApp
+      at:
+        offset: 0x80000000 
     ##################################################     
-  #########
-  Commands:
-  #########
-    ##################################################
-    - name: TrigDaq
+    TrigDaq:
       description: "Initialize DDR buffer and trigger data acquisition from software"
+      class: SequenceCommand
+      at:
+        offset: 0x80000000 
       sequence:
-        - entry: AmcCarrierCore/AmcCarrierBsa/BsaRawDiagnostic/AxiStreamDmaRingWrite/Initialize
+        - entry: AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine/WaveformEngineBuffers/Initialize
           value: 0x1
         # Trigger bay 0 
-        # Only Bay 1 triggered because the module triggers are interconnected in hw and
-        # Bay 1 gets triggered automatically if the cascade trigger is enabled     
-        - entry: AmcCarrierDemoApp/AxisDaqMux[0]/TriggerDaq       
-          value: 0x1        
-        # In case we trigger bay 1 later
-        #- entry: AmcCarrierDemoApp/AxisDaqMux[1]/TriggerDaq
-       #   value: 0x1
-    ##################################################
+        # Only Bay 0 triggered because the module triggers are interconnected in hw and
+        # Bay 1 gets triggered automatically by Cascaded trigger        
+        - entry: AmcCarrierDemoApp/DaqMuxV2Bay1/TriggerDaq
+          value: 0x1
+        # In case we trigger bay 0 later
+        # - entry: AmcCarrierDemoApp/DaqMuxV2[1]/TriggerDaq       
+          # value: 0x1
+   ##################################################
