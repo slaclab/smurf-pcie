@@ -99,6 +99,8 @@ AmcRfDemoCore: &AmcRfDemoCore
         - entry: usleep
           value: 1000000
         # Init DAC Jesd
+        - entry: Dac38J84/ClearAlarms
+          value: 0x1 
         - entry: Dac38J84/InitDac
           value: 0x1          
     ##################################################
