@@ -142,7 +142,6 @@ architecture rtl of Jesd204bGthWrapper is
 ---------------------------------------   
 component gthultrascalejesdcoregen
   port (
-    --gtwiz_userclk_tx_reset_in : in std_logic_vector(0 downto 0);
     gtwiz_userclk_tx_active_in : in std_logic_vector(0 downto 0);
     gtwiz_userclk_rx_active_in : in std_logic_vector(0 downto 0);
     gtwiz_buffbypass_tx_reset_in : in std_logic_vector(0 downto 0);
@@ -178,6 +177,7 @@ component gthultrascalejesdcoregen
     txpolarity_in : in std_logic_vector(5 downto 0);
     txusrclk_in : in std_logic_vector(5 downto 0);
     txusrclk2_in : in std_logic_vector(5 downto 0);
+    txdiffctrl_in : in  std_logic_vector(23 downto 0);
     gthtxn_out : out std_logic_vector(5 downto 0);
     gthtxp_out : out std_logic_vector(5 downto 0);
     rxbyteisaligned_out : out std_logic_vector(5 downto 0);
@@ -425,7 +425,7 @@ begin
          gthtxp_out                           => gtTxP,
          txoutclk_out                         => open,
          txpmaresetdone_out                   => open,
-         
+         txdiffctrl_in                        => x"FFFFFF",         
          -- RX settings
          rx8b10ben_in                         => "111111",
          rxcommadeten_in                      => "111111",
