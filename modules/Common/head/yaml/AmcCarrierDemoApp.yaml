@@ -22,20 +22,20 @@ AmcCarrierDemoApp: &AmcCarrierDemoApp
   ########
   children:
   ########
-    AmcRfDemoCoreBay0:
-      <<: *AmcRfDemoCore
-      at:
-        offset: 0x00000000  
+    # AmcRfDemoCoreBay0:
+      # <<: *AmcRfDemoCore
+      # at:
+        # offset: 0x00000000  
     ##################################################     
     AmcRfDemoCoreBay1:
       <<: *AmcRfDemoCore
       at:
         offset: 0x01000000 
     ##################################################     
-    DaqMuxV2Bay0:
-      <<: *DaqMuxV2
-      at:
-        offset: 0x02000000 
+    # DaqMuxV2Bay0:
+      # <<: *DaqMuxV2
+      # at:
+        # offset: 0x02000000 
     ##################################################
     DaqMuxV2Bay1:
       <<: *DaqMuxV2
