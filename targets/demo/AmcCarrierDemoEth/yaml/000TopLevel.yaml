@@ -33,7 +33,7 @@ stream: &stream
     depack:
       useDepack: yes
     TDESTMux:
-      TDEST: 0x80
+      TDEST: 0x84
     
 NetIODev:
   ipAddr: 10.0.2.102
@@ -57,46 +57,46 @@ NetIODev:
        at:
          <<: *stream
          TDESTMux:
-           TDEST: 0x80
+           TDEST: 0x84
      Stream1:
        class: Field 
        at:
          <<: *stream
          TDESTMux:
-           TDEST: 0x81
+           TDEST: 0x85
      Stream2:
        class: Field 
        at:
          <<: *stream
          TDESTMux:
-           TDEST: 0x82
+           TDEST: 0x86
      Stream3:
        class: Field 
        at:
          <<: *stream
          TDESTMux:
-           TDEST: 0x83
-     Stream4:
-       class: Field 
-       at:
-         <<: *stream
-         TDESTMux:
-           TDEST: 0x84
-     Stream5:
-       class: Field 
-       at:
-         <<: *stream
-         TDESTMux:
-           TDEST: 0x85
-     Stream6:
-       class: Field 
-       at:
-         <<: *stream
-         TDESTMux:
-           TDEST: 0x86
-     Stream7:
-       class: Field 
-       at:
-         <<: *stream
-         TDESTMux:
            TDEST: 0x87
+     # Stream4:
+       # class: Field 
+       # at:
+         # <<: *stream
+         # TDESTMux:
+           # TDEST: 0x84
+     # Stream5:
+       # class: Field 
+       # at:
+         # <<: *stream
+         # TDESTMux:
+           # TDEST: 0x85
+     # Stream6:
+       # class: Field 
+       # at:
+         # <<: *stream
+         # TDESTMux:
+           # TDEST: 0x86
+     # Stream7:
+       # class: Field 
+       # at:
+         # <<: *stream
+         # TDESTMux:
+           # TDEST: 0x87

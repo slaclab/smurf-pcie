@@ -26,7 +26,7 @@ AmcCarrierMrEth: &AmcCarrierDemoEth
       at:
         offset: 0x00000000  
     ##################################################     
-    AmcCarrierMrLlrfApp:
+    AmcCarrierDemoApp:
       <<: *AmcCarrierDemoApp
       at:
         offset: 0x80000000 
