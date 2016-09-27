@@ -34,8 +34,11 @@ set_property PACKAGE_PIN G3 [get_ports {jesdTxN[1][5]}]
 set_property PACKAGE_PIN F2 [get_ports {jesdRxP[1][5]}]
 set_property PACKAGE_PIN F1 [get_ports {jesdRxN[1][5]}]
 
-# Spare_Dclk8 clock 
-set_property PACKAGE_PIN M6 [get_ports {jesdClkP[1]}] 
+# Spare_Dclk8 clock
+# Note! jesdClk is inverted
+#P13 PIN20
+set_property PACKAGE_PIN M6 [get_ports {jesdClkP[1]}]
+#P13 PIN21
 set_property PACKAGE_PIN M5 [get_ports {jesdClkN[1]}]
 
 # Spare_SDclk9 clock Note! Different jesdSysRef pins from AMC0
@@ -90,45 +93,58 @@ set_property -dict { PACKAGE_PIN  AA32 IOSTANDARD LVCMOS18} [get_ports {attLatch
 #set_property -dict { PACKAGE_PIN   IOSTANDARD LVCMOS18} [get_ports {attLatchEn_o[1][5]}]
 
 # LVDS DAC signals
+#P14 PIN127 #P14 PIN126
 set_property -dict { PACKAGE_PIN AD30   IOSTANDARD LVDS} [get_ports {dacDataP[0]}]
 set_property -dict { PACKAGE_PIN AD31   IOSTANDARD LVDS} [get_ports {dacDataN[0]}]
+#P14 PIN130 #P14 PIN129
 set_property -dict { PACKAGE_PIN AB25   IOSTANDARD LVDS} [get_ports {dacDataP[1]}]
 set_property -dict { PACKAGE_PIN AB26   IOSTANDARD LVDS} [get_ports {dacDataN[1]}]
+#P14 PIN133 #P14 PIN132 (Inverted)
 set_property -dict { PACKAGE_PIN AA27   IOSTANDARD LVDS} [get_ports {dacDataP[2]}]
 set_property -dict { PACKAGE_PIN AB27   IOSTANDARD LVDS} [get_ports {dacDataN[2]}]
+#P14 PIN142 #P14 PIN141
 set_property -dict { PACKAGE_PIN AC26   IOSTANDARD LVDS} [get_ports {dacDataP[3]}]
 set_property -dict { PACKAGE_PIN AC27   IOSTANDARD LVDS} [get_ports {dacDataN[3]}]
+#P14 PIN145 #P14 PIN144 (Inverted)
 set_property -dict { PACKAGE_PIN AB24   IOSTANDARD LVDS} [get_ports {dacDataP[4]}]
 set_property -dict { PACKAGE_PIN AC24   IOSTANDARD LVDS} [get_ports {dacDataN[4]}]
+#P14 PIN148 #P14 PIN147 (Inverted)
 set_property -dict { PACKAGE_PIN AD25   IOSTANDARD LVDS} [get_ports {dacDataP[5]}]
 set_property -dict { PACKAGE_PIN AD26   IOSTANDARD LVDS} [get_ports {dacDataN[5]}]
+#P14 PIN151 #P14 PIN150 (Inverted)
 set_property -dict { PACKAGE_PIN Y26    IOSTANDARD LVDS} [get_ports {dacDataP[6]}]
 set_property -dict { PACKAGE_PIN Y27    IOSTANDARD LVDS} [get_ports {dacDataN[6]}]
-
-# Note: This is a workaround because of board design fault (Connect back after next revision of AMC card) 
-# set_property -dict { PACKAGE_PIN J29    IOSTANDARD LVDS} [get_ports {dacDataP[7]}]
-# set_property -dict { PACKAGE_PIN J30    IOSTANDARD LVDS} [get_ports {dacDataN[7]}]
-set_property -dict { PACKAGE_PIN W33    IOSTANDARD LVDS} [get_ports {dacDataP[7]}]
-set_property -dict { PACKAGE_PIN Y33    IOSTANDARD LVDS} [get_ports {dacDataN[7]}]
-set_property -dict { PACKAGE_PIN AM22   IOSTANDARD LVDS} [get_ports {dacDataP[8]}]
-set_property -dict { PACKAGE_PIN AN22   IOSTANDARD LVDS} [get_ports {dacDataN[8]}]
-set_property -dict { PACKAGE_PIN AF30   IOSTANDARD LVDS} [get_ports {dacDataP[9]}]
-set_property -dict { PACKAGE_PIN AG30   IOSTANDARD LVDS} [get_ports {dacDataN[9]}]
-set_property -dict { PACKAGE_PIN AM21   IOSTANDARD LVDS} [get_ports {dacDataP[10]}]
-set_property -dict { PACKAGE_PIN AN21   IOSTANDARD LVDS} [get_ports {dacDataN[10]}]
-set_property -dict { PACKAGE_PIN AC34   IOSTANDARD LVDS} [get_ports {dacDataP[11]}]
-set_property -dict { PACKAGE_PIN AD34   IOSTANDARD LVDS} [get_ports {dacDataN[11]}]
-set_property -dict { PACKAGE_PIN AL24   IOSTANDARD LVDS} [get_ports {dacDataP[12]}]
-set_property -dict { PACKAGE_PIN AL25   IOSTANDARD LVDS} [get_ports {dacDataN[12]}]
-set_property -dict { PACKAGE_PIN AE33   IOSTANDARD LVDS} [get_ports {dacDataP[13]}]
-set_property -dict { PACKAGE_PIN AF34   IOSTANDARD LVDS} [get_ports {dacDataN[13]}]
-set_property -dict { PACKAGE_PIN AL22   IOSTANDARD LVDS} [get_ports {dacDataP[14]}]
-set_property -dict { PACKAGE_PIN AL23   IOSTANDARD LVDS} [get_ports {dacDataN[14]}]
-set_property -dict { PACKAGE_PIN AF20   IOSTANDARD LVDS} [get_ports {dacDataP[15]}]
-set_property -dict { PACKAGE_PIN AG20   IOSTANDARD LVDS} [get_ports {dacDataN[15]}]
+#P13 PIN94 #P13 PIN93 (Inverted)
+set_property -dict { PACKAGE_PIN AG31   IOSTANDARD LVDS} [get_ports {dacDataP[7]}]
+set_property -dict { PACKAGE_PIN AG32   IOSTANDARD LVDS} [get_ports {dacDataN[7]}]
+#P13 PIN100 #P13 PIN99 (Inverted)
+set_property -dict { PACKAGE_PIN AF30   IOSTANDARD LVDS} [get_ports {dacDataP[8]}]
+set_property -dict { PACKAGE_PIN AG30   IOSTANDARD LVDS} [get_ports {dacDataN[8]}]
+#P13 PIN103 #P13 PIN102(Inverted)
+set_property -dict { PACKAGE_PIN AM21   IOSTANDARD LVDS} [get_ports {dacDataP[9]}]
+set_property -dict { PACKAGE_PIN AN21   IOSTANDARD LVDS} [get_ports {dacDataN[9]}]
+#P13 PIN106 #P13 PIN105(Inverted)
+set_property -dict { PACKAGE_PIN AC34   IOSTANDARD LVDS} [get_ports {dacDataP[10]}]
+set_property -dict { PACKAGE_PIN AD34   IOSTANDARD LVDS} [get_ports {dacDataN[10]}]
+#P13 PIN109 #P13 PIN108(Inverted)
+set_property -dict { PACKAGE_PIN AL24   IOSTANDARD LVDS} [get_ports {dacDataP[11]}]
+set_property -dict { PACKAGE_PIN AL25   IOSTANDARD LVDS} [get_ports {dacDataN[11]}]
+#P13 PIN112 #P13 PIN111(Inverted)
+set_property -dict { PACKAGE_PIN AE33   IOSTANDARD LVDS} [get_ports {dacDataP[12]}]
+set_property -dict { PACKAGE_PIN AF34   IOSTANDARD LVDS} [get_ports {dacDataN[12]}]
+#P13 PIN115 #P13 PIN114(Inverted)
+set_property -dict { PACKAGE_PIN AL22   IOSTANDARD LVDS} [get_ports {dacDataP[13]}]
+set_property -dict { PACKAGE_PIN AL23   IOSTANDARD LVDS} [get_ports {dacDataN[13]}]
+#P13 PIN118 #P13 PIN117(Inverted)
+set_property -dict { PACKAGE_PIN AF20   IOSTANDARD LVDS} [get_ports {dacDataP[14]}]
+set_property -dict { PACKAGE_PIN AG20   IOSTANDARD LVDS} [get_ports {dacDataN[14]}]
+#P13 PIN127 #P13 PIN126(Inverted)
+set_property -dict { PACKAGE_PIN V31   IOSTANDARD LVDS} [get_ports {dacDataP[15]}]
+set_property -dict { PACKAGE_PIN W31   IOSTANDARD LVDS} [get_ports {dacDataN[15]}]
 # DCK (Connected so it is not inverted)
-set_property -dict { PACKAGE_PIN AG31  IOSTANDARD LVDS} [get_ports {dacDckP}]
-set_property -dict { PACKAGE_PIN AG32  IOSTANDARD LVDS} [get_ports {dacDckN}]
+#P13 PIN97 #P13 PIN96
+set_property -dict { PACKAGE_PIN AM22  IOSTANDARD LVDS} [get_ports {dacDckP}]
+set_property -dict { PACKAGE_PIN AN22  IOSTANDARD LVDS} [get_ports {dacDckN}]
 
 # Interlock and trigger
 set_property -dict { PACKAGE_PIN AD9  IOSTANDARD LVCMOS25 } [get_ports {timingTrig}]

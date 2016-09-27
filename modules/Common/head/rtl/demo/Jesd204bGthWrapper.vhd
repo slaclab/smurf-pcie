@@ -425,7 +425,7 @@ begin
          gthtxp_out                           => gtTxP,
          txoutclk_out                         => open,
          txpmaresetdone_out                   => open,
-         txdiffctrl_in                        => x"FFFFFF",         
+         txdiffctrl_in                        => x"CCCCCC",         
          -- RX settings
          rx8b10ben_in                         => "111111",
          rxcommadeten_in                      => "111111",

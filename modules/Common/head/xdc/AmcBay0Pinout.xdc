@@ -35,14 +35,9 @@ set_property PACKAGE_PIN AB2 [get_ports {jesdRxP[0][5]}]
 set_property PACKAGE_PIN AB1 [get_ports {jesdRxN[0][5]}]
 
 # Spare_Dclk8 clock 
-#set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0]}] 
-#set_property PACKAGE_PIN AB5 [get_ports {jesdClkN[0]}]
-
-# FPGA_SDCLK Warning this is a sysref port
-# This connection is a stability workaround
-set_property PACKAGE_PIN AD6 [get_ports {jesdClkP[0]}] 
-set_property PACKAGE_PIN AD5 [get_ports {jesdClkN[0]}]
-
+#P11 PIN20 #P11 PIN21
+set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0]}] 
+set_property PACKAGE_PIN AB5 [get_ports {jesdClkN[0]}]
 
 # Spare_SDclk9 clock
 set_property -dict { PACKAGE_PIN AA34 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdSysRefP[0]}] 
