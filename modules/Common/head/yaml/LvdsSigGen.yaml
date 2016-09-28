@@ -77,3 +77,18 @@ LvdsSigGen: &LvdsSigGen
       sizeBits: 9
       mode: RO
       description: Get 9-bit LVDS tap delay (16x) [0x2f:0x20]
+    #########################################################    
+      at:
+        offset: 0x0C0
+      class: IntField
+      name: FifoUnreflowCnt
+      mode: RO
+      description: "32 to 16 core Async Fifo underflow"
+    ######################################################### 
+      at:
+        offset: 0x0C4
+      class: IntField
+      name: FifoOverflowCnt
+      mode: RO
+      description: "32 to 16 core Async Fifo overflow"
+    ######################################################### 

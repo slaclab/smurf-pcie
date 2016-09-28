@@ -69,7 +69,9 @@ entity LvdsDacRegItf is
    --  
       load_o         : out slv(DATA_WIDTH_G-1 downto 0);  
       tapDelaySet_o  : out Slv9Array(DATA_WIDTH_G-1 downto 0);   
-      tapDelayStat_i : in  Slv9Array(DATA_WIDTH_G-1 downto 0)
+      tapDelayStat_i : in  Slv9Array(DATA_WIDTH_G-1 downto 0);
+      overflow_i     : in  sl;
+      underflow_i    : in  sl
    );   
 end LvdsDacRegItf;
 
@@ -105,16 +107,38 @@ architecture rtl of LvdsDacRegItf is
    -- Integer address
    signal s_RdAddr: natural := 0;
    signal s_WrAddr: natural := 0;
-   
+   signal s_statusCnt : SlVectorArray(1 downto 0, 31 downto 0);
+   signal s_errors    : slv(1 downto 0);
    -- Status
    signal s_tapDelayStat : Slv9Array(DATA_WIDTH_G-1 downto 0); 
 begin
    
+   s_errors <= overflow_i & underflow_i;
+   
+   U_SyncStatusVector : entity work.SyncStatusVector
+   generic map (
+      TPD_G          => TPD_G,
+      OUT_POLARITY_G => '1',
+      CNT_RST_EDGE_G => true,
+      CNT_WIDTH_G    => 32,
+      WIDTH_G        => 2)
+   port map (
+      -- Input Status bit Signals (wrClk domain)
+      statusIn  => s_errors,
+      -- Output Status bit Signals (rdClk domain)  
+      statusOut => open,
+      -- Status Bit Counters Signals (rdClk domain) 
+      cntRstIn  => '0',
+      cntOut    => s_statusCnt,
+      -- Clocks and Reset Ports
+      wrClk     => devClk_i,
+      rdClk     => axiClk_i);
+         
    -- Convert address to integer (lower two bits of address are always '0')
    s_RdAddr <= conv_integer( axilReadMaster.araddr(9 downto 2));
    s_WrAddr <= conv_integer( axilWriteMaster.awaddr(9 downto 2)); 
    
-   comb : process (axilReadMaster, axilWriteMaster, r, axiRst_i, s_RdAddr, s_WrAddr, s_tapDelayStat) is
+   comb : process (axilReadMaster, axilWriteMaster, r, axiRst_i, s_RdAddr, s_WrAddr, s_tapDelayStat, s_statusCnt) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -173,6 +197,14 @@ begin
                for I in 15 downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then
                      v.axilReadSlave.rdata(8 downto 0) := s_tapDelayStat(I);
+                  end if;
+               end loop;
+            when 16#30# to 16#3F# =>
+               for I in 1 downto 0 loop
+                  if (axilReadMaster.araddr(5 downto 2) = I) then
+                     for J in 31 downto 0 loop
+                        v.axilReadSlave.rdata(J) := s_statusCnt(I, J);
+                     end loop;
                   end if;
                end loop;               
             when others =>

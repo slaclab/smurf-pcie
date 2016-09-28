@@ -85,6 +85,8 @@ architecture rtl of LvdsDacSigGen is
 
    -- Generator signals 
    signal s_laneEn       : sl;
+   signal s_underflow    : sl;
+   signal s_overflow     : sl;   
    signal s_periodSize   : slv(ADDR_WIDTH_G-1 downto 0);
    signal s_polarityMask : slv(DATA_WIDTH_G-1 downto 0);
    signal s_sampleData   : slv(DATA_WIDTH_G-1 downto 0);   
@@ -162,7 +164,9 @@ begin
       polarityMask_o  => s_polarityMask,
       load_o          => load_o,      
       tapDelaySet_o   => tapDelaySet_o, 
-      tapDelayStat_i  => tapDelayStat_i);
+      tapDelayStat_i  => tapDelayStat_i,
+      overflow_i      => s_overflow,
+      underflow_i     => s_underflow);
 
    -----------------------------------------------------------
    -- Signal generator lanes
@@ -179,6 +183,8 @@ begin
       devClk_i        => devClk_i,
       devRst_i        => devRst_i,      
       extData_i       => extData_i,
+      overflow_o      => s_overflow,
+      underflow_o     => s_underflow,
 
       axiClk_i        => axiClk,
       axiRst_i        => axiRst,            
@@ -187,7 +193,8 @@ begin
       axilWriteMaster => locAxilWriteMasters(LANE_INDEX_C),
       axilWriteSlave  => locAxilWriteSlaves(LANE_INDEX_C), 
       periodSize_i    => s_periodSize,
-      sampleData_o    => s_sampleData);
+      sampleData_o    => s_sampleData
+      );
    -----------------------------------------------------
    -- Reverse polarity on masked bits
    sampleData_o <= s_sampleData xor s_polarityMask;

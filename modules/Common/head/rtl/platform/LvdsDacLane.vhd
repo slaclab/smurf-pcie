@@ -58,7 +58,9 @@ entity LvdsDacLane is
       -- External sample data input 
       -- 2 samples per c-c
       -- Should be little-endian none byte-swapped
-      extData_i  : in  slv((2*DATA_WIDTH_G)-1 downto 0);
+      extData_i    : in  slv((2*DATA_WIDTH_G)-1 downto 0);
+      overflow_o   : out sl;
+      underflow_o  : out sl;
       
       -- Lane number AXI number to be inserted into AXI stream
       axilReadMaster  : in    AxiLiteReadMasterType;
@@ -109,6 +111,8 @@ begin
       wrClk    => devClk_i,
       wrRst    => devRst_i,
       validIn  => '1',
+      overflow => overflow_o,
+      underflow=> underflow_o,     
       dataIn   => extData_i,
       rdClk    => devClk2x_i,
       rdRst    => devRst2x_i,
