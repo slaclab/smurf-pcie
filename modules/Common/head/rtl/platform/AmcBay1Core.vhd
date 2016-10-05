@@ -548,11 +548,8 @@ begin
          OutputTapDelay_INST: entity work.OutputTapDelay
          generic map (
             TPD_G              => TPD_G,
-            REFCLK_FREQUENCY_G => 277.5)
+            REFCLK_FREQUENCY_G => 370.0)
          port map (
-            refClk_i => dlyRefClk,
-            refRst_i => dlyRefRst,
-            --
             clk_i    => jesdClk2x,
             rst_i    => jesdRst2x,
             load_i   => s_load(i),
