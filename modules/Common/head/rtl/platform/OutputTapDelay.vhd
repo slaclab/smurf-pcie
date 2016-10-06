@@ -83,7 +83,7 @@ begin
          IS_CLK_INVERTED  => '0',
          IS_RST_INVERTED  => '0',
          REFCLK_FREQUENCY => REFCLK_FREQUENCY_G,
-         UPDATE_MODE      => "SYNC")
+         UPDATE_MODE      => "ASYNC")
       port map (
          CE          => '0',   -- CE increments or decrements tap delay (Not used in VAR_LOAD type)
          CLK         => clk_i,
