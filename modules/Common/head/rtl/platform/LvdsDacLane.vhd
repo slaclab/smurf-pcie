@@ -81,11 +81,13 @@ architecture rtl of LvdsDacLane is
 
    -- Register
    type RegType is record
+      sampleData : slv(sampleData_o'range);
       cnt   : slv(ADDR_WIDTH_G-1 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      cnt     => (others => '0')
+      sampleData  => (others => '0'),
+      cnt         => (others => '0')
    );
 
    signal r   : RegType := REG_INIT_C;
@@ -147,7 +149,7 @@ begin
       dout           => s_ramData);
        
    -- Address counter
-   comb : process (r, devRst2x_i, periodSize_i, enable_i) is
+   comb : process (r, devRst2x_i, periodSize_i, enable_i, s_extDataSync, s_ramData) is
       variable v : RegType;
    begin
       -- rateDiv clock generator 
@@ -159,7 +161,15 @@ begin
       else 
          v.cnt := r.cnt + 1;    
       end if;
-           
+
+      -- Register sample data before outputting
+      -- If signal generator is disabled output external data
+      if (enable_i = '0' ) then
+         v.sampleData := s_extDataSync;
+      else
+         v.sampleData := s_ramData;
+      end if;
+      
       if (devRst2x_i = '1') then
          v := REG_INIT_C;
       end if;
@@ -174,7 +184,6 @@ begin
       end if;
    end process seq;
            
-   -- If signal generator is disabled output external data
-   sampleData_o <= s_ramData when enable_i = '1' else s_extDataSync;
+   sampleData_o <= r.sampleData;
 
 end rtl;
