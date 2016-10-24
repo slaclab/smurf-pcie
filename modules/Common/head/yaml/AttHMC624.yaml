@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once AttHMC624.yaml
 
 AttHMC624: &AttHMC624 
   description: Serial Attenuator

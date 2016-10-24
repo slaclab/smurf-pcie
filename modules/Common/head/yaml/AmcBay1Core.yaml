@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once AmcBay1Core.yaml
 #include JesdRx.yaml
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml

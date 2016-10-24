@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once AmcRfDemoCore.yaml
 #include Dac38J84.yaml
 #include DacSigGen.yaml
 #include GenericMemory.yaml

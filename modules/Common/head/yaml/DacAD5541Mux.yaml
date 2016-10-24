@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once DacAD5541Mux.yaml
 
 DacAD5541Mux: &DacAD5541Mux 
   description: DacAD5541Mux module

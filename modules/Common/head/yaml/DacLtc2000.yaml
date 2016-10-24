@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once DacLtc2000.yaml
 
 DacLtc2000: &DacLtc2000
   class: MMIODev
