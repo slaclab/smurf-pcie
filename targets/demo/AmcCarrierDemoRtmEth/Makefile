@@ -2,22 +2,23 @@
 target: prom
 
 # Define target part
-export PRJ_PART = XCKU040-FFVA1156-2-E
+export PRJ_PART = XCKU060-FFVA1156-2-E
+#export PRJ_PART = XCKU040-FFVA1156-2-E
 
 # Define the tags
-export STDLIB_TAG  = head
-export AMC_TAG     = head
-export MGT_TAG     = head
-export PGP_TAG     = head
-export SALT_TAG    = head
-export N25Q_TAG    = head
-export SY56040_TAG = head
-export BSA_TAG     = head
-export TIMING_TAG  = head
-export ETH_TAG     = head
-export RSSI_TAG    = head
-export JESD_TAG    = head
-export MBLAZE_TAG  = head
+export STDLIB_TAG  = 2.1
+export AMC_TAG     = 2.1
+export MGT_TAG     = 2.1
+export PGP_TAG     = 2.0
+export SALT_TAG    = 2.0
+export N25Q_TAG    = 2.1
+export SY56040_TAG = 2.1
+export BSA_TAG     = 2.1
+export TIMING_TAG  = 2.1
+export ETH_TAG     = 2.1
+export RSSI_TAG    = 2.1
+export JESD_TAG    = 2.1
+export MBLAZE_TAG  = 2.1
 # Local tags
 export COMMON_TAG     = head
 export MR_CORE_TAG    = head

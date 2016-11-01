@@ -13,9 +13,9 @@ use ieee.std_logic_1164.all;
 
 package Version is
 
-   constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"00000005";  -- MAKE_VERSION
+   constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"00000006";  -- MAKE_VERSION
 
-   constant BUILD_STAMP_C : string := "AmcCarrierDemoEth: Vivado v2016.2 (x86_64) Built Tue Sep 27 13:46:32 PDT 2016 by ulegat";
+   constant BUILD_STAMP_C : string := "AmcCarrierDemoEth: Vivado v2016.2 (x86_64) Built Tue Nov  1 16:29:07 PDT 2016 by ulegat";
 
 end Version;
 
@@ -27,4 +27,5 @@ end Version;
 -- 09/14/2016 (0x00000003): New yaml
 -- 09/15/2016 (0x00000004): Updated diffswing xci - Works
 -- 09/15/2016 (0x00000005): Added sign extension and averaging of negative values - 
+-- 11/01/2016 (0x00000006): XCKU060 Bigger FPGA image TAGs 2.1
 -------------------------------------------------------------------------------
