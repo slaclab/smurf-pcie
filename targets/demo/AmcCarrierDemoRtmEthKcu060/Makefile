@@ -3,7 +3,6 @@ target: prom
 
 # Define target part
 export PRJ_PART = XCKU060-FFVA1156-2-E
-#export PRJ_PART = XCKU040-FFVA1156-2-E
 
 # Define the tags
 export STDLIB_TAG  = 2.1

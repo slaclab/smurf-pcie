@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierDemoRtmEth.vhd
+-- File       : AmcCarrierDemoRtmEthKcu060.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-20
@@ -33,7 +33,7 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 
-entity AmcCarrierDemoRtmEth is
+entity AmcCarrierDemoRtmEthKcu060 is
    generic (
       TPD_G            : time    := 1 ns; 
       SIM_SPEEDUP_G    : boolean := false;              -- True=Speedup the resets for simulation   
@@ -151,9 +151,9 @@ entity AmcCarrierDemoRtmEth is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end AmcCarrierDemoRtmEth;
+end AmcCarrierDemoRtmEthKcu060;
 
-architecture top_level of AmcCarrierDemoRtmEth is
+architecture top_level of AmcCarrierDemoRtmEthKcu060 is
 
    -- AmcCarrierCore Configuration Constants
    constant APP_TYPE_C    : AppType := APP_LLRF_TYPE_C;

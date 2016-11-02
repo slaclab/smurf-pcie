@@ -27,5 +27,5 @@ end Version;
 -- 09/14/2016 (0x00000003): New yaml
 -- 09/15/2016 (0x00000004): Updated diffswing xci - Works
 -- 09/15/2016 (0x00000005): Added sign extension and averaging of negative values - 
--- 11/01/2016 (0x00000006): XCKU060 Bigger FPGA image TAGs 2.1
+-- 11/02/2016 (0x00000006): 2.1 TAGS
 -------------------------------------------------------------------------------

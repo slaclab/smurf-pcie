@@ -13,7 +13,7 @@ use ieee.std_logic_1164.all;
 
 package Version is
 
-   constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"00000002";  -- MAKE_VERSION
+   constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"00000001";  -- MAKE_VERSION
 
    constant BUILD_STAMP_C : string := "AmcCarrierDemoRtmEth: Vivado v2016.2 (x86_64) Built Tue Nov  1 16:14:43 PDT 2016 by ulegat";
 
@@ -22,8 +22,7 @@ end Version;
 -------------------------------------------------------------------------------
 -- Revision History:
 --
--- 04/20/2016 (0x00000001): Initial Build
--- 11/01/2016 (0x00000002): XCKU060 Bigger FPGA image
+-- 11/01/2016 (0x00000001): Initial XCKU060 FPGA image
 --
 -------------------------------------------------------------------------------
 

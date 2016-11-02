@@ -1,4 +1,4 @@
-../../../modules/AmcCarrierCore/head/xdc/AmcCarrierCore.xdc
+../../../modules/AmcCarrierCore/2.1/xdc/AmcCarrierCore.xdc
 ../../../modules/Common/head/xdc/AmcDemoBay0Pinout.xdc
 ../../../modules/Common/head/xdc/AmcDemoBay1Pinout.xdc
-hdl/AmcCarrierDemoRtmEth.xdc
+hdl/AmcCarrierDemoRtmEthKcu060.xdc
