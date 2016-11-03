@@ -68,7 +68,7 @@ AmcBay0Core: &AmcBay0Core
         offset: 0x0
       sequence:
         # Reset the RX's GTs
-        - entry: JesdRx/C_ResetGTs
+        - entry: JesdRx/ResetRxGTs
           value: 0x1       
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc
