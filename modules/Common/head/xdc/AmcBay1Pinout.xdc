@@ -92,6 +92,25 @@ set_property -dict { PACKAGE_PIN  AA32 IOSTANDARD LVCMOS18} [get_ports {attLatch
 #set_property -dict { PACKAGE_PIN   IOSTANDARD LVCMOS18} [get_ports {attLatchEn_o[1][4]}]
 #set_property -dict { PACKAGE_PIN   IOSTANDARD LVCMOS18} [get_ports {attLatchEn_o[1][5]}]
 
+
+## Adding placment constraints on the LVDS DAC's ODDRE1 & ODELAYE3 module
+set_property LOC BITSLICE_RX_TX_X0Y229 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[0].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y166 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[1].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y164 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[2].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y162 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[3].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y160 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[4].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y158 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[5].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y156 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[6].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y221 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[7].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y218 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[8].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y39  [get_cells {U_App/U_AMC1/GEN_DLY_OUT[9].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y238 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[10].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y36  [get_cells {U_App/U_AMC1/GEN_DLY_OUT[11].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y227 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[12].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y34  [get_cells {U_App/U_AMC1/GEN_DLY_OUT[13].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y2   [get_cells {U_App/U_AMC1/GEN_DLY_OUT[14].OutputTapDelay_INST/U_ODELAYE3}]
+set_property LOC BITSLICE_RX_TX_X0Y257 [get_cells {U_App/U_AMC1/GEN_DLY_OUT[15].OutputTapDelay_INST/U_ODELAYE3}]
+
 # LVDS DAC signals
 #P14 PIN127 #P14 PIN126
 set_property -dict { PACKAGE_PIN AD30   IOSTANDARD LVDS} [get_ports {dacDataP[0]}]
