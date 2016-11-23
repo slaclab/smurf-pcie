@@ -67,24 +67,35 @@ AmcBay0Core: &AmcBay0Core
       at:
         offset: 0x0
       sequence:
-        # Reset the RX's GTs
-        - entry: JesdRx/ResetRxGTs
+        # Put the RX's GTs into RESET
+        - entry: JesdRx/ResetGTs
           value: 0x1       
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc
           value: 0x1       
         # 1000 ms sleep
-        - entry: usleep
-          value: 1000000       
+        # - entry: usleep
+          # value: 1000000       
 
         # Power up the LMK's SYSREF
-        - entry: Lmk04828/PwrUpSysRef
-          value: 0x1       
+        # - entry: Lmk04828/PwrUpSysRef
+          # value: 0x1       
         # 1000 ms sleep
-        - entry: usleep
-          value: 1000000    
+        # # - entry: usleep
+          # # value: 1000000    
 
         # Clear the Alarms
-        - entry: Lmk04828/InitLmk          
-          value: 0x1       
+        # - entry: Lmk04828/InitLmk          
+          # value: 0x1
+          
+        # 1000 ms sleep
+        - entry: usleep
+          value: 1000000  
+
+        # Release the RX's GTs RESET
+        - entry: JesdRx/ResetGTs
+          value: 0x0
+        # Clear errors to have a fresh start
+        - entry: JesdRx/ClearRxErrors
+          value: 0x1           
     ##################################################

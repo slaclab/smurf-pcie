@@ -183,7 +183,8 @@ end component;
    signal s_stableClkVec : slv(L_RX_G-1 downto 0);
    signal s_gtRefClkVec  : slv(L_RX_G-1 downto 0);   
    signal s_rxDone     : sl;
-
+   signal s_cdrStable  : sl;
+   
    -- Turn off realignment once aligned
    signal s_dataValidVec : slv(L_RX_G-1 downto 0);
    signal s_allignEnVec : slv(L_RX_G-1 downto 0);
@@ -266,6 +267,7 @@ begin
       r_jesdGtRxArr(I).decErr    <= s_rxctrl3(I*8+GT_WORD_SIZE_C-1  downto  I*8); 
 
       r_jesdGtRxArr(I).rstDone   <= s_rxDone;
+      r_jesdGtRxArr(I).cdrStable <= s_cdrStable;
    
       s_devClkVec(I)    <= devClk_i;
       s_devClk2Vec(I)   <= devClk2_i;
@@ -290,23 +292,22 @@ begin
       GthUltrascaleJesdCoregen_INST: GthUltrascaleJesdCoregenBay0
       port map (
          -- Clocks
-         --gtwiz_userclk_tx_reset_in(0)         => s_gtTxReset,
-         gtwiz_userclk_tx_active_in(0)        => devClkActive_i,
-         gtwiz_userclk_rx_active_in(0)        => devClkActive_i,
+         gtwiz_userclk_tx_active_in(0)        => not s_gtRxReset,
+         gtwiz_userclk_rx_active_in(0)        => not s_gtRxReset,
          
-         gtwiz_buffbypass_tx_reset_in(0)      => devRst_i,
-         gtwiz_buffbypass_tx_start_user_in(0) => devRst_i,
+         gtwiz_buffbypass_tx_reset_in(0)      => s_gtRxReset,
+         gtwiz_buffbypass_tx_start_user_in(0) => s_gtRxReset,
          gtwiz_buffbypass_tx_done_out         => open,
          gtwiz_buffbypass_tx_error_out        => open,
 
          gtwiz_reset_clk_freerun_in(0)        => stableClk,
          
-         gtwiz_reset_all_in(0)                   => '0',
-         gtwiz_reset_tx_pll_and_datapath_in(0)   => devRst_i,
-         gtwiz_reset_tx_datapath_in(0)           => devRst_i,
+         gtwiz_reset_all_in(0)                   => s_gtRxReset,
+         gtwiz_reset_tx_pll_and_datapath_in(0)   => s_gtRxReset,
+         gtwiz_reset_tx_datapath_in(0)           => s_gtRxReset,
          gtwiz_reset_rx_pll_and_datapath_in(0)   => s_gtRxReset,
          gtwiz_reset_rx_datapath_in(0)           => s_gtRxReset,
-         gtwiz_reset_rx_cdr_stable_out        => open,
+         gtwiz_reset_rx_cdr_stable_out(0)        => s_cdrStable,
          gtwiz_reset_tx_done_out(0)           => open,
          gtwiz_reset_rx_done_out(0)           => s_rxDone,
          gtwiz_userdata_tx_in                 => (others => '0'),
