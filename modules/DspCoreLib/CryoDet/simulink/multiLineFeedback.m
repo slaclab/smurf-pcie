@@ -69,17 +69,17 @@ switch channelNo    %can't seem to make vector states work so punt to a few scal
     case 5
         int1 = intdf5;
     case 6  
-        int1 = intdf0;
+        int1 = intdf6;
     case 7
-        int1 = intdf1;
+        int1 = intdf7;
     case 8
-        int1 = intdf2;
+        int1 = intdf8;
     case 9
-        int1 = intdf3;
+        int1 = intdf9;
     case 10
-        int1 = intdf4;
+        int1 = intdf10;
     case 11
-        int1 = intdf5;
+        int1 = intdf11;
     otherwise
         int1 = xfix(dfType, 0);
 end  % end punting
