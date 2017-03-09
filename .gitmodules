@@ -1,0 +1,15 @@
+[submodule "firmware/submodules/surf"]
+	path = firmware/submodules/surf
+	url = git@github.com:slaclab/surf.git
+[submodule "firmware/submodules/ruckus"]
+	path = firmware/submodules/ruckus
+	url = git@github.com:slaclab/ruckus.git
+[submodule "firmware/submodules/amc-carrier-core"]
+	path = firmware/submodules/amc-carrier-core
+	url = git@github.com:slaclab/amc-carrier-core.git
+[submodule "firmware/submodules/sysgen-dsp-lib"]
+	path = firmware/submodules/sysgen-dsp-lib
+	url = git@github.com:slaclab/sysgen-dsp-lib.git
+[submodule "firmware/submodules/lcls-timing-core"]
+	path = firmware/submodules/lcls-timing-core
+	url = git@github.com:slaclab/lcls-timing-core.git
