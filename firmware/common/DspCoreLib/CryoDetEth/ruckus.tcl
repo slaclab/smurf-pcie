@@ -5,4 +5,4 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 loadSource -dir "$::DIR_PATH/hdl/"
 
 # Load submodules' code and constraints
-loadRuckusTcl "$::DIR_PATH/../DspCoreLib/CryoDetEth"
+loadRuckusTcl "$::DIR_PATH/../shared"
