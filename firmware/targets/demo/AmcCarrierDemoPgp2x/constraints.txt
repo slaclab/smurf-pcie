@@ -1,1 +1,0 @@
-hdl/AmcCarrierDemoPgp2x.xdc
