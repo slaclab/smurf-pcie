@@ -27,7 +27,6 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.MpsCentralNodePkg.all;
 
 entity DemoCtlReg is
 generic (

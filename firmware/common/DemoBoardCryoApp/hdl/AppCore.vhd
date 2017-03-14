@@ -165,7 +165,8 @@ architecture mapping of AppCore is
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    -- Internal signals
-   signal s_extTrig      : slv(1 downto 0);     
+   signal s_extTrig      : slv(1 downto 0);
+   signal s_muxSel       : slv(1 downto 0);
    signal s_dacDspValues : sampleDataVectorArray(1 downto 0, 1 downto 0);
    signal s_dacDspValids : Slv2Array(1 downto 0);  
    
@@ -219,7 +220,7 @@ begin
    U_DUAL_AMC: entity work.AmcCryoDemoDualCore
       generic map (
          TPD_G            => TPD_G,
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
+         AXI_CLK_FREQ_G   => 156.25E+6,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G)
       port map (
@@ -321,13 +322,13 @@ begin
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axiReadMaster  => axilReadMasters(CFG0_INDEX_C+i),
-         axiReadSlave   => axilReadSlaves(CFG0_INDEX_C+i),
-         axiWriteMaster => axilWriteMasters(CFG0_INDEX_C+i),
-         axiWriteSlave  => axilWriteSlaves(CFG0_INDEX_C+i),
+         axilReadMaster  => axilReadMasters(CFG_INDEX0_C+i),
+         axilReadSlave   => axilReadSlaves(CFG_INDEX0_C+i),
+         axilWriteMaster => axilWriteMasters(CFG_INDEX0_C+i),
+         axilWriteSlave  => axilWriteSlaves(CFG_INDEX0_C+i),
          devClk          => jesdClk(i),
          devRst          => jesdRst(i),
-         muxSel_o        => s_muxSel);
+         muxSel_o        => s_muxSel(i));
          
       --------------
       -- DAC Multiplexer 
