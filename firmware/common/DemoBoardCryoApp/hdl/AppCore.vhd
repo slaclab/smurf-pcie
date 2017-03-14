@@ -342,6 +342,21 @@ begin
                                   dacSigValids(i)(1 downto 0); 
            
    end generate GEN_BAY;
+   
+   ----------------
+   -- No RTM core
+   ----------------   
+   RtmEmptyCore_INST: entity work.RtmEmptyCore
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+      port map (
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         rtmLsP          => rtmLsP,
+         rtmLsN          => rtmLsN,
+         genClkP         => genClkP,
+         genClkN         => genClkN);
 
 -------------------------------------------------------------------
 end mapping;

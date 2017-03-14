@@ -1,2 +1,0 @@
-manual yaml/000TopLevel.yaml
-manual yaml/AmcCarrierDemoEth.yaml
