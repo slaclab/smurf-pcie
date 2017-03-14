@@ -2,4 +2,4 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 # Load Source Code
-loadSource -dir "$::DIR_PATH/simulink/netlist/dspcore.dcp"
+loadSource -path "$::DIR_PATH/simulink/netlist/dspcore.dcp"
