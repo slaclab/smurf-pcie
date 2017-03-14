@@ -42,7 +42,7 @@ entity AppCore is
       SIM_SPEEDUP_G    : boolean          := false;
       SIMULATION_G     : boolean          := false;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := x"80000000";
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C,
+      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       -- True=370MHz SysGen DSP clock, False=185MHz SysGen DSP clock
       DSP_CLK_2X_G     : boolean          := false);
    port (
