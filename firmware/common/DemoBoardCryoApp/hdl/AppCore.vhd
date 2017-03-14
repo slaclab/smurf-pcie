@@ -157,7 +157,7 @@ architecture mapping of AppCore is
    constant AMC_INDEX_C  : natural := 0;
    constant DSP_INDEX_C  : natural := 1;
    constant CFG_INDEX0_C : natural := 2;
-   constant CFG_INDEX1_C : natural := 2;
+   constant CFG_INDEX1_C : natural := 3;
    
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
