@@ -37,8 +37,8 @@ entity KcuJesd is
       AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
       JESD_DRP_EN_G      : boolean              := true;
-      JESD_RX_LANE_G     : natural range 0 to 8 := 8;
-      JESD_TX_LANE_G     : natural range 0 to 8 := 8;
+      JESD_RX_LANE_G     : natural range 0 to 8 := 4;
+      JESD_TX_LANE_G     : natural range 0 to 8 := 4;
       JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
       JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
       JESD_RX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;

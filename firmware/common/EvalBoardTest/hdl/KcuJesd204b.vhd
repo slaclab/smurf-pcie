@@ -34,20 +34,21 @@ entity KcuJesd204b is
       TPD_G              : time                 := 1 ns;
       TEST_G             : boolean              := false;
       SYSREF_GEN_G       : boolean              := false;
-      JESD_RX_LANE_G     : natural range 0 to 8 := 8;
-      JESD_TX_LANE_G     : natural range 0 to 8 := 8;
-      JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
+      JESD_RX_LANE_G     : natural range 0 to 8 := 4;
+      JESD_TX_LANE_G     : natural range 0 to 8 := 0;
+      GT_LANE_G          : natural range 0 to 8 := 4;
+      JESD_RX_POLARITY_G : slv(GT_LANE_G-1 downto 0)      := "00000000";
+      JESD_TX_POLARITY_G : slv(GT_LANE_G-1 downto 0)      := "00000000";
       AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_SLVERR_C);
    port (
       -- DRP Interface
-      drpClk          : in  slv(6 downto 0);
-      drpRdy          : out slv(6 downto 0);
-      drpEn           : in  slv(6 downto 0);
-      drpWe           : in  slv(6 downto 0);
+      drpClk          : in  slv(GT_LANE_G-1 downto 0);
+      drpRdy          : out slv(GT_LANE_G-1 downto 0);
+      drpEn           : in  slv(GT_LANE_G-1 downto 0);
+      drpWe           : in  slv(GT_LANE_G-1 downto 0);
       drpAddr         : in  slv(62 downto 0);
-      drpDi           : in  slv(111 downto 0);
-      drpDo           : out slv(111 downto 0);
+      drpDi           : in  slv(GT_LANE_G*16-1 downto 0);
+      drpDo           : out slv(GT_LANE_G*16-1 downto 0);
       -- AXI interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -75,10 +76,10 @@ entity KcuJesd204b is
       devRst_i        : in  sl;         -- 
       devClkActive_i  : in  sl := '1';  -- devClk_i MCMM locked      
       -- GTH Ports
-      gtTxP           : out slv(6 downto 0);  -- GT Serial Transmit Positive
-      gtTxN           : out slv(6 downto 0);  -- GT Serial Transmit Negative
-      gtRxP           : in  slv(6 downto 0);  -- GT Serial Receive Positive
-      gtRxN           : in  slv(6 downto 0);  -- GT Serial Receive Negative      
+      gtTxP           : out slv(GT_LANE_G-1 downto 0);  -- GT Serial Transmit Positive
+      gtTxN           : out slv(GT_LANE_G-1 downto 0);  -- GT Serial Transmit Negative
+      gtRxP           : in  slv(GT_LANE_G-1 downto 0);  -- GT Serial Receive Positive
+      gtRxN           : in  slv(GT_LANE_G-1 downto 0);  -- GT Serial Receive Negative      
       -- SYSREF for subclass 1 fixed latency
       sysRef_i        : in  sl;
       -- Synchronisation output combined from all receivers to be connected to ADC/DAC chips
@@ -149,34 +150,34 @@ architecture mapping of KcuJesd204b is
          txpmaresetdone_out                 : out std_logic_vector(6 downto 0));
    end component;
 
-   signal r_jesdGtRxArr : jesdGtRxLaneTypeArray(6 downto 0) := (others => JESD_GT_RX_LANE_INIT_C);
-   signal r_jesdGtTxArr : jesdGtTxLaneTypeArray(6 downto 0) := (others => JESD_GT_TX_LANE_INIT_C);
+   signal r_jesdGtRxArr : jesdGtRxLaneTypeArray(GT_LANE_G-1 downto 0) := (others => JESD_GT_RX_LANE_INIT_C);
+   signal r_jesdGtTxArr : jesdGtTxLaneTypeArray(GT_LANE_G-1 downto 0) := (others => JESD_GT_TX_LANE_INIT_C);
 
-   signal s_gtRxUserReset : slv(6 downto 0) := (others => '0');
+   signal s_gtRxUserReset : slv(GT_LANE_G-1 downto 0) := (others => '0');
    signal s_gtRxReset     : sl              := '0';
-   signal s_gtTxUserReset : slv(6 downto 0) := (others => '0');
+   signal s_gtTxUserReset : slv(GT_LANE_G-1 downto 0) := (others => '0');
    signal s_gtTxReset     : sl              := '0';
    signal s_gtResetAll    : sl              := '0';
 
    signal s_sysRef        : sl                          := '0';
    signal s_sysRefDbg     : sl                          := '0';
-   signal s_rxctrl0       : slv(111 downto 0)           := (others => '0');
-   signal s_rxctrl1       : slv(111 downto 0)           := (others => '0');
-   signal s_rxctrl2       : slv(55 downto 0)            := (others => '0');
-   signal s_rxctrl3       : slv(55 downto 0)            := (others => '0');
-   signal s_rxData        : slv(223 downto 0)           := (others => '0');
-   signal s_txData        : slv(223 downto 0)           := (others => '0');
-   signal s_txDataK       : slv(55 downto 0)            := (others => '0');
-   signal s_devClkVec     : slv(6 downto 0)             := (others => '0');
-   signal s_devClk2Vec    : slv(6 downto 0)             := (others => '0');
-   signal s_stableClkVec  : slv(6 downto 0)             := (others => '0');
-   signal s_gtRefClkVec   : slv(6 downto 0)             := (others => '0');
+   signal s_rxctrl0       : slv(GT_LANE_G*16-1 downto 0)           := (others => '0');
+   signal s_rxctrl1       : slv(GT_LANE_G*16-1 downto 0)           := (others => '0');
+   signal s_rxctrl2       : slv(GT_LANE_G*8-1 downto 0)            := (others => '0');
+   signal s_rxctrl3       : slv(GT_LANE_G*8-1 downto 0)            := (others => '0');
+   signal s_rxData        : slv(GT_LANE_G*32-1 downto 0)           := (others => '0');
+   signal s_txData        : slv(GT_LANE_G*32-1 downto 0)           := (others => '0');
+   signal s_txDataK       : slv(GT_LANE_G*8-1 downto 0)            := (others => '0');
+   signal s_devClkVec     : slv(GT_LANE_G-1 downto 0)             := (others => '0');
+   signal s_devClk2Vec    : slv(GT_LANE_G-1 downto 0)             := (others => '0');
+   signal s_stableClkVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
+   signal s_gtRefClkVec   : slv(GT_LANE_G-1 downto 0)             := (others => '0');
    signal s_rxDone        : sl                          := '0';
    signal s_txDone        : sl                          := '0';
-   signal s_gtTxReady     : slv(6 downto 0)             := (others => '0');
-   signal s_allignEnVec   : slv(6 downto 0)             := (others => '0');
-   signal s_dataValidVec  : slv(6 downto 0)             := (others => '0');
-   signal s_sampleDataArr : sampleDataArray(6 downto 0) := (others => (others => '0'));
+   signal s_gtTxReady     : slv(GT_LANE_G-1 downto 0)             := (others => '0');
+   signal s_allignEnVec   : slv(GT_LANE_G-1 downto 0)             := (others => '0');
+   signal s_dataValidVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
+   signal s_sampleDataArr : sampleDataArray(GT_LANE_G-1 downto 0) := (others => (others => '0'));
 
    signal s_cdrStable  : sl;
    signal dummyZeroBit : sl;
@@ -221,9 +222,9 @@ begin
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
    
-   TERM_UNUSED : if (JESD_RX_LANE_G /= 7) generate
-      s_dataValidVec(6 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
-      s_sampleDataArr(6 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
+   TERM_UNUSED : if (JESD_RX_LANE_G /= GT_LANE_G) generate
+      s_dataValidVec(GT_LANE_G-1 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
+      s_sampleDataArr(GT_LANE_G-1 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
    end generate;   
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
@@ -316,7 +317,7 @@ begin
    -----------------
    -- GTH TX signals
    -----------------   
-   TX_LANES_GEN : for i in 6 downto 0 generate
+   TX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
       s_txData((i*32)+31 downto (i*32)) <= r_jesdGtTxArr(i).data;
       s_txDataK((i*8)+7 downto (i*8))   <= x"0" & r_jesdGtTxArr(i).dataK;
       s_gtTxReady(i)                    <= s_txDone;
@@ -325,7 +326,7 @@ begin
    -----------------
    -- GTH RX signals
    -----------------
-   RX_LANES_GEN : for i in 6 downto 0 generate
+   RX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
       r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
       r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
@@ -342,7 +343,7 @@ begin
    s_gtResetAll <= s_gtTxReset or s_gtRxReset;
    dummyZeroBit <= devRst_i and s_txDone and s_rxDone;
 
-   U_Coregen : AppTopJesd204bCoregen
+   U_Coregen : KcuJesd204bCoregen
       port map (
          -- Clocks
          gtwiz_userclk_tx_active_in(0)         => devClkActive_i,

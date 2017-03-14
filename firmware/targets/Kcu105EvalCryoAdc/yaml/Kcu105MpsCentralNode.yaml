@@ -1,0 +1,66 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once
+#include AxiVersion.yaml
+#include AxiSysMonUltraScale.yaml
+#include EthMacPhy.yaml
+#include UdpEngineServer.yaml
+#include RssiCore.yaml
+#include MpsCentralNodeCore.yaml
+#include MpsCentralNodeConfig.yaml
+
+Kcu105MpsCentralNode: &Kcu105MpsCentralNode 
+  name: Kcu105MpsCentralNode
+  class: MMIODev
+  configPrio: 1
+  description: AMC 
+  size: 0x100000000
+  ########
+  children:
+  ########
+    AxiVersion:
+      <<: *AxiVersion
+      at:
+        offset: 0x00000000
+    ##################################################        
+    AxiSysMonUltraScale:
+      <<: *AxiSysMonUltraScale
+      at:
+        offset: 0x00010000
+    ##################################################
+    EthMacPhy:
+      <<: *EthMacPhy
+      at:
+        offset: 0x00020000  
+      instantiate: false
+    ##################################################
+    UdpEngineServer:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x00040000
+      description: "ServerConfig[4:0]"      
+    ##################################################
+    RssiServer:
+      <<: *RssiCore
+      at:
+        offset: 0x00050000 
+      description: Server RSSI Software
+    ##################################################
+    MpsCentralNodeCore:
+      <<: *MpsCentralNodeCore
+      at:
+        offset: 0x80000000 
+    ##################################################
+    MpsCentralNodeConfig:
+      <<: *MpsCentralNodeConfig
+      at:
+        offset: 0x80100000 
+    ##################################################
