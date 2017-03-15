@@ -72,9 +72,10 @@ set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 8  [current_design]
 set_property ASYNC_REG TRUE [get_cells -hierarchical *crossDomainSyncReg_reg*]
 
 # Timing Constraints 
-create_clock -name clkRefP -period  6.400 [get_ports {clkRefP}]
+create_clock -name clkRefP  -period  6.400 [get_ports {clkRefP}]
+create_clock -name jesdClkP -period  3.200 [get_ports {jesdClkP}]
 
-create_generated_clock -name jesdClk [get_pins {U_Core/U_Clk/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name jesdClk [get_pins {U_jesd/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name axilClk [get_pins {U_Core/TenGigEthGthUltraScaleWrapper_Inst/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_TenGigEthRst/CLK156_BUFG_GT/O}]
 create_generated_clock -name dnaClk  [get_pins {U_Core/AxiVersion_Inst/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 

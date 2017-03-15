@@ -68,6 +68,10 @@ entity Kcu105MpsCentralNode is
 
       jesdRxSyncP : out sl;   
       jesdRxSyncN : out sl;
+      jesdRxSyncLed : out sl;
+      
+      jesdSysRefP  : in sl;
+      jesdSysRefN  : in sl;      
       
       -- Control ports
       fmcCtrl : out slv(1 downto 0);
@@ -80,22 +84,59 @@ entity Kcu105MpsCentralNode is
 end Kcu105MpsCentralNode;
 
 architecture top_level of Kcu105MpsCentralNode is
-   
+
+   constant NUM_AXI_MASTERS_C : natural := 2;
+
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 30, 28);  -- [0x8FFFFFFF:0x80000000]
+
+   constant REG_INDEX_C  : natural := 0;
+   constant JESD_INDEX_C : natural := 1;
+   --
    signal axilReadMaster  : AxiLiteReadMasterType;
    signal axilReadSlave   : AxiLiteReadSlaveType;
    signal axilWriteMaster : AxiLiteWriteMasterType;
    signal axilWriteSlave  : AxiLiteWriteSlaveType;
-
-   signal jesdClk   : sl;
+   --
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   
+   -- Internal signals   signal jesdClk   : sl;
    signal jesdRst   : sl;
    signal jesdClk2x : sl; 
    signal jesdRst2x : sl; 
    signal axilClk  : sl;
    signal axilRst  : sl;   
    signal phyReady : sl;
-
+   signal adcValids : slv(GT_LANE_G-1 downto 0);
+   signal adcValues : sampleDataArray(GT_LANE_G-1 downto 0);
+   
+   signal s_control : slv(31 downto 0);
+   
+   -- JESD
+   signal jesdSysRef  : sl;
+   signal jesdRxSync  : sl;   
    
 begin
+
+   ----------------------------------------------------------------
+   -- JESD Buffers
+   ----------------------------------------------------------------
+   IBUFDS_SysRef : IBUFDS
+      port map (
+         I  => jesdSysRefP,
+         IB => jesdSysRefN,
+         O  => jesdSysRef);
+         
+   GEN_RX_SYNC :
+
+   OBUFDS_RxSync : OBUFDS
+      port map (
+         I  => jesdRxSync,
+         O  => jesdRxSyncP,
+         OB => jesdRxSyncN);
+
 
    --------------
    -- Core Module
@@ -130,57 +171,103 @@ begin
          ethTxP         => ethTxP,
          ethTxN         => ethTxN);
 
+   ---------------------
+   -- AXI-Lite Crossbar
+   ---------------------
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+         
    ----------------------
-   -- Application
+   -- Registers
+   ----------------------         
+   U_KcuReg: entity work.KcuReg
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+      port map (
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(REG_INDEX_C),
+         axilReadSlave   => axilReadSlaves(REG_INDEX_C),
+         axilWriteMaster => axilWriteMasters(REG_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(REG_INDEX_C),
+         devClk          => jesdClk,
+         devRst          => jesdRst,
+         control_o       => s_control,
+         data_i          => adcValues);
+   
+   fmcCtrl(0) <= s_control(0);
+   fmcCtrl(1) <= s_control(1);
+   
+   ----------------------
+   -- Jesd
    ----------------------
    U_jesd : entity work.KcuJesd
-   generic map (
-      TPD_G              => TPD_G,
-      AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-      AXI_BASE_ADDR_G    => AXI_BASE_ADDR_G,
-      JESD_DRP_EN_G      => JESD_DRP_EN_G,
-      JESD_RX_LANE_G     => JESD_RX_LANE_G,
-      JESD_TX_LANE_G     => JESD_TX_LANE_G,
-      JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
-      JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
-      JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G,
-      JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G,
-      JESD_REF_SEL_G     => JESD_REF_SEL_G)
-   port map (
-      jesdClk         => jesdClk,
-      jesdRst         => jesdRst,
-      jesdClk2x       => jesdClk2x,
-      jesdRst2x       => jesdRst2x,
-      jesdSysRef      => jesdSysRef,
-      jesdRxSync      => jesdRxSync,
-      jesdTxSync      => jesdTxSync,
-      adcValids       => adcValids,
-      adcValues       => adcValues,
-      dacValids       => (others => '0'),
-      dacValues       => (others => (others=>'0')),
-      axilClk         => axilClk,
-      axilRst         => axilRst,
-      axilReadMaster  => axilReadMaster,
-      axilReadSlave   => axilReadSlave,
-      axilWriteMaster => axilWriteMaster,
-      axilWriteSlave  => axilWriteSlave,
-      jesdRxP         => jesdRxP,
-      jesdRxN         => jesdRxN,
-      jesdTxP         => jesdTxP,
-      jesdTxN         => jesdTxN,
-      jesdClkP        => jesdClkP,
-      jesdClkN        => jesdClkN);
+      generic map (
+         TPD_G              => TPD_G,
+         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G    => AXI_BASE_ADDR_G,
+         JESD_DRP_EN_G      => JESD_DRP_EN_G,
+         JESD_RX_LANE_G     => JESD_RX_LANE_G,
+         JESD_TX_LANE_G     => JESD_TX_LANE_G,
+         JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
+         JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
+         JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G,
+         JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G,
+         JESD_REF_SEL_G     => JESD_REF_SEL_G)
+      port map (
+         jesdClk         => jesdClk,
+         jesdRst         => jesdRst,
+         jesdClk2x       => jesdClk2x,
+         jesdRst2x       => jesdRst2x,
+         jesdSysRef      => jesdSysRef,
+         jesdRxSync      => jesdRxSync,
+         jesdTxSync      => '0',
+         adcValids       => adcValids,
+         adcValues       => adcValues,
+         dacValids       => (others => '0'),
+         dacValues       => (others => (others=>'0')),
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(JESD_INDEX_C),
+         axilReadSlave   => axilReadSlaves(JESD_INDEX_C),
+         axilWriteMaster => axilWriteMasters(JESD_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(JESD_INDEX_C),
+         jesdRxP         => jesdRxP,
+         jesdRxN         => jesdRxN,
+         jesdTxP         => jesdTxP,
+         jesdTxN         => jesdTxN,
+         jesdClkP        => jesdClkP,
+         jesdClkN        => jesdClkN);
 
 
-
+   -- Output assignment
    led(7) <= phyReady;
-   led(6) <= pgpRst0;
+   led(6) <= jesdRst;
    led(5) <= extRst;
    -- led(4) <= '0'; 
    -- led(3) <= '0';
-   led(2) <= '0';   
-   led(1) <= '0';
+   led(2) <= jesdSysRef;   
+   led(1) <= jesdRxSync;
    led(0) <= '0';   
+   
+   jesdRxSyncLed <= jesdRxSync;
    
    U_axi_Heartbeat: entity work.Heartbeat
    generic map (
@@ -197,16 +284,16 @@ begin
    generic map (
       TPD_G        => TPD_G,
       USE_DSP48_G  => "yes",
-      PERIOD_IN_G  => 4.0E-9,
+      PERIOD_IN_G  => 3.2E-9,
       PERIOD_OUT_G => 0.5)-- 1 MHz
    port map (
-      clk => pgpClk,
-      rst => pgpRst0,
+      clk => jesdClk,
+      rst => jesdRst,
       o   => led(4));  
    
-   smaGpioP <= mpsTest(7);              -- J36
-   smaGpioN <= mpsTest(2);              -- J37
-   smaClkP  <= mpsTest(1);              -- J34
-   smaClkN  <= mpsTest(0);              -- J35
+   -- smaGpioP <= mpsTest(7);              -- J36
+   -- smaGpioN <= mpsTest(2);              -- J37
+   -- smaClkP  <= mpsTest(1);              -- J34
+   -- smaClkN  <= mpsTest(0);              -- J35
 
 end top_level;

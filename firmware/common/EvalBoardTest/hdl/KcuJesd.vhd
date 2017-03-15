@@ -36,14 +36,12 @@ entity KcuJesd is
       SIMULATION_G       : boolean              := false;
       AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
-      JESD_DRP_EN_G      : boolean              := true;
+      JESD_DRP_EN_G      : boolean              := false;
+      GT_LANE_G          : natural range 0 to 8 := 4;
       JESD_RX_LANE_G     : natural range 0 to 8 := 4;
-      JESD_TX_LANE_G     : natural range 0 to 8 := 4;
+      JESD_TX_LANE_G     : natural range 0 to 8 := 0;
       JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_RX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
-      JESD_TX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
-      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);
+      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000");
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
@@ -54,11 +52,11 @@ entity KcuJesd is
       jesdRxSync      : out sl;
       jesdTxSync      : in  sl;
       -- ADC Interface
-      adcValids       : out slv(6 downto 0);
-      adcValues       : out sampleDataArray(6 downto 0);
+      adcValids       : out slv(GT_LANE_G-1 downto 0);
+      adcValues       : out sampleDataArray(GT_LANE_G-1 downto 0);
       -- DAC interface
-      dacValids       : in  slv(6 downto 0);
-      dacValues       : in  sampleDataArray(6 downto 0);
+      dacValids       : in  slv(GT_LANE_G-1 downto 0);
+      dacValues       : in  sampleDataArray(GT_LANE_G-1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -70,12 +68,12 @@ entity KcuJesd is
       -- Application Ports --
       -----------------------
       -- JESD High Speed Ports
-      jesdRxP         : in  slv(6 downto 0);
-      jesdRxN         : in  slv(6 downto 0);
-      jesdTxP         : out slv(6 downto 0);
-      jesdTxN         : out slv(6 downto 0);
-      jesdClkP        : in  slv(2 downto 0);
-      jesdClkN        : in  slv(2 downto 0));
+      jesdRxP         : in  slv(GT_LANE_G-1 downto 0);
+      jesdRxN         : in  slv(GT_LANE_G-1 downto 0);
+      jesdTxP         : out slv(GT_LANE_G-1 downto 0);
+      jesdTxN         : out slv(GT_LANE_G-1 downto 0);
+      jesdClkP        : in  sl;
+      jesdClkN        : in  sl);
 end KcuJesd;
 
 architecture mapping of KcuJesd is
@@ -103,38 +101,23 @@ architecture mapping of KcuJesd is
    signal gthReadMasters  : AxiLiteReadMasterArray(JESD_LANE_C-1 downto 0);
    signal gthReadSlaves   : AxiLiteReadSlaveArray(JESD_LANE_C-1 downto 0);
 
-   signal refClkDiv2Vec  : slv(2 downto 0);
-   signal refClkVec      : slv(2 downto 0);
+   signal refClkDiv2     : sl;
    signal refClk         : sl;
-   signal amcClkVec      : slv(2 downto 0);
    signal amcClk         : sl;
    signal amcRst         : sl;
-   signal jesdClk185     : sl;
-   signal jesdRst185     : sl;
+   signal jesdClk     : sl;
+   signal jesdRst     : sl;
    signal jesdMmcmLocked : sl;
 
-   signal drpClk  : slv(6 downto 0)   := (others => '0');
-   signal drpRdy  : slv(6 downto 0)   := (others => '0');
-   signal drpEn   : slv(6 downto 0)   := (others => '0');
-   signal drpWe   : slv(6 downto 0)   := (others => '0');
+   signal drpClk  : slv(GT_LANE_G-1 downto 0)   := (others => '0');
+   signal drpRdy  : slv(GT_LANE_G-1 downto 0)   := (others => '0');
+   signal drpEn   : slv(GT_LANE_G-1 downto 0)   := (others => '0');
+   signal drpWe   : slv(GT_LANE_G-1 downto 0)   := (others => '0');
    signal drpAddr : slv(62 downto 0)  := (others => '0');
-   signal drpDi   : slv(111 downto 0) := (others => '0');
-   signal drpDo   : slv(111 downto 0) := (others => '0');
-
-   signal adcEn : slv(6 downto 0)             := (others => '0');
-   signal adc   : sampleDataArray(6 downto 0) := (others => (others => '0'));
-   signal dac   : sampleDataArray(6 downto 0) := (others => (others => '0'));
+   signal drpDi   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
+   signal drpDo   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
 
 begin
-
-   GEN_ROUTE : for i in 6 downto 0 generate
-
-      adcValids(i) <= adcEn(JESD_RX_ROUTES_G(i));
-      adcValues(i) <= adc(JESD_RX_ROUTES_G(i));
-
-      dac(JESD_TX_ROUTES_G(i)) <= dacValues(i);
-
-   end generate GEN_ROUTE;
 
    ---------------------
    -- AXI-Lite Crossbars
@@ -161,34 +144,27 @@ begin
    ----------------
    -- JESD Clocking
    ----------------
-   GEN_GTH_CLK : for i in 2 downto 0 generate
+   U_IBUFDS_GTE3 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => jesdClkP,
+         IB    => jesdClkN,
+         CEB   => '0',
+         ODIV2 => refClkDiv2,  -- Not divided
+         O     => refClk);       
 
-      U_IBUFDS_GTE3 : IBUFDS_GTE3
-         generic map (
-            REFCLK_EN_TX_PATH  => '0',
-            REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
-            REFCLK_ICNTL_RX    => "00")
-         port map (
-            I     => jesdClkP(i),
-            IB    => jesdClkN(i),
-            CEB   => '0',
-            ODIV2 => refClkDiv2Vec(i),  -- 185 MHz, Frequency the same as jesdRefClk
-            O     => refClkVec(i));     -- 185 MHz     
-
-      U_BUFG_GT : BUFG_GT
-         port map (
-            I       => refClkDiv2Vec(i),  -- 185 MHz
-            CE      => '1',
-            CLR     => '0',
-            CEMASK  => '1',
-            CLRMASK => '1',
-            DIV     => "000",             -- Divide by 1
-            O       => amcClkVec(i));     -- 185 MHz
-
-   end generate GEN_GTH_CLK;
-
-   refClk <= refClkVec(conv_integer(JESD_REF_SEL_G));
-   amcClk <= amcClkVec(conv_integer(JESD_REF_SEL_G));
+   U_BUFG_GT : BUFG_GT
+      port map (
+         I       => refClkDiv2,  -- Not divided
+         CE      => '1',
+         CLR     => '0',
+         CEMASK  => '1',
+         CLRMASK => '1',
+         DIV     => "000",             
+         O       => amcClk);     
 
    U_PwrUpRst : entity work.PwrUpRst
       generic map (
@@ -208,7 +184,7 @@ begin
          FB_BUFG_G          => true,
          NUM_CLOCKS_G       => 2,
          BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 5.405,
+         CLKIN_PERIOD_G     => 3.2,
          DIVCLK_DIVIDE_G    => 1,
          CLKFBOUT_MULT_F_G  => 6.000,
          CLKOUT0_DIVIDE_F_G => 6.000,
@@ -218,9 +194,9 @@ begin
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
-         clkOut(0)       => jesdClk185,
+         clkOut(0)       => jesdClk,
          clkOut(1)       => jesdClk2x,
-         rstOut(0)       => jesdRst185,
+         rstOut(0)       => jesdRst,
          rstOut(1)       => jesdRst2x,
          locked          => jesdMmcmLocked,
          -- AXI-Lite Interface 
@@ -231,13 +207,13 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
-   jesdClk <= jesdClk185;
-   jesdRst <= jesdRst185;
+   jesdClk <= jesdClk;
+   jesdRst <= jesdRst;
 
    -------------
    -- JESD block
    -------------
-   U_Jesd : entity work.AppTopJesd204b
+   U_Jesd : entity work.KcuJesd204b
       generic map (
          TPD_G              => TPD_G,
          TEST_G             => false,
@@ -268,18 +244,18 @@ begin
          txWriteMaster   => axilWriteMasters(JESD_TX_INDEX_C),
          txWriteSlave    => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => adcEn,
-         sampleDataArr_o => adc,
-         sampleDataArr_i => dac,
+         dataValidVec_o  => adcValids,
+         sampleDataArr_o => adcValues,
+         sampleDataArr_i => dacValues,
          -------
          -- JESD
          -------
          -- Clocks
          stableClk       => axilClk,
          refClk          => refClk,
-         devClk_i        => jesdClk185,
-         devClk2_i       => jesdClk185,
-         devRst_i        => jesdRst185,
+         devClk_i        => jesdClk,
+         devClk2_i       => jesdClk,
+         devRst_i        => jesdRst,
          devClkActive_i  => jesdMmcmLocked,
          -- GTH Ports
          gtTxP           => jesdTxP,
