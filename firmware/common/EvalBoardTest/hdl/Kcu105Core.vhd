@@ -53,8 +53,8 @@ entity Kcu105Core is
       axilWriteSlave  : in  AxiLiteWriteSlaveType;
       
       -- Sw Message master (EMAC_AXIS_CONFIG_C) AxilClk domain
-      swObMaster     : in  AxiStreamMasterType;
-      swObSlave      : out AxiStreamSlaveType:= AXI_STREAM_SLAVE_FORCE_C;
+      swObMaster     : in  AxiStreamMasterType:= AXI_STREAM_MASTER_INIT_C;
+      swObSlave      : out AxiStreamSlaveType;
       swIbMaster     : out AxiStreamMasterType;
       swIbSlave      : in  AxiStreamSlaveType:= AXI_STREAM_SLAVE_FORCE_C;
       
@@ -204,7 +204,7 @@ begin
          phyClk(0)              => clk,
          phyRst(0)              => rst,
          phyReady(0)            => phyReady,
-         gtClk                  => gtRefClk,
+         gtClk                  => open,
          -- MGT Clock Port (156.25 MHz or 312.5 MHz)
          gtClkP                 => clkRefP,
          gtClkN                 => clkRefN,

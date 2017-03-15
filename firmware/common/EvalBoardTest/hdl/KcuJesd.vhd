@@ -40,8 +40,8 @@ entity KcuJesd is
       GT_LANE_G          : natural range 0 to 8 := 4;
       JESD_RX_LANE_G     : natural range 0 to 8 := 4;
       JESD_TX_LANE_G     : natural range 0 to 8 := 0;
-      JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000");
+      JESD_RX_POLARITY_G : slv(7 downto 0)      := "00000000";
+      JESD_TX_POLARITY_G : slv(7 downto 0)      := "00000000");
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
@@ -105,15 +105,15 @@ architecture mapping of KcuJesd is
    signal refClk         : sl;
    signal amcClk         : sl;
    signal amcRst         : sl;
-   signal jesdClk     : sl;
-   signal jesdRst     : sl;
+   signal jesdClk1x      : sl;
+   signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
    signal drpClk  : slv(GT_LANE_G-1 downto 0)   := (others => '0');
    signal drpRdy  : slv(GT_LANE_G-1 downto 0)   := (others => '0');
    signal drpEn   : slv(GT_LANE_G-1 downto 0)   := (others => '0');
    signal drpWe   : slv(GT_LANE_G-1 downto 0)   := (others => '0');
-   signal drpAddr : slv(62 downto 0)  := (others => '0');
+   signal drpAddr : slv(GT_LANE_G*9-1 downto 0)  := (others => '0');
    signal drpDi   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
    signal drpDo   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
 
@@ -194,9 +194,9 @@ begin
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
-         clkOut(0)       => jesdClk,
+         clkOut(0)       => jesdClk1x,
          clkOut(1)       => jesdClk2x,
-         rstOut(0)       => jesdRst,
+         rstOut(0)       => jesdRst1x,
          rstOut(1)       => jesdRst2x,
          locked          => jesdMmcmLocked,
          -- AXI-Lite Interface 
@@ -207,8 +207,8 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
-   jesdClk <= jesdClk;
-   jesdRst <= jesdRst;
+   jesdClk <= jesdClk1x;
+   jesdRst <= jesdRst1x;
 
    -------------
    -- JESD block
@@ -253,9 +253,9 @@ begin
          -- Clocks
          stableClk       => axilClk,
          refClk          => refClk,
-         devClk_i        => jesdClk,
-         devClk2_i       => jesdClk,
-         devRst_i        => jesdRst,
+         devClk_i        => jesdClk1x,
+         devClk2_i       => jesdClk1x,
+         devRst_i        => jesdRst1x,
          devClkActive_i  => jesdMmcmLocked,
          -- GTH Ports
          gtTxP           => jesdTxP,

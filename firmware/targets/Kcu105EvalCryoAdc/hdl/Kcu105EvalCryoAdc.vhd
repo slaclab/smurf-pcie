@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : Kcu105MpsCentralNode.vhd
+-- File       : Kcu105EvalCryoAdc.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-01-25
@@ -34,7 +34,7 @@ use work.Pgp2bPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity Kcu105MpsCentralNode is
+entity Kcu105EvalCryoAdc is
    generic (
       TPD_G            : time             := 1 ns;
       BUILD_INFO_G     : BuildInfoType;
@@ -81,13 +81,13 @@ entity Kcu105MpsCentralNode is
       ethRxN   : in  sl;
       ethTxP   : out sl;
       ethTxN   : out sl);
-end Kcu105MpsCentralNode;
+end Kcu105EvalCryoAdc;
 
-architecture top_level of Kcu105MpsCentralNode is
+architecture top_level of Kcu105EvalCryoAdc is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 30, 28);  -- [0x8FFFFFFF:0x80000000]
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, X"80000000", 30, 28);  -- [0x8FFFFFFF:0x80000000]
 
    constant REG_INDEX_C  : natural := 0;
    constant JESD_INDEX_C : natural := 1;
@@ -102,15 +102,16 @@ architecture top_level of Kcu105MpsCentralNode is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    
-   -- Internal signals   signal jesdClk   : sl;
+   -- Internal signals   
+   signal jesdClk   : sl;
    signal jesdRst   : sl;
    signal jesdClk2x : sl; 
    signal jesdRst2x : sl; 
    signal axilClk  : sl;
    signal axilRst  : sl;   
    signal phyReady : sl;
-   signal adcValids : slv(GT_LANE_G-1 downto 0);
-   signal adcValues : sampleDataArray(GT_LANE_G-1 downto 0);
+   signal adcValids : slv(3 downto 0);
+   signal adcValues : slv32Array(3 downto 0);
    
    signal s_control : slv(31 downto 0);
    
@@ -128,8 +129,6 @@ begin
          I  => jesdSysRefP,
          IB => jesdSysRefN,
          O  => jesdSysRef);
-         
-   GEN_RX_SYNC :
 
    OBUFDS_RxSync : OBUFDS
       port map (
@@ -222,15 +221,9 @@ begin
       generic map (
          TPD_G              => TPD_G,
          AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G    => AXI_BASE_ADDR_G,
-         JESD_DRP_EN_G      => JESD_DRP_EN_G,
-         JESD_RX_LANE_G     => JESD_RX_LANE_G,
-         JESD_TX_LANE_G     => JESD_TX_LANE_G,
-         JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
-         JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
-         JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G,
-         JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G,
-         JESD_REF_SEL_G     => JESD_REF_SEL_G)
+         AXI_BASE_ADDR_G    => AXI_CONFIG_C(JESD_INDEX_C).baseAddr,
+         JESD_RX_LANE_G     => 4,
+         JESD_TX_LANE_G     => 4)
       port map (
          jesdClk         => jesdClk,
          jesdRst         => jesdRst,
@@ -240,7 +233,10 @@ begin
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => '0',
          adcValids       => adcValids,
-         adcValues       => adcValues,
+         adcValues(0)    => adcValues(0),
+         adcValues(1)    => adcValues(1),
+         adcValues(2)    => adcValues(2),
+         adcValues(3)    => adcValues(3),
          dacValids       => (others => '0'),
          dacValues       => (others => (others=>'0')),
          axilClk         => axilClk,

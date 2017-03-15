@@ -50,7 +50,7 @@ port (
    -- Software registers
    control_o : out slv(31 downto 0);
    
-   data_i : slv32Array(3 downto 0);
+   data_i : slv32Array(3 downto 0)
    
 );   
 end KcuReg;
@@ -85,7 +85,7 @@ begin
    ------------------------------------
    -- Register Space
    ------------------------------------
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
+   comb : process (r, axilReadMaster, axilRst, axilWriteMaster, s_data) is
       variable v      : RegType;
       variable regCon : AxiLiteEndpointType;
    begin
@@ -168,7 +168,7 @@ begin
             )
          port map (
             wr_clk => devClk,
-            din    => data(i),
+            din    => data_i(i),
             rd_clk => axilClk,
             dout   => s_data(i)
             );
@@ -185,7 +185,7 @@ begin
       port map (
          clk        => devClk,
          rst        => devRst,
-         dataIn(0)  => r.control,   
-         dataOut(0) => control_o);
+         dataIn     => r.control,   
+         dataOut    => control_o);
 ---------------------------------------------------------------------
 end rtl;
