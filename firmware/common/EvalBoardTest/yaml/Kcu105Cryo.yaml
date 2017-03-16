@@ -8,17 +8,17 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once Kcu105Cryo.yaml
 #include AxiVersion.yaml
 #include AxiSysMonUltraScale.yaml
 #include EthMacPhy.yaml
 #include UdpEngineServer.yaml
 #include RssiCore.yaml
-#include MpsCentralNodeCore.yaml
-#include MpsCentralNodeConfig.yaml
+#include JesdRx.yaml
 
-Kcu105MpsCentralNode: &Kcu105MpsCentralNode 
-  name: Kcu105MpsCentralNode
+
+Kcu105Cryo: &Kcu105Cryo 
+  name: Kcu105Cryo
   class: MMIODev
   configPrio: 1
   description: AMC 
@@ -45,22 +45,36 @@ Kcu105MpsCentralNode: &Kcu105MpsCentralNode
     UdpEngineServer:
       <<: *UdpEngineServer
       at:
-        offset: 0x00040000
+        offset: 0x00030000
       description: "ServerConfig[4:0]"      
     ##################################################
     RssiServer:
       <<: *RssiCore
       at:
-        offset: 0x00050000 
+        offset: 0x00040000 
       description: Server RSSI Software
-    ##################################################
-    MpsCentralNodeCore:
-      <<: *MpsCentralNodeCore
+    ##################################################     
+    JesdRx:
+      <<: *JesdRx
       at:
-        offset: 0x80000000 
-    ##################################################
-    MpsCentralNodeConfig:
-      <<: *MpsCentralNodeConfig
+        offset: 0x90000000  
+    #########################################################
+    #### Internal registers ####
+    #########################################################
+    FmcCtrl:
       at:
-        offset: 0x80100000 
-    ##################################################
+        offset: 0x80000000
+      class: IntField
+      sizeBits: 2
+      lsBit: 0
+      mode: RW
+      description: "2 FmcCtrl bits."
+    #########################################################
+    Data:
+      at:
+        offset: 0x80000100
+        nelms: 4
+        stride: 0x4
+      class: IntField
+      mode: RO
+      description: "Data from all 4 channels."

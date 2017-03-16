@@ -9,7 +9,7 @@
 ##############################################################################
 #schemaversion 3.0.0
 #once
-#include Kcu105MpsCentralNode.yaml
+#include Kcu105Cryo.yaml
 
 #MMIO range, will be attached to FPGA
 mmio: &mmio
@@ -17,8 +17,8 @@ mmio: &mmio
   class: MMIODev
   configPrio: 1
   children:
-      Kcu105MpsCentralNode:
-          <<: *Kcu105MpsCentralNode
+      Kcu105Cryo:
+          <<: *Kcu105Cryo
           at:
             offset: 0x00000000
   
