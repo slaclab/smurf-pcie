@@ -10,6 +10,7 @@
 #schemaversion 3.0.0
 #once AppCore.yaml
 #include AmcCryoDemoCore.yaml
+#include SysgenCryo.yaml
 
 AppCore: &AppCore
   name: AppCore
@@ -26,10 +27,10 @@ AppCore: &AppCore
         offset: 0x00000000
         stride: 0x00100000
     ##################################################    
-    # SysgenDemo:
-      # <<: *SysgenCryo
-      # at:
-        # offset: 0x01000000
+    SysgenCryo:
+      <<: *SysgenCryo
+      at:
+        offset: 0x01000000
     #########################################################
     #### Internal registers ####
     #########################################################

@@ -50,7 +50,7 @@ set_property -dict { PACKAGE_PIN A12 IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports
 set_property -dict { PACKAGE_PIN J8  IOSTANDARD LVDS  } [get_ports {jesdRxSyncP}] 
 set_property -dict { PACKAGE_PIN H8  IOSTANDARD LVDS  } [get_ports {jesdRxSyncN}] 
 
-# Exstras on FMC
+# Extras on FMC
 set_property -dict { PACKAGE_PIN B10} [get_ports {jesdRxSyncLed}]
 
 set_property -dict { PACKAGE_PIN H21} [get_ports {fmcCtrl[0]}]
@@ -64,6 +64,9 @@ set_property PACKAGE_PIN G27 [get_ports smaGpioN]
 set_property PACKAGE_PIN D23 [get_ports smaClkP]
 set_property PACKAGE_PIN C23 [get_ports smaClkN]
 
+set_property -dict { PACKAGE_PIN AL14} [get_ports {debug[0]}]
+set_property -dict { PACKAGE_PIN AM14} [get_ports {debug[1]}]
+
 # BITSTREAM Configurations
 set_property BITSTREAM.CONFIG.CONFIGRATE   6  [current_design] 
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 8  [current_design]
@@ -73,7 +76,9 @@ set_property ASYNC_REG TRUE [get_cells -hierarchical *crossDomainSyncReg_reg*]
 
 # Timing Constraints 
 create_clock -name clkRefP  -period  6.400 [get_ports {clkRefP}]
-create_clock -name jesdClkP -period  3.200 [get_ports {jesdClkP}]
+#create_clock -name jesdClkP -period  6.400 [get_ports {jesdClkP}]
+create_clock -name jesdClkP -period  3.256 [get_ports {jesdClkP}]
+#create_clock -name jesdClkP -period  3.200 [get_ports {jesdClkP}]
 
 create_generated_clock -name jesdClk [get_pins {U_jesd/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name axilClk [get_pins {U_Core/TenGigEthGthUltraScaleWrapper_Inst/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_TenGigEthRst/CLK156_BUFG_GT/O}]

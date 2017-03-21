@@ -10,8 +10,9 @@
       <PollPeriod>0</PollPeriod>
       <RunCount>1000</RunCount>
       <RunRate>1Hz</RunRate>
-      <Kcu105MpsCentralNode>
+      <Kcu105Cryo>
          <Enabled>True</Enabled>
+         <FmcCtrl>0x0</FmcCtrl>
          <AxiSysMonUltraScale>
             <AlarmThresholdReg12>0x4963</AlarmThresholdReg12>
             <AlarmThresholdReg16>0x9A74</AlarmThresholdReg16>
@@ -60,55 +61,30 @@
             <MasterReset>0x0</MasterReset>
             <ScratchPad>0x0</ScratchPad>
          </AxiVersion>
-         <MpsCentralNodeCore>
-            <Enable>0x1</Enable>
+         <JesdRx>
+            <ClearErrors>0x0</ClearErrors>
+            <Enable>0xF</Enable>
             <Enabled>True</Enabled>
-            <EvaluationClear>0x0</EvaluationClear>
-            <EvaluationEnable>0x0</EvaluationEnable>
-            <EvaluationSwPowerLevel_0x0000>0x0</EvaluationSwPowerLevel_0x0000>
-            <EvaluationSwPowerLevel_0x0001>0x0</EvaluationSwPowerLevel_0x0001>
-            <MonitorClear>0x0</MonitorClear>
-            <SoftwareClear>0x0</SoftwareClear>
-            <SoftwareEnable>0x0</SoftwareEnable>
-            <SoftwareWdHeartbeat>0x0</SoftwareWdHeartbeat>
-            <SoftwareWdTime>0x0</SoftwareWdTime>
-            <Switch>0x0</Switch>
-            <TimeoutClear>0x1</TimeoutClear>
-            <TimeoutEnable>0x1</TimeoutEnable>
-            <TimeoutMask_0x0000>0xFF</TimeoutMask_0x0000>
-            <TimeoutMask_0x0001>0x0</TimeoutMask_0x0001>
-            <TimeoutMask_0x0002>0x0</TimeoutMask_0x0002>
-            <TimeoutMask_0x0003>0x0</TimeoutMask_0x0003>
-            <TimeoutMask_0x0004>0x0</TimeoutMask_0x0004>
-            <TimeoutMask_0x0005>0x0</TimeoutMask_0x0005>
-            <TimeoutMask_0x0006>0x0</TimeoutMask_0x0006>
-            <TimeoutMask_0x0007>0x0</TimeoutMask_0x0007>
-            <TimeoutMask_0x0008>0x0</TimeoutMask_0x0008>
-            <TimeoutMask_0x0009>0x0</TimeoutMask_0x0009>
-            <TimeoutMask_0x000A>0x0</TimeoutMask_0x000A>
-            <TimeoutMask_0x000B>0x0</TimeoutMask_0x000B>
-            <TimeoutMask_0x000C>0x0</TimeoutMask_0x000C>
-            <TimeoutMask_0x000D>0x0</TimeoutMask_0x000D>
-            <TimeoutMask_0x000E>0x0</TimeoutMask_0x000E>
-            <TimeoutMask_0x000F>0x0</TimeoutMask_0x000F>
-            <TimeoutMask_0x0010>0x0</TimeoutMask_0x0010>
-            <TimeoutMask_0x0011>0x0</TimeoutMask_0x0011>
-            <TimeoutMask_0x0012>0x0</TimeoutMask_0x0012>
-            <TimeoutMask_0x0013>0x0</TimeoutMask_0x0013>
-            <TimeoutMask_0x0014>0x0</TimeoutMask_0x0014>
-            <TimeoutMask_0x0015>0x0</TimeoutMask_0x0015>
-            <TimeoutMask_0x0016>0x0</TimeoutMask_0x0016>
-            <TimeoutMask_0x0017>0x0</TimeoutMask_0x0017>
-            <TimeoutMask_0x0018>0x0</TimeoutMask_0x0018>
-            <TimeoutMask_0x0019>0x0</TimeoutMask_0x0019>
-            <TimeoutMask_0x001A>0x0</TimeoutMask_0x001A>
-            <TimeoutMask_0x001B>0x0</TimeoutMask_0x001B>
-            <TimeoutMask_0x001C>0x0</TimeoutMask_0x001C>
-            <TimeoutMask_0x001D>0x0</TimeoutMask_0x001D>
-            <TimeoutMask_0x001E>0x0</TimeoutMask_0x001E>
-            <TimeoutMask_0x001F>0x0</TimeoutMask_0x001F>
-            <TimeoutTime>0x4</TimeoutTime>
-         </MpsCentralNodeCore>
+            <InvertSync>0x0</InvertSync>
+            <LinkErrMask>0x3F</LinkErrMask>
+            <ReplaceEnable>0x1</ReplaceEnable>
+            <ResetGTs>0x0</ResetGTs>
+            <ScrambleEnable>0x0</ScrambleEnable>
+            <SubClass>0x1</SubClass>
+            <SysrefDelay>0x0</SysrefDelay>
+            <ThresholdHigh_0x0000>0xA000</ThresholdHigh_0x0000>
+            <ThresholdHigh_0x0001>0xA000</ThresholdHigh_0x0001>
+            <ThresholdHigh_0x0002>0xA000</ThresholdHigh_0x0002>
+            <ThresholdHigh_0x0003>0xA000</ThresholdHigh_0x0003>
+            <ThresholdHigh_0x0004>0x0</ThresholdHigh_0x0004>
+            <ThresholdHigh_0x0005>0x0</ThresholdHigh_0x0005>
+            <ThresholdLow_0x0000>0x5000</ThresholdLow_0x0000>
+            <ThresholdLow_0x0001>0x5000</ThresholdLow_0x0001>
+            <ThresholdLow_0x0002>0x5000</ThresholdLow_0x0002>
+            <ThresholdLow_0x0003>0x5000</ThresholdLow_0x0003>
+            <ThresholdLow_0x0004>0x0</ThresholdLow_0x0004>
+            <ThresholdLow_0x0005>0x0</ThresholdLow_0x0005>
+         </JesdRx>
          <RssiServer>
             <CloseConn>0x0</CloseConn>
             <CumAckTimeout>0x19</CumAckTimeout>
@@ -130,10 +106,11 @@
          <UdpEngineServer>
             <Enabled>True</Enabled>
          </UdpEngineServer>
-      </Kcu105MpsCentralNode>
+      </Kcu105Cryo>
       <Enabled>True</Enabled>
-      <Kcu105MpsCentralNode index="0">
+      <Kcu105Cryo index="0">
          <Enabled>True</Enabled>
+         <FmcCtrl>0x0</FmcCtrl>
          <AxiSysMonUltraScale index="0">
             <AlarmThresholdReg12>0x4963</AlarmThresholdReg12>
             <AlarmThresholdReg16>0x9A74</AlarmThresholdReg16>
@@ -182,55 +159,30 @@
             <MasterReset>0x0</MasterReset>
             <ScratchPad>0x0</ScratchPad>
          </AxiVersion>
-         <MpsCentralNodeCore index="0">
-            <Enable>0x1</Enable>
+         <JesdRx index="0">
+            <ClearErrors>0x0</ClearErrors>
+            <Enable>0xF</Enable>
             <Enabled>True</Enabled>
-            <EvaluationClear>0x0</EvaluationClear>
-            <EvaluationEnable>0x0</EvaluationEnable>
-            <EvaluationSwPowerLevel_0x0000>0x0</EvaluationSwPowerLevel_0x0000>
-            <EvaluationSwPowerLevel_0x0001>0x0</EvaluationSwPowerLevel_0x0001>
-            <MonitorClear>0x0</MonitorClear>
-            <SoftwareClear>0x0</SoftwareClear>
-            <SoftwareEnable>0x0</SoftwareEnable>
-            <SoftwareWdHeartbeat>0x0</SoftwareWdHeartbeat>
-            <SoftwareWdTime>0x0</SoftwareWdTime>
-            <Switch>0x0</Switch>
-            <TimeoutClear>0x1</TimeoutClear>
-            <TimeoutEnable>0x1</TimeoutEnable>
-            <TimeoutMask_0x0000>0xFF</TimeoutMask_0x0000>
-            <TimeoutMask_0x0001>0x0</TimeoutMask_0x0001>
-            <TimeoutMask_0x0002>0x0</TimeoutMask_0x0002>
-            <TimeoutMask_0x0003>0x0</TimeoutMask_0x0003>
-            <TimeoutMask_0x0004>0x0</TimeoutMask_0x0004>
-            <TimeoutMask_0x0005>0x0</TimeoutMask_0x0005>
-            <TimeoutMask_0x0006>0x0</TimeoutMask_0x0006>
-            <TimeoutMask_0x0007>0x0</TimeoutMask_0x0007>
-            <TimeoutMask_0x0008>0x0</TimeoutMask_0x0008>
-            <TimeoutMask_0x0009>0x0</TimeoutMask_0x0009>
-            <TimeoutMask_0x000A>0x0</TimeoutMask_0x000A>
-            <TimeoutMask_0x000B>0x0</TimeoutMask_0x000B>
-            <TimeoutMask_0x000C>0x0</TimeoutMask_0x000C>
-            <TimeoutMask_0x000D>0x0</TimeoutMask_0x000D>
-            <TimeoutMask_0x000E>0x0</TimeoutMask_0x000E>
-            <TimeoutMask_0x000F>0x0</TimeoutMask_0x000F>
-            <TimeoutMask_0x0010>0x0</TimeoutMask_0x0010>
-            <TimeoutMask_0x0011>0x0</TimeoutMask_0x0011>
-            <TimeoutMask_0x0012>0x0</TimeoutMask_0x0012>
-            <TimeoutMask_0x0013>0x0</TimeoutMask_0x0013>
-            <TimeoutMask_0x0014>0x0</TimeoutMask_0x0014>
-            <TimeoutMask_0x0015>0x0</TimeoutMask_0x0015>
-            <TimeoutMask_0x0016>0x0</TimeoutMask_0x0016>
-            <TimeoutMask_0x0017>0x0</TimeoutMask_0x0017>
-            <TimeoutMask_0x0018>0x0</TimeoutMask_0x0018>
-            <TimeoutMask_0x0019>0x0</TimeoutMask_0x0019>
-            <TimeoutMask_0x001A>0x0</TimeoutMask_0x001A>
-            <TimeoutMask_0x001B>0x0</TimeoutMask_0x001B>
-            <TimeoutMask_0x001C>0x0</TimeoutMask_0x001C>
-            <TimeoutMask_0x001D>0x0</TimeoutMask_0x001D>
-            <TimeoutMask_0x001E>0x0</TimeoutMask_0x001E>
-            <TimeoutMask_0x001F>0x0</TimeoutMask_0x001F>
-            <TimeoutTime>0x4</TimeoutTime>
-         </MpsCentralNodeCore>
+            <InvertSync>0x0</InvertSync>
+            <LinkErrMask>0x3F</LinkErrMask>
+            <ReplaceEnable>0x1</ReplaceEnable>
+            <ResetGTs>0x0</ResetGTs>
+            <ScrambleEnable>0x0</ScrambleEnable>
+            <SubClass>0x1</SubClass>
+            <SysrefDelay>0x0</SysrefDelay>
+            <ThresholdHigh_0x0000>0xA000</ThresholdHigh_0x0000>
+            <ThresholdHigh_0x0001>0xA000</ThresholdHigh_0x0001>
+            <ThresholdHigh_0x0002>0xA000</ThresholdHigh_0x0002>
+            <ThresholdHigh_0x0003>0xA000</ThresholdHigh_0x0003>
+            <ThresholdHigh_0x0004>0x0</ThresholdHigh_0x0004>
+            <ThresholdHigh_0x0005>0x0</ThresholdHigh_0x0005>
+            <ThresholdLow_0x0000>0x5000</ThresholdLow_0x0000>
+            <ThresholdLow_0x0001>0x5000</ThresholdLow_0x0001>
+            <ThresholdLow_0x0002>0x5000</ThresholdLow_0x0002>
+            <ThresholdLow_0x0003>0x5000</ThresholdLow_0x0003>
+            <ThresholdLow_0x0004>0x0</ThresholdLow_0x0004>
+            <ThresholdLow_0x0005>0x0</ThresholdLow_0x0005>
+         </JesdRx>
          <RssiServer index="0">
             <CloseConn>0x0</CloseConn>
             <CumAckTimeout>0x19</CumAckTimeout>
@@ -252,6 +204,6 @@
          <UdpEngineServer index="0">
             <Enabled>True</Enabled>
          </UdpEngineServer>
-      </Kcu105MpsCentralNode>
+      </Kcu105Cryo>
    </config>
 </system>

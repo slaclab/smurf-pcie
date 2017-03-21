@@ -75,6 +75,7 @@ entity Kcu105EvalCryoAdc is
       
       -- Control ports
       fmcCtrl : out slv(1 downto 0);
+      debug   : out slv(1 downto 0);
       
       -- 10G-BaseR ETH Ports
       ethRxP   : in  sl;
@@ -263,6 +264,21 @@ begin
    led(1) <= jesdRxSync;
    led(0) <= '0';   
    
+   
+   U_axi_10MHz_reference: entity work.Heartbeat
+   generic map (
+      TPD_G        => TPD_G,
+      USE_DSP48_G  => "yes",
+      PERIOD_IN_G  => 6.4E-9,
+      PERIOD_OUT_G => 100.0E-9)-- 10 MHz
+   port map (
+      clk => axilClk,
+      rst => axilRst,
+      o   => smaGpioP);
+   --smaGpioP <= axilClk;
+   
+   smaClkP  <= jesdClk;   
+   
    jesdRxSyncLed <= jesdRxSync;
    
    U_axi_Heartbeat: entity work.Heartbeat
@@ -270,18 +286,19 @@ begin
       TPD_G        => TPD_G,
       USE_DSP48_G  => "yes",
       PERIOD_IN_G  => 6.4E-9,
-      PERIOD_OUT_G => 0.5)-- 1 MHz
+      PERIOD_OUT_G => 1.0)-- 1 Hz
    port map (
       clk => axilClk,
       rst => axilRst,
       o   => led(3)); 
+      
    
-   U_pgp_Heartbeat: entity work.Heartbeat
+   U_jesd_Heartbeat: entity work.Heartbeat
    generic map (
       TPD_G        => TPD_G,
       USE_DSP48_G  => "yes",
       PERIOD_IN_G  => 3.2E-9,
-      PERIOD_OUT_G => 0.5)-- 1 MHz
+      PERIOD_OUT_G => 1.0)-- 1 Hz
    port map (
       clk => jesdClk,
       rst => jesdRst,

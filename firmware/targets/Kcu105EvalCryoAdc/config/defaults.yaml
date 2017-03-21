@@ -1,150 +1,52 @@
-# Config File Generated: 2017-02-22.10:34:42
-- Kcu105MpsCentralNode:
-    - MpsCentralNodeConfig:
-        - AppId6: !<value> 0x00000000
-        - AppId7: !<value> 0x00000000
-        - AppId5: !<value> 0x00000000
-        - AppId4: !<value> 0x00000000
-        - AppId2: !<value> 0x00000000
-        - AppId3: !<value> 0x00000000
-        - AppId1: !<value>
-            - 0x40400103
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x02000000
-            - 0x00405001
-        - AppId0: !<value>
-            - 0x04e00016
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x12400000
-            - 0x00045000
-    - MpsCentralNodeCore:
-        - SoftwareWdTime: !<value> 0x00000000
-        - SoftwareWdHeartbeat: !<value> 0x0
-        - SoftwareClear: !<value> 0x0
-        - SoftwareEnable: !<value> 0x0
-        - EvaluationSwPowerLevel: !<value> 0xffffffff
-        - EvaluationClear: !<value> 0x0
-        - EvaluationEnable: !<value> 0x0
-        - TimeoutMask: !<value>
-            - 0x000000ff
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-        - TimeoutTime: !<value> 0x7
-        - TimeoutClear: !<value> 0x0
-        - TimeoutEnable: !<value> 0x1
-        - MonitorClear: !<value> 0x0
-        - Enable: !<value> 0x1
+# Config File Generated: 2017-03-16.12:00:20
+- Kcu105Cryo:
+    - FmcCtrl: !<value> 0x0
+    - JesdRx:
+        - ThresholdLow: !<value>
+            - 0x5000
+            - 0x5000
+            - 0x5000
+            - 0x5000
+            - 0x0000
+            - 0x0000
+        - ThresholdHigh: !<value>
+            - 0xa000
+            - 0xa000
+            - 0xa000
+            - 0xa000
+            - 0x0000
+            - 0x0000
+        - LinkErrMask: !<value> 0x3f
+        - ScrambleEnable: !<value> Disabled
+        - InvertSync: !<value> Regular
+        - ResetGTs: !<value> 0x0
+        - ClearErrors: !<value> 0x0
+        - SubClass: !<value> 0x1
+        - ReplaceEnable: !<value> Enabled
+        - Enable: !<value> 0x0f
+        - SysrefDelay: !<value> 0x00
     - AxiVersion:
-        - FpgaReloadHalt: !<value> 0x0
+        - MasterReset: !<value> 0x0
         - FpgaReloadAddress: !<value> 0x00000000
         - FpgaReload: !<value> 0x0
-        - MasterReset: !<value> 0x0
+        - FpgaReloadHalt: !<value> 0x0
         - ScratchPad: !<value> 0x00000000
+    - RssiServer:
+        - MaxOutOfSeq: !<value> 0x00
+        - MaxCumAck: !<value> 0x03
+        - MaxNumRetrans: !<value> 0x02
+        - NullSegTimeout: !<value> 0x00c8
+        - CumAckTimeout: !<value> 0x0019
+        - RetransTimeout: !<value> 0x0032
+        - MaxSegSize: !<value> 0x0400
+        - MaxOutsSeg: !<value> 0x08
+        - Version: !<value> 0x1
+        - InitSeqN: !<value> 0x80
+        - HeaderChksumEn: !<value> 0x1
+        - Mode: !<value> 0x0
+        - InjectFault: !<value> 0x0
+        - CloseConn: !<value> 0x0
+        - OpenConn: !<value> 0x0
     - AxiSysMonUltraScale:
         - AlarmThresholdReg_25_16: !<value>
             - 0x00009a74
@@ -157,16 +59,6 @@
             - 0x00000000
         - AlarmThresholdReg16: !<value> 0x00009a74
         - AlarmThresholdReg12: !<value> 0x00004963
-        - SequenceReg_7_0: !<value>
-            - 0x00004f01
-            - 0x00000000
-            - 0x00004f00
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-            - 0x00000000
-        - SequenceReg9: !<value> 0x00000000
         - AlarmThresholdReg_8_0: !<value>
             - 0x0000b723
             - 0x00004e81
@@ -177,6 +69,16 @@
             - 0x00009555
             - 0x0000af7b
             - 0x00004e81
+        - SequenceReg_7_0: !<value>
+            - 0x00004f01
+            - 0x00000000
+            - 0x00004f00
+            - 0x00000000
+            - 0x00000000
+            - 0x00000000
+            - 0x00000000
+            - 0x00000000
+        - SequenceReg9: !<value> 0x00000000
         - SequenceRegister8: !<value> 0x00000000
         - ConfigurationRegister: !<value>
             - 0x00000000
@@ -185,21 +87,5 @@
             - 0x0000000f
         - IPIER: !<value> 0x00000000
         - GIER: !<value> 0x00000000
-        - CONVSTR: !<value> 0x00000000
         - SYSMONRR: !<value> 0x00000000
-    - RssiServer:
-        - MaxCumAck: !<value> 0x03
-        - MaxNumRetrans: !<value> 0x02
-        - MaxOutOfSeq: !<value> 0x00
-        - NullSegTimeout: !<value> 0x00c8
-        - CumAckTimeout: !<value> 0x0019
-        - RetransTimeout: !<value> 0x0032
-        - MaxSegSize: !<value> 0x0400
-        - MaxOutsSeg: !<value> 0x08
-        - Version: !<value> 0x1
-        - InitSeqN: !<value> 0x80
-        - HeaderChksumEn: !<value> 0x1
-        - Mode: !<value> 0x0
-        - CloseConn: !<value> 0x0
-        - InjectFault: !<value> 0x0
-        - OpenConn: !<value> 0x0
+        - CONVSTR: !<value> 0x00000000

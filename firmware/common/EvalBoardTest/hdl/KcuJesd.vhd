@@ -184,12 +184,14 @@ begin
          FB_BUFG_G          => true,
          NUM_CLOCKS_G       => 2,
          BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 3.2,
+         --CLKIN_PERIOD_G     => 3.2,
+         CLKIN_PERIOD_G     => 3.256,
+         --CLKIN_PERIOD_G     => 6.4,
          DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 6.000,
-         CLKOUT0_DIVIDE_F_G => 6.000,
+         CLKFBOUT_MULT_F_G  => 4.000,
+         CLKOUT0_DIVIDE_F_G => 4.000,
          CLKOUT0_RST_HOLD_G => 16,
-         CLKOUT1_DIVIDE_G   => 3,
+         CLKOUT1_DIVIDE_G   => 2,
          CLKOUT1_RST_HOLD_G => 32)
       port map (
          clkIn           => amcClk,
