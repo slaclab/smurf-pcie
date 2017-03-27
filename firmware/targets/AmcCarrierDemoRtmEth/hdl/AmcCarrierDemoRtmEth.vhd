@@ -210,7 +210,7 @@ begin
          JESD_RX_POLARITY_G   => (others => "1111111"),  -- Configured by application
          JESD_TX_POLARITY_G   => (others => "0000000"),  -- Note: One of the TX lanes has reversed polarity. Check the DAC configuration to make sure that it gets reversed there.
          JESD_RX_ROUTES_G     => (others => JESD_ROUTES_INIT_C),  -- Lane routing crossbar JESD_ROUTES_INIT_C = parallel route 
-         JESD_TX_ROUTES_G     => (others => JESD_ROUTES_INIT_C),  -- Lane routing crossbar JESD_ROUTES_INIT_C = parallel route 
+         JESD_TX_ROUTES_G     => (others => JESD_SWAP_TX_4_5_C),  -- Lane routing crossbar 0 and 1 are connected to 4 and 5
          JESD_REF_SEL_G       => (others => DEV_CLK0_SEL_C),  -- Configured by application
          -- Signal Generator Generics
          SIG_GEN_SIZE_G       => (others => 2),  -- Configured by application
