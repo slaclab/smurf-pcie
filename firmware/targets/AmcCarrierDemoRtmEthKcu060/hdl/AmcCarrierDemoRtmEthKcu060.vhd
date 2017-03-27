@@ -156,7 +156,6 @@ architecture top_level of AmcCarrierDemoRtmEthKcu060 is
       5 => 1,
       6 => 6);
    
-   
    -- AXI-Lite Interface (axilClk domain)
    signal axilClk              : sl;
    signal axilRst              : sl;
