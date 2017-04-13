@@ -20,47 +20,55 @@
 import pyrogue as pr
 
 class SysgenCryo(pr.Device):
-    def __init__(self, name="SysgenCryo", description="Sysgen Cryo Module", memBase=None, offset=0x0, hidden=False):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
+    def __init__(   self,       
+                    name        = "SysgenCryo",
+                    description = "Sysgen Cryo Module",
+                    memBase     =  None,
+                    offset      =  0x00,
+                    hidden      =  False,
+                ):
+        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, )
 
         ##############################
         # Variables
         ##############################
 
-        self.add(pr.Variable(   name         = "Revision",
-                                description  = "Sysgen Revision Register",
-                                offset       =  0x00,
-                                bitSize      =  32,
-                                bitOffset    =  0x00,
-                                base         = "hex",
-                                mode         = "RO",
-                            ))
-        for i in range(8):
-            self.add(pr.Variable(   name         = "Status_%i" % (i),
-                                    description  = "Status Registers %i" % (i),
-                                    offset       =  0x04 + (i * 0x04),
-                                    bitSize      =  32,
-                                    bitOffset    =  0x00,
-                                    base         = "hex",
-                                    mode         = "RO",
-                                ))
+        self.addVariable(   name         = "Revision",
+                            description  = "Sysgen Revision Register",
+                            offset       =  0x00,
+                            bitSize      =  32,
+                            bitOffset    =  0x00,
+                            base         = "hex",
+                            mode         = "RO",
+                        )
 
-        for i in range(8):
-            self.add(pr.Variable(   name         = "Config_%i" % (i),
-                                    description  = "Config Registers %i" % (i),
-                                    offset       =  0x800 + (i * 0x04),
-                                    bitSize      =  32,
-                                    bitOffset    =  0x00,
-                                    base         = "hex",
-                                    mode         = "RW",
-                                ))
+        self.addVariables(  name         = "Status",
+                            description  = "Status Registers",
+                            offset       =  0x04,
+                            bitSize      =  32,
+                            bitOffset    =  0x00,
+                            base         = "hex",
+                            mode         = "RO",
+                            number       =  8,
+                            stride       =  4,
+                        )
 
-        self.add(pr.Variable(   name         = "Scratchpad",
-                                description  = "Scratchpad Register defines the bus size",
-                                offset       =  0xFFC,
-                                bitSize      =  32,
-                                bitOffset    =  0x00,
-                                base         = "hex",
-                                mode         = "RW",
-                            ))
+        self.addVariables(  name         = "Config",
+                            description  = "Config Registers",
+                            offset       =  0x800,
+                            bitSize      =  32,
+                            bitOffset    =  0x00,
+                            base         = "hex",
+                            mode         = "RW",
+                            number       =  8,
+                            stride       =  4,
+                        )
 
+        self.addVariable(   name         = "Scratchpad",
+                            description  = "Scratchpad Register defines the bus size",
+                            offset       =  0xFFC,
+                            bitSize      =  32,
+                            bitOffset    =  0x00,
+                            base         = "hex",
+                            mode         = "RW",
+                        )
