@@ -41,7 +41,8 @@ entity AppTopJesdCryo is
       JESD_RX_LANE_G     : natural range 0 to 8 := 8;
       JESD_TX_LANE_G     : natural range 0 to 8 := 8;
       JESD_RX_POLARITY_G : slv(7 downto 0)      := "00000000";
-      JESD_TX_POLARITY_G : slv(7 downto 0)      := "00000000");
+      JESD_TX_POLARITY_G : slv(7 downto 0)      := "00000000";
+      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
@@ -72,8 +73,8 @@ entity AppTopJesdCryo is
       jesdRxN         : in  slv(GT_LANE_G-1 downto 0);
       jesdTxP         : out slv(GT_LANE_G-1 downto 0);
       jesdTxN         : out slv(GT_LANE_G-1 downto 0);
-      jesdClkP        : in  sl;
-      jesdClkN        : in  sl);
+      jesdClkP        : in  slv(2 downto 0);
+      jesdClkN        : in  slv(2 downto 0));
 end AppTopJesdCryo;
 
 architecture mapping of AppTopJesdCryo is
@@ -101,8 +102,10 @@ architecture mapping of AppTopJesdCryo is
    signal gthReadMasters  : AxiLiteReadMasterArray(JESD_LANE_C-1 downto 0);
    signal gthReadSlaves   : AxiLiteReadSlaveArray(JESD_LANE_C-1 downto 0);
 
-   signal refClkDiv2     : sl;
+   signal refClkDiv2Vec  : slv(2 downto 0);
+   signal refClkVec      : slv(2 downto 0);
    signal refClk         : sl;
+   signal amcClkVec      : slv(2 downto 0);   
    signal amcClk         : sl;
    signal amcRst         : sl;
    signal jesdClk1x      : sl;
@@ -144,28 +147,35 @@ begin
    ----------------
    -- JESD Clocking
    ----------------
-   U_IBUFDS_GTE3 : IBUFDS_GTE3
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => jesdClkP,
-         IB    => jesdClkN,
-         CEB   => '0',
-         ODIV2 => refClkDiv2,  -- Not divided
-         O     => refClk);       
+   GEN_GTH_CLK : for i in 2 downto 0 generate
 
-   U_BUFG_GT : BUFG_GT
-      port map (
-         I       => refClkDiv2,  -- Not divided
-         CE      => '1',
-         CLR     => '0',
-         CEMASK  => '1',
-         CLRMASK => '1',
-         DIV     => "000",             
-         O       => amcClk);     
+      U_IBUFDS_GTE3 : IBUFDS_GTE3
+         generic map (
+            REFCLK_EN_TX_PATH  => '0',
+            REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
+            REFCLK_ICNTL_RX    => "00")
+         port map (
+            I     => jesdClkP(i),
+            IB    => jesdClkN(i),
+            CEB   => '0',
+            ODIV2 => refClkDiv2Vec(i),  -- 185 MHz, Frequency the same as jesdRefClk
+            O     => refClkVec(i));     -- 185 MHz     
 
+      U_BUFG_GT : BUFG_GT
+         port map (
+            I       => refClkDiv2Vec(i),  -- 185 MHz
+            CE      => '1',
+            CLR     => '0',
+            CEMASK  => '1',
+            CLRMASK => '1',
+            DIV     => "000",             -- Divide by 1
+            O       => amcClkVec(i));     -- 185 MHz
+
+   end generate GEN_GTH_CLK;
+   
+   refClk <= refClkVec(conv_integer(JESD_REF_SEL_G));
+   amcClk <= amcClkVec(conv_integer(JESD_REF_SEL_G));   
+   
    U_PwrUpRst : entity work.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
