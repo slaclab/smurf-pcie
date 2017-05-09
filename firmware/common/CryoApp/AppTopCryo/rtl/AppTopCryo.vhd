@@ -190,7 +190,7 @@ architecture mapping of AppTopCryo is
    signal debugValids : Slv4Array(1 downto 0);
    signal debugValues : sampleDataVectorArray(1 downto 0, 3 downto 0);
 
-   signal dataValids : Slv18Array(1 downto 0);
+   signal dataValids : Slv20Array(1 downto 0);
 
    signal dacSigCtrl   : DacSigCtrlArray(1 downto 0);
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
@@ -385,7 +385,7 @@ begin
             dacValues(4)    => dacValues(i, 4),
             dacValues(5)    => dacValues(i, 5),
             dacValues(6)    => dacValues(i, 6),
-            adcValues(7)    => adcValues(i, 7),            
+            dacValues(7)    => dacValues(i, 7),            
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
