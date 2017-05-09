@@ -54,6 +54,7 @@ entity AppCore is
       freezeHw            : out   slv(1 downto 0);
       evrTrig             : in    AppTopTrigType;
       trigHw              : out   slv(1 downto 0);
+      trigCascBay         : out   slv(1 downto 0);
       -- JESD SYNC Interface (jesdClk[1:0] domain)
       jesdSysRef          : out   slv(1 downto 0);
       jesdRxSync          : in    slv(1 downto 0);
@@ -257,8 +258,9 @@ begin
    GEN_TRIG :
    for i in 1 downto 0 generate
       -- Daq triggers freeze
-      trigHw(i)    <= s_extTrig(i) or evrTrig.trigPulse(i);   
-      freezeHw(i)  <= s_extTrig(i) or evrTrig.trigPulse(i);
+      trigHw(i)      <= s_extTrig(i) or evrTrig.trigPulse(i);   
+      freezeHw(i)    <= s_extTrig(i) or evrTrig.trigPulse(i);
+      trigCascBay(i) <= '0';
       --
    end generate GEN_TRIG;
    
