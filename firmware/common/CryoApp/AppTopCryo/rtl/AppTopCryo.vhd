@@ -184,7 +184,7 @@ architecture mapping of AppTopCryo is
    signal adcValids : Slv8Array(1 downto 0);
    signal adcValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
 
-   signal dacValids : Slv7Array(1 downto 0);
+   signal dacValids : Slv8Array(1 downto 0);
    signal dacValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
 
    signal debugValids : Slv4Array(1 downto 0);
