@@ -34,9 +34,9 @@ entity AppTopJesd204bCryo is
       TPD_G              : time                 := 1 ns;
       TEST_G             : boolean              := false;
       SYSREF_GEN_G       : boolean              := false;
-      JESD_RX_LANE_G     : natural range 0 to 8 := 4;
-      JESD_TX_LANE_G     : natural range 0 to 8 := 0;
-      GT_LANE_G          : natural range 0 to 8 := 4;
+      JESD_RX_LANE_G     : natural range 0 to 8 := 8;
+      JESD_TX_LANE_G     : natural range 0 to 8 := 8;
+      GT_LANE_G          : natural range 0 to 8 := 8;
       JESD_RX_POLARITY_G : slv(7 downto 0)      := "00000000";
       JESD_TX_POLARITY_G : slv(7 downto 0)      := "00000000";
       AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_SLVERR_C);
