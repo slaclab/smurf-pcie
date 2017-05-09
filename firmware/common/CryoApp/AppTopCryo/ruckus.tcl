@@ -6,4 +6,4 @@ loadSource      -dir  "$::DIR_PATH/rtl/"
 
 
 loadSource      -path "$::DIR_PATH/coregen/AppTopJesd204bCoregenCryo.dcp"
-# loadSource    -path "$::DIR_PATH/coregen/AppTopJesd204bCoregenCryo.xci"
+#loadSource    -path "$::DIR_PATH/coregen/AppTopJesd204bCoregenCryo.xci"

@@ -232,6 +232,7 @@ begin
          SYSREF_GEN_G       => false,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
+         GT_LANE_G          => JESD_RX_LANE_G,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
          JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
          AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)
