@@ -71,7 +71,7 @@ entity AppCore is
       -- If SIG_GEN_LANE_MODE_G = '1', (jesdClk2x[1:0] domain)
       dacSigCtrl          : out   DacSigCtrlArray(1 downto 0);
       dacSigStatus        : in    DacSigStatusArray(1 downto 0);
-      dacSigValids        : in    Slv7Array(1 downto 0);
+      dacSigValids        : in    Slv8Array(1 downto 0);
       dacSigValues        : in    sampleDataVectorArray(1 downto 0, 7 downto 0);
       -- AXI-Lite Interface (axilClk domain) [0x8FFFFFFF:0x80000000]
       axilClk             : in    sl;
