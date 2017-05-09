@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierDemoRtmEthKcu060.vhd
+-- File       : AmcCarrierCryoRtmEthKcu060.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-13
--- Last update: 2017-03-13
+-- Created    : 2017-05-09
+-- Last update: 2017-05-09
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -- 
@@ -28,7 +28,7 @@ use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AppTopPkg.all;
 
-entity AmcCarrierDemoRtmEthKcu060 is
+entity AmcCarrierCryoRtmEthKcu060 is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -142,9 +142,9 @@ entity AmcCarrierDemoRtmEthKcu060 is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end AmcCarrierDemoRtmEthKcu060;
+end AmcCarrierCryoRtmEthKcu060;
 
-architecture top_level of AmcCarrierDemoRtmEthKcu060 is
+architecture top_level of AmcCarrierCryoRtmEthKcu060 is
    
    constant JESD_SWAP_4_5_0_1_C : AppTopJesdRouteType := (
       0 => 4,
@@ -207,21 +207,19 @@ architecture top_level of AmcCarrierDemoRtmEthKcu060 is
 
 begin
 
-   U_AppTop : entity work.AppTop
+   U_AppTop : entity work.AppTopCryo
       generic map (
          TPD_G                => TPD_G,
          MR_LCLS_APP_G        => true,          -- Configured by application
          -- JESD Generics
          JESD_DRP_EN_G        => false,          -- Configured by application
-         JESD_RX_LANE_G       => (others => 6),  -- Configured by application
-         JESD_TX_LANE_G       => (others => 2),  -- Configured by application
-         JESD_RX_POLARITY_G   => (others => "1111111"),  -- Configured by application
-         JESD_TX_POLARITY_G   => (others => "0000000"),  -- Note: One of the TX lanes has reversed polarity. Check the DAC configuration to make sure that it gets reversed there.
-         JESD_RX_ROUTES_G     => (others => JESD_SWAP_4_5_0_1_C), -- Lane routing crossbar 0 and 1 are connected to 4 and 5
-         JESD_TX_ROUTES_G     => (others => JESD_ROUTES_INIT_C),  -- Lane routing crossbar JESD_ROUTES_INIT_C = parallel route 
+         JESD_RX_LANE_G       => (others => 8),  -- Configured by application
+         JESD_TX_LANE_G       => (others => 8),  -- Configured by application
+         JESD_RX_POLARITY_G   => (others => "00000000"),  -- Configured by application
+         JESD_TX_POLARITY_G   => (others => "00000000"),  -- Configured by application
          JESD_REF_SEL_G       => (others => DEV_CLK0_SEL_C),  -- Configured by application
          -- Signal Generator Generics
-         SIG_GEN_SIZE_G       => (others => 2),  -- Configured by application
+         SIG_GEN_SIZE_G       => (others => 8),  -- Configured by application
          SIG_GEN_ADDR_WIDTH_G => (others => 9),  -- Configured by application
          SIG_GEN_LANE_MODE_G  => (others => "0000000"),  -- '0': 32 bit, '1': 16 bit
          -- Triggering Generics
