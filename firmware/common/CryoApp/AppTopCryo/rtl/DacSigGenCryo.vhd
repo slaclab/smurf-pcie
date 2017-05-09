@@ -42,8 +42,8 @@ entity DacSigGenCryo is
       jesdRst2x       : in  sl;
       dacSigCtrl      : in  DacSigCtrlType;
       dacSigStatus    : out DacSigStatusType;
-      dacSigValids    : out slv(6 downto 0);
-      dacSigValues    : out sampleDataArray(6 downto 0);
+      dacSigValids    : out slv(7 downto 0);
+      dacSigValues    : out sampleDataArray(7 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
