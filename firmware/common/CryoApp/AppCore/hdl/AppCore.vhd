@@ -60,9 +60,9 @@ entity AppCore is
       jesdRxSync          : in    slv(1 downto 0);
       jesdTxSync          : out   slv(1 downto 0);
       -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
-      adcValids           : in    Slv7Array(1 downto 0);
+      adcValids           : in    Slv8Array(1 downto 0);
       adcValues           : in    sampleDataVectorArray(1 downto 0, 7 downto 0);
-      dacValids           : out   Slv7Array(1 downto 0);
+      dacValids           : out   Slv8Array(1 downto 0);
       dacValues           : out   sampleDataVectorArray(1 downto 0, 7 downto 0);
       debugValids         : out   Slv4Array(1 downto 0);
       debugValues         : out   sampleDataVectorArray(1 downto 0, 3 downto 0);
