@@ -29,6 +29,7 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.jesd204bpkg.all;
+use work.AppTopPkg.all;
 use work.AppTopCryoPkg.all;
 
 entity AppTopCryo is
@@ -192,8 +193,8 @@ architecture mapping of AppTopCryo is
 
    signal dataValids : Slv20Array(1 downto 0);
 
-   signal dacSigCtrl   : DacSigCtrlArray(1 downto 0);
-   signal dacSigStatus : DacSigStatusArray(1 downto 0);
+   signal dacSigCtrl   : DacSigCtrlCryoArray(1 downto 0);
+   signal dacSigStatus : DacSigStatusCryoArray(1 downto 0);
    signal dacSigValids : Slv8Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
 
