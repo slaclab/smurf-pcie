@@ -55,6 +55,7 @@ entity AppCore is
       freezeHw            : out   slv(1 downto 0);
       evrTrig             : in    AppTopTrigType;
       trigHw              : out   slv(1 downto 0);
+      trigCascBay         : out   slv(1 downto 0);
       -- JESD SYNC Interface (jesdClk[1:0] domain)
       jesdSysRef          : out   slv(1 downto 0);
       jesdRxSync          : in    slv(1 downto 0);
