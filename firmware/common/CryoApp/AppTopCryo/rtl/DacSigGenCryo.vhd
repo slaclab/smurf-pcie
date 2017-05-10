@@ -79,7 +79,7 @@ architecture mapping of DacSigGenCryo is
 begin
    
    GEN_EMPTY : if SIG_GEN_SIZE_G = 0 generate
-      dacSigStatus <= DAC_SIG_STATUS_INIT_C;
+      dacSigStatus <= DAC_SIG_STATUS_INIT_CRYO_C;
       dacSigValids <= (others => '0');
       dacSigValues <= (others => x"0000_0000");
 
