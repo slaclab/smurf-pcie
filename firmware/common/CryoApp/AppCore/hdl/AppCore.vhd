@@ -174,7 +174,7 @@ architecture mapping of AppCore is
 begin
 
    -- Unconnected outs
-   dacSigCtrl <= (others => DAC_SIG_CTRL_INIT_C);
+   dacSigCtrl <= (others => DAC_SIG_CTRL_INIT_CRYO_C);
 
    diagnosticClk <= axilClk;
    diagnosticRst <= axilRst;
@@ -190,7 +190,7 @@ begin
    ibAppDebugSlave  <= AXI_STREAM_SLAVE_FORCE_C;
 
    mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
-   dacSigCtrl  <= (others => DAC_SIG_CTRL_INIT_C);
+   dacSigCtrl  <= (others => DAC_SIG_CTRL_INIT_CRYO_C);
    timingPhy   <= TIMING_PHY_INIT_C;
    
    ---------------------
