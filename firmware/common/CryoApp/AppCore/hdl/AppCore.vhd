@@ -33,7 +33,7 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
+use work.AppTopCryoPkg.all;
 
 entity AppCore is
    generic (
