@@ -24,7 +24,7 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
+use work.AppTopCryoPkg.all;
 
 entity DacSigGenCryo is
    generic (
