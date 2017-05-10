@@ -37,11 +37,11 @@ export RTM_ETH = 1
 ##########################################################################################
 
 # AMC_TYPE_BAY0 & AMC_INTF_BAY0 are defined by application
-export AMC_TYPE_BAY0 = AmcCryoDemo
+export AMC_TYPE_BAY0 = AmcCryo
 export AMC_INTF_BAY0 = 
 
 # AMC_TYPE_BAY1 & AMC_INTF_BAY1 are defined by application
-export AMC_TYPE_BAY1 = AmcCryoDemo
+export AMC_TYPE_BAY1 = AmcCryo
 export AMC_INTF_BAY1 = 
 
 # RTM_TYPE & RTM_INTF are defined by application

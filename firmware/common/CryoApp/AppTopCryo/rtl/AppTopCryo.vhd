@@ -404,7 +404,7 @@ begin
             jesdClkP        => jesdClkP(i),
             jesdClkN        => jesdClkN(i));
 
-      U_DacSigGen : entity work.DacSigGen
+      U_DacSigGen : entity work.DacSigGenCryo
          generic map (
             TPD_G                => TPD_G,
             AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,
