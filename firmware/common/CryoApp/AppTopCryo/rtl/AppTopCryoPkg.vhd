@@ -33,7 +33,7 @@ package AppTopCryoPkg is
       running : slv(7 downto 0);
    end record;
    type DacSigStatusCryoArray is array (natural range <>) of DacSigStatusCryoType;
-   constant DAC_SIG_STATUS_INI_CRYO_C : DacSigStatusCryoType := (
+   constant DAC_SIG_STATUS_INIT_CRYO_C : DacSigStatusCryoType := (
       running => (others => '0'));
 
 end package AppTopCryoPkg;
