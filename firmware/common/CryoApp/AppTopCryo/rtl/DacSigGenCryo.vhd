@@ -32,9 +32,9 @@ entity DacSigGenCryo is
       TPD_G                : time                   := 1 ns;
       AXI_BASE_ADDR_G      : slv(31 downto 0)       := (others => '0');
       AXI_ERROR_RESP_G     : slv(1 downto 0)        := AXI_RESP_DECERR_C;
-      SIG_GEN_SIZE_G       : natural range 0 to 8   := 0;                 -- 0 = Disabled
+      SIG_GEN_SIZE_G       : natural range 0 to 10  := 0;                 -- 0 = Disabled
       SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24 := 9;
-      SIG_GEN_LANE_MODE_G  : slv(7 downto 0)        := (others => '0'));  -- '0': 32 bit, '1': 16 bit
+      SIG_GEN_LANE_MODE_G  : slv(9 downto 0)        := (others => '0'));  -- '0': 32 bit, '1': 16 bit
    port (
       -- DAC Signal Generator Interface
       jesdClk         : in  sl;
@@ -43,8 +43,8 @@ entity DacSigGenCryo is
       jesdRst2x       : in  sl;
       dacSigCtrl      : in  DacSigCtrlCryoType;
       dacSigStatus    : out DacSigStatusCryoType;
-      dacSigValids    : out slv(7 downto 0);
-      dacSigValues    : out sampleDataArray(7 downto 0);
+      dacSigValids    : out slv(9 downto 0);
+      dacSigValues    : out sampleDataArray(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -66,15 +66,15 @@ architecture mapping of DacSigGenCryo is
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    -- Internal signals
-   signal s_enable    : slv(7 downto 0);
-   signal s_mode      : slv(7 downto 0);
-   signal s_sign      : slv(7 downto 0);
-   signal s_trigSw    : slv(7 downto 0);
-   signal s_trig      : slv(7 downto 0);
-   signal s_overflow  : slv(7 downto 0);
-   signal s_underflow : slv(7 downto 0);
-   signal s_running   : slv(7 downto 0);
-   signal s_period    : slv32Array(7 downto 0);
+   signal s_enable    : slv(9 downto 0);
+   signal s_mode      : slv(9 downto 0);
+   signal s_sign      : slv(9 downto 0);
+   signal s_trigSw    : slv(9 downto 0);
+   signal s_trig      : slv(9 downto 0);
+   signal s_overflow  : slv(9 downto 0);
+   signal s_underflow : slv(9 downto 0);
+   signal s_running   : slv(9 downto 0);
+   signal s_period    : slv32Array(9 downto 0);
    
 begin
    

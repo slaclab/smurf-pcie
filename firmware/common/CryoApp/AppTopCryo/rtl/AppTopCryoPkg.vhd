@@ -23,14 +23,14 @@ use work.StdRtlPkg.all;
 package AppTopCryoPkg is
 
    type DacSigCtrlCryoType is record
-      start : slv(7 downto 0);
+      start : slv(9 downto 0);
    end record;
    type DacSigCtrlCryoArray is array (natural range <>) of DacSigCtrlCryoType;
    constant DAC_SIG_CTRL_INIT_CRYO_C : DacSigCtrlCryoType := (
       start => (others => '0'));
 
    type DacSigStatusCryoType is record
-      running : slv(7 downto 0);
+      running : slv(9 downto 0);
    end record;
    type DacSigStatusCryoArray is array (natural range <>) of DacSigStatusCryoType;
    constant DAC_SIG_STATUS_INIT_CRYO_C : DacSigStatusCryoType := (

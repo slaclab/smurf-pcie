@@ -44,13 +44,13 @@ entity AppTopCryo is
       JESD_DRP_EN_G        : boolean                   := false;
       JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 8);
       JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 8);
-      JESD_RX_POLARITY_G   : Slv8Array(1 downto 0)     := (others => "00000000");
-      JESD_TX_POLARITY_G   : Slv8Array(1 downto 0)     := (others => "00000000");
+      JESD_RX_POLARITY_G   : Slv10Array(1 downto 0)     := (others => "0000000000");
+      JESD_TX_POLARITY_G   : Slv10Array(1 downto 0)     := (others => "0000000000");
       JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
       -- Signal Generator Generics
       SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 8);
       SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
-      SIG_GEN_LANE_MODE_G  : Slv8Array(1 downto 0)     := (others => "00000000");
+      SIG_GEN_LANE_MODE_G  : Slv10Array(1 downto 0)    := (others => "0000000000");
       -- Triggering Generics
       TRIG_SIZE_G          : positive range 1 to 16    := 3;
       TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
@@ -112,10 +112,10 @@ entity AppTopCryo is
       -- Application Ports --
       -----------------------
       -- AMC's JESD Ports
-      jesdRxP              : in    Slv8Array(1 downto 0);
-      jesdRxN              : in    Slv8Array(1 downto 0);
-      jesdTxP              : out   Slv8Array(1 downto 0);
-      jesdTxN              : out   Slv8Array(1 downto 0);
+      jesdRxP              : in    Slv10Array(1 downto 0);
+      jesdRxN              : in    Slv10Array(1 downto 0);
+      jesdTxP              : out   Slv10Array(1 downto 0);
+      jesdTxN              : out   Slv10Array(1 downto 0);
       jesdClkP             : in    Slv3Array(1 downto 0);
       jesdClkN             : in    Slv3Array(1 downto 0);
       -- AMC's JTAG Ports
@@ -135,6 +135,9 @@ entity AppTopCryo is
       -- AMC's Spare Ports
       spareP               : inout Slv16Array(1 downto 0);
       spareN               : inout Slv16Array(1 downto 0);
+      -- AMC's IO Ports kcu60 only 
+      amcIoP           : inout Slv4Array(1 downto 0);
+      amcIoN           : inout Slv4Array(1 downto 0);
       -- RTM's Low Speed Ports
       rtmLsP               : inout slv(53 downto 0);
       rtmLsN               : inout slv(53 downto 0);
@@ -182,11 +185,11 @@ architecture mapping of AppTopCryo is
    signal jesdRxSync : slv(1 downto 0);
    signal jesdTxSync : slv(1 downto 0);
 
-   signal adcValids : Slv8Array(1 downto 0);
-   signal adcValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
+   signal adcValids : Slv10Array(1 downto 0);
+   signal adcValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
-   signal dacValids : Slv8Array(1 downto 0);
-   signal dacValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
+   signal dacValids : Slv10Array(1 downto 0);
+   signal dacValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
    signal debugValids : Slv4Array(1 downto 0);
    signal debugValues : sampleDataVectorArray(1 downto 0, 3 downto 0);
@@ -195,8 +198,8 @@ architecture mapping of AppTopCryo is
 
    signal dacSigCtrl   : DacSigCtrlCryoArray(1 downto 0);
    signal dacSigStatus : DacSigStatusCryoArray(1 downto 0);
-   signal dacSigValids : Slv8Array(1 downto 0);
-   signal dacSigValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
+   signal dacSigValids : Slv10Array(1 downto 0);
+   signal dacSigValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
    signal obAppDbgMaster : AxiStreamMasterType;
    signal obAppDbgSlave  : AxiStreamSlaveType;
@@ -377,6 +380,8 @@ begin
             adcValues(5)    => adcValues(i, 5),
             adcValues(6)    => adcValues(i, 6),
             adcValues(7)    => adcValues(i, 7),
+            adcValues(8)    => adcValues(i, 8),
+            adcValues(9)    => adcValues(i, 9),
             -- DAC Interface
             dacValids       => dacValids(i),
             dacValues(0)    => dacValues(i, 0),
@@ -386,7 +391,9 @@ begin
             dacValues(4)    => dacValues(i, 4),
             dacValues(5)    => dacValues(i, 5),
             dacValues(6)    => dacValues(i, 6),
-            dacValues(7)    => dacValues(i, 7),            
+            dacValues(7)    => dacValues(i, 7),
+            dacValues(8)    => dacValues(i, 8),
+            dacValues(9)    => dacValues(i, 9),          
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
@@ -430,6 +437,8 @@ begin
             dacSigValues(5) => dacSigValues(i, 5),
             dacSigValues(6) => dacSigValues(i, 6),
             dacSigValues(7) => dacSigValues(i, 7),
+            dacSigValues(8) => dacSigValues(i, 8),
+            dacSigValues(9) => dacSigValues(i, 9),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
@@ -541,6 +550,9 @@ begin
          -- AMC's Spare Ports
          spareP              => spareP,
          spareN              => spareN,
+         -- AMC's IO Ports kcu60 only  
+         amcIoP              => amcIoP,
+         amcIoN              => amcIoN,
          -- RTM's Low Speed Ports
          rtmLsP              => rtmLsP,
          rtmLsN              => rtmLsN,

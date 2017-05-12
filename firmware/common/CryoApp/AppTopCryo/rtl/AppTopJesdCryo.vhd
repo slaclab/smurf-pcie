@@ -37,11 +37,11 @@ entity AppTopJesdCryo is
       AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
       JESD_DRP_EN_G      : boolean              := false;
-      GT_LANE_G          : natural range 0 to 8 := 8;
-      JESD_RX_LANE_G     : natural range 0 to 8 := 8;
-      JESD_TX_LANE_G     : natural range 0 to 8 := 8;
-      JESD_RX_POLARITY_G : slv(7 downto 0)      := "00000000";
-      JESD_TX_POLARITY_G : slv(7 downto 0)      := "00000000";
+      GT_LANE_G          : natural range 0 to 10 := 10;
+      JESD_RX_LANE_G     : natural range 0 to 10 := 8;
+      JESD_TX_LANE_G     : natural range 0 to 10 := 8;
+      JESD_RX_POLARITY_G : slv(9 downto 0)      := "0000000000";
+      JESD_TX_POLARITY_G : slv(9 downto 0)      := "0000000000";
       JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);
    port (
       -- Clock/reset/SYNC
@@ -232,7 +232,7 @@ begin
          SYSREF_GEN_G       => false,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
-         GT_LANE_G          => JESD_RX_LANE_G,
+         GT_LANE_G          => GT_LANE_G,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
          JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
          AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)

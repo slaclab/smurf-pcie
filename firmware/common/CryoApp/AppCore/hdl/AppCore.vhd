@@ -55,16 +55,16 @@ entity AppCore is
       freezeHw            : out   slv(1 downto 0);
       evrTrig             : in    AppTopTrigType;
       trigHw              : out   slv(1 downto 0);
-      trigCascBay         : out   slv(1 downto 0);
+      trigCascBay         : in    slv(1 downto 0);
       -- JESD SYNC Interface (jesdClk[1:0] domain)
       jesdSysRef          : out   slv(1 downto 0);
       jesdRxSync          : in    slv(1 downto 0);
       jesdTxSync          : out   slv(1 downto 0);
       -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
-      adcValids           : in    Slv8Array(1 downto 0);
-      adcValues           : in    sampleDataVectorArray(1 downto 0, 7 downto 0);
-      dacValids           : out   Slv8Array(1 downto 0);
-      dacValues           : out   sampleDataVectorArray(1 downto 0, 7 downto 0);
+      adcValids           : in    Slv10Array(1 downto 0);
+      adcValues           : in    sampleDataVectorArray(1 downto 0, 9 downto 0);
+      dacValids           : out   Slv10Array(1 downto 0);
+      dacValues           : out   sampleDataVectorArray(1 downto 0, 9 downto 0);
       debugValids         : out   Slv4Array(1 downto 0);
       debugValues         : out   sampleDataVectorArray(1 downto 0, 3 downto 0);
       -- DAC Signal Generator Interface
@@ -72,8 +72,8 @@ entity AppCore is
       -- If SIG_GEN_LANE_MODE_G = '1', (jesdClk2x[1:0] domain)
       dacSigCtrl          : out   DacSigCtrlCryoArray(1 downto 0);
       dacSigStatus        : in    DacSigStatusCryoArray(1 downto 0);
-      dacSigValids        : in    Slv8Array(1 downto 0);
-      dacSigValues        : in    sampleDataVectorArray(1 downto 0, 7 downto 0);
+      dacSigValids        : in    Slv10Array(1 downto 0);
+      dacSigValues        : in    sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- AXI-Lite Interface (axilClk domain) [0x8FFFFFFF:0x80000000]
       axilClk             : in    sl;
       axilRst             : in    sl;
@@ -136,6 +136,9 @@ entity AppCore is
       -- AMC's Spare Ports
       spareP              : inout Slv16Array(1 downto 0);
       spareN              : inout Slv16Array(1 downto 0);
+      -- AMC's IO Ports kcu60 only 
+      amcIoP           : inout Slv4Array(1 downto 0);
+      amcIoN           : inout Slv4Array(1 downto 0);
       -- RTM's Low Speed Ports
       rtmLsP              : inout slv(53 downto 0);
       rtmLsN              : inout slv(53 downto 0);
@@ -146,7 +149,8 @@ entity AppCore is
       rtmHsTxN            : out   sl := '1';
       -- RTM's Clock Reference 
       genClkP             : in    sl;
-      genClkN             : in    sl);
+      genClkN             : in    sl
+      );
 end AppCore;
 
 architecture mapping of AppCore is
@@ -168,8 +172,8 @@ architecture mapping of AppCore is
    -- Internal signals
    signal s_extTrig      : slv(1 downto 0);
    signal s_muxSel       : slv(1 downto 0);
-   signal s_dacDspValues : sampleDataVectorArray(1 downto 0, 1 downto 0);
-   signal s_dacDspValids : Slv2Array(1 downto 0);  
+   signal s_dacDspValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
+   signal s_dacDspValids : Slv8Array(1 downto 0);  
    
 begin
 
@@ -218,40 +222,38 @@ begin
    ----------------
    -- AMC Interface
    ----------------
-   -- U_DUAL_AMC: entity work.AmcCryoDemoDualCore
-      -- generic map (
-         -- TPD_G            => TPD_G,
-         -- AXI_CLK_FREQ_G   => 156.25E+6,
-         -- AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         -- AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G)
-      -- port map (
-         -- -- User ports
-         
-         -- amcTrigHw       => s_extTrig,
-         -- jesdSysRef      => jesdSysRef,
-         -- jesdRxSync      => jesdRxSync,
-         -- jesdTxSync      => jesdTxSync,
-         -- axilClk         => axilClk,
-         -- axilRst         => axilRst,
-         -- axilReadMaster  => axilReadMasters(AMC_INDEX_C),
-         -- axilReadSlave   => axilReadSlaves(AMC_INDEX_C),
-         -- axilWriteMaster => axilWriteMasters(AMC_INDEX_C),
-         -- axilWriteSlave  => axilWriteSlaves(AMC_INDEX_C),
-         -- -----------------------
-         -- -- Application Ports --
-         -- -----------------------
-         -- jtagPri         => jtagPri,
-         -- jtagSec         => jtagSec,
-         -- fpgaClkP        => fpgaClkP,
-         -- fpgaClkN        => fpgaClkN,
-         -- sysRefP         => sysRefP,
-         -- sysRefN         => sysRefN,
-         -- syncInP         => syncInP,
-         -- syncInN         => syncInN,
-         -- syncOutP        => syncOutP,
-         -- syncOutN        => syncOutN,
-         -- spareP          => spareP,
-         -- spareN          => spareN);
+   U_DUAL_AMC: entity work.AmcCryoDualCore
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_CLK_FREQ_G   => 156.25E+6,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G)
+      port map (
+         adcRst          => (others => "00"),
+         lmkRef          => "00",
+         jesdSysRef      => jesdSysRef,
+         jesdRxSync      => jesdRxSync,
+         jesdTxSync      => jesdTxSync,
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(AMC_INDEX_C),
+         axilReadSlave   => axilReadSlaves(AMC_INDEX_C),
+         axilWriteMaster => axilWriteMasters(AMC_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(AMC_INDEX_C),
+         jtagPri         => jtagPri,
+         jtagSec         => jtagSec,
+         fpgaClkP        => fpgaClkP,
+         fpgaClkN        => fpgaClkN,
+         sysRefP         => sysRefP,
+         sysRefN         => sysRefN,
+         syncInP         => syncInP,
+         syncInN         => syncInN,
+         syncOutP        => syncOutP,
+         syncOutN        => syncOutN,
+         spareP          => spareP,
+         spareN          => spareN,
+         amcIoP          => amcIoP,
+         amcIoN          => amcIoN);
 
    -- DaqMux/Trig Interface
    -- trigPulse 0 and 1 Daq Bay0,1
@@ -261,59 +263,42 @@ begin
       -- Daq triggers freeze
       trigHw(i)      <= s_extTrig(i) or evrTrig.trigPulse(i);   
       freezeHw(i)    <= s_extTrig(i) or evrTrig.trigPulse(i);
-      trigCascBay(i) <= '0';
       --
    end generate GEN_TRIG;
    
    ----------------
-   -- System generator wrapper
-   -- Bay 1 only
+   -- System generator wrapper TODO Add when defined
    ----------------   
-
-   -- Bay0: Loopback
-   -- s_dacDspValues(0,0) <= adcValues(0,0);
-   -- s_dacDspValues(0,1) <= adcValues(0,1);
-   -- debugValues(0,0)    <= (others => '0');
-   -- debugValues(0,1)    <= (others => '0');
-   -- debugValues(0,2)    <= (others => '0');
-   -- debugValues(0,3)    <= (others => '0');
-   -- s_dacDspValids(0)   <= (others => '1'); 
-   
-   -- -- Bay1: Attach sysgen
-   -- U_DemoDspCoreWrapper: entity work.DemoDspCoreWrapper
-      -- generic map (
-         -- TPD_G        => TPD_G,
-         -- DSP_CLK_2X_G => DSP_CLK_2X_G)
-      -- port map (
-         -- jesdClk        => jesdClk(1),
-         -- jesdRst        => jesdRst(1),
-         -- jesdClk2x      => jesdClk2x(1),
-         -- jesdRst2x      => jesdRst2x(1),
-         -- adcHs(0)       => adcValues(1,0),
-         -- adcHs(1)       => adcValues(1,1),
-         -- adcHs(2)       => adcValues(1,2),
-         -- adcHs(3)       => adcValues(1,3),            
-         -- adcHs(4)       => adcValues(1,4),
-         -- adcHs(5)       => adcValues(1,5),            
-         -- dacHs(0)       => s_dacDspValues(1,0),
-         -- dacHs(1)       => s_dacDspValues(1,1),            
-         -- debug(0)       => debugValues(1,0),
-         -- debug(1)       => debugValues(1,1),
-         -- debug(2)       => debugValues(1,2),
-         -- debug(3)       => debugValues(1,3),
-         -- axiClk         => axilClk,
-         -- axiRst         => axilRst,
-         -- axiReadMaster  => axilReadMasters(DSP_INDEX_C),
-         -- axiReadSlave   => axilReadSlaves(DSP_INDEX_C),
-         -- axiWriteMaster => axilWriteMasters(DSP_INDEX_C),
-         -- axiWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
-   -- --   
-   -- s_dacDspValids(1)       <= (others => '1');
 
 
    GEN_BAY :
    for i in 1 downto 0 generate
-   
+      ----------------
+      -- ADC/DAC loopback
+      ----------------
+
+      GEN_CH :
+      for j in 7 downto 0 generate            
+         s_dacDspValues(i,j) <= adcValues(i,j);
+         --------------
+         -- DAC Multiplexer 
+         -- Chooses between System generator (0) or
+         -- Signal generator (1)
+         --------------
+         dacValues(i,j) <= s_dacDspValues(i,j)  when s_muxSel(i)='0' else
+                              dacSigValues(i,j);                        
+      end generate GEN_CH;
+         
+      dacValids(i)(7 downto 0) <= s_dacDspValids(i)  when s_muxSel(i)='0' else
+                                  dacSigValids(i)(7 downto 0);
+
+      debugValues(i,0)    <= (others => '0');
+      debugValues(i,1)    <= (others => '0');
+      debugValues(i,2)    <= (others => '0');
+      debugValues(i,3)    <= (others => '0');
+      debugValids(i)      <= (others => '0');
+      
+      s_dacDspValids(i)   <= (others => '1'); 
       ----------------
       -- Register interface
       ----------------    
@@ -331,19 +316,7 @@ begin
          devClk          => jesdClk(i),
          devRst          => jesdRst(i),
          muxSel_o        => s_muxSel(i));
-         
-      --------------
-      -- DAC Multiplexer 
-      -- Chooses between System generator (0) or
-      -- Signal generator (1)
-      --------------
-      dacValues(i,0) <= s_dacDspValues(i,0)  when s_muxSel(i)='0' else
-                           dacSigValues(i,0); 
-      dacValues(i,1) <= s_dacDspValues(i,1)  when s_muxSel(i)='0' else
-                           dacSigValues(i,1);                          
-      dacValids(i)(1 downto 0) <= s_dacDspValids(i)  when s_muxSel(i)='0' else
-                                  dacSigValids(i)(1 downto 0); 
-           
+   --         
    end generate GEN_BAY;
    
    ----------------

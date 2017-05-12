@@ -37,10 +37,10 @@ entity AmcCarrierCryoRtmEthKcu060 is
       -- Application Ports --
       -----------------------
       -- AMC's JESD Ports
-      jesdRxP          : in    Slv8Array(1 downto 0);
-      jesdRxN          : in    Slv8Array(1 downto 0);
-      jesdTxP          : out   Slv8Array(1 downto 0);
-      jesdTxN          : out   Slv8Array(1 downto 0);
+      jesdRxP          : in    Slv10Array(1 downto 0);
+      jesdRxN          : in    Slv10Array(1 downto 0);
+      jesdTxP          : out   Slv10Array(1 downto 0);
+      jesdTxN          : out   Slv10Array(1 downto 0);
       jesdClkP         : in    Slv3Array(1 downto 0);
       jesdClkN         : in    Slv3Array(1 downto 0);
       -- AMC's JTAG Ports
@@ -57,6 +57,9 @@ entity AmcCarrierCryoRtmEthKcu060 is
       syncInN          : inout Slv4Array(1 downto 0);
       syncOutP         : inout Slv10Array(1 downto 0);
       syncOutN         : inout Slv10Array(1 downto 0);
+      -- AMC's IO Ports kcu60 only 
+      amcIoP           : inout Slv4Array(1 downto 0);
+      amcIoN           : inout Slv4Array(1 downto 0);
       -- AMC's Spare Ports
       spareP           : inout Slv16Array(1 downto 0);
       spareN           : inout Slv16Array(1 downto 0);
@@ -215,9 +218,9 @@ begin
          JESD_DRP_EN_G        => false,          -- Configured by application
          JESD_RX_LANE_G       => (others => 8),  -- Configured by application
          JESD_TX_LANE_G       => (others => 8),  -- Configured by application
-         JESD_RX_POLARITY_G   => (others => "00000000"),  -- Configured by application
-         JESD_TX_POLARITY_G   => (others => "00000000"),  -- Configured by application
-         JESD_REF_SEL_G       => (others => DEV_CLK0_SEL_C),  -- Configured by application
+         JESD_RX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
+         JESD_TX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
+         JESD_REF_SEL_G       => (others => DEV_CLK2_SEL_C),  -- Configured by application
          -- Signal Generator Generics
          SIG_GEN_SIZE_G       => (others => 8),  -- Configured by application
          SIG_GEN_ADDR_WIDTH_G => (others => 9),  -- Configured by application
@@ -306,6 +309,9 @@ begin
          -- AMC's Spare Ports
          spareP               => spareP,
          spareN               => spareN,
+         -- AMC's IO Ports kcu60 only  
+         amcIoP              => amcIoP,
+         amcIoN              => amcIoN,
          -- RTM's Low Speed Ports
          rtmLsP               => rtmLsP,
          rtmLsN               => rtmLsN,
