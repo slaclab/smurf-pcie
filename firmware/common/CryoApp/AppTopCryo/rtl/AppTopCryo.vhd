@@ -136,8 +136,8 @@ entity AppTopCryo is
       spareP               : inout Slv16Array(1 downto 0);
       spareN               : inout Slv16Array(1 downto 0);
       -- AMC's IO Ports kcu60 only 
-      amcIoP           : inout Slv4Array(1 downto 0);
-      amcIoN           : inout Slv4Array(1 downto 0);
+      amcIoP               : inout Slv4Array(1 downto 0);
+      amcIoN               : inout Slv4Array(1 downto 0);
       -- RTM's Low Speed Ports
       rtmLsP               : inout slv(53 downto 0);
       rtmLsN               : inout slv(53 downto 0);

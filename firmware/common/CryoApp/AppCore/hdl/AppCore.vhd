@@ -252,8 +252,8 @@ begin
          syncOutN        => syncOutN,
          spareP          => spareP,
          spareN          => spareN,
-         amcIoP          => amcIoP,
-         amcIoN          => amcIoN);
+         amcIoP          => open, -- amcIoP,
+         amcIoN          => open);-- amcIoN
 
    -- DaqMux/Trig Interface
    -- trigPulse 0 and 1 Daq Bay0,1
