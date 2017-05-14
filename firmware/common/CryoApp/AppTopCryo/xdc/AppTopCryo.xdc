@@ -29,3 +29,7 @@ set_property -dict { PACKAGE_PIN B13 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 }
 set_property -dict { PACKAGE_PIN D13 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {amcIoP[0][3]}] #P14 PIN160
 set_property -dict { PACKAGE_PIN E13 IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {amcIoN[0][3]}] #P14 PIN159
 
+set_property PACKAGE_PIN N29 [get_ports {jesdClkP[0][3]}] ; #P11 PIN88 
+set_property PACKAGE_PIN N30 [get_ports {jesdClkN[0][3]}] ; #P11 PIN87 
+set_property PACKAGE_PIN J29 [get_ports {jesdClkP[1][3]}] ; #P13 PIN88
+set_property PACKAGE_PIN J30 [get_ports {jesdClkN[1][3]}] ; #P13 PIN87

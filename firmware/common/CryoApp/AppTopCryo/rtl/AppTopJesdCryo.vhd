@@ -73,8 +73,8 @@ entity AppTopJesdCryo is
       jesdRxN         : in  slv(GT_LANE_G-1 downto 0);
       jesdTxP         : out slv(GT_LANE_G-1 downto 0);
       jesdTxN         : out slv(GT_LANE_G-1 downto 0);
-      jesdClkP        : in  slv(2 downto 0);
-      jesdClkN        : in  slv(2 downto 0));
+      jesdClkP        : in  slv(3 downto 0);
+      jesdClkN        : in  slv(3 downto 0));
 end AppTopJesdCryo;
 
 architecture mapping of AppTopJesdCryo is
@@ -104,7 +104,8 @@ architecture mapping of AppTopJesdCryo is
 
    signal refClkDiv2Vec  : slv(2 downto 0);
    signal refClkVec      : slv(2 downto 0);
-   signal refClk         : sl;
+   signal refClkR        : sl;
+   signal refClkL        : sl;   
    signal amcClkVec      : slv(2 downto 0);   
    signal amcClk         : sl;
    signal amcRst         : sl;
@@ -147,7 +148,22 @@ begin
    ----------------
    -- JESD Clocking
    ----------------
-   GEN_GTH_CLK : for i in 2 downto 0 generate
+   
+   -- Left column reference
+      U_IBUFDS_GTE3 : IBUFDS_GTE3
+         generic map (
+            REFCLK_EN_TX_PATH  => '0',
+            REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
+            REFCLK_ICNTL_RX    => "00")
+         port map (
+            I     => jesdClkP(3),
+            IB    => jesdClkN(3),
+            CEB   => '0',
+            ODIV2 => refClkL,  -- 185 MHz, Frequency the same as jesdRefClk
+            O     => open);    -- 185 MHz    
+   
+   -- Choose Right coulumn reference
+   GEN_GTH_R_CLK : for i in 2 downto 0 generate
 
       U_IBUFDS_GTE3 : IBUFDS_GTE3
          generic map (
@@ -171,9 +187,9 @@ begin
             DIV     => "000",             -- Divide by 1
             O       => amcClkVec(i));     -- 185 MHz
 
-   end generate GEN_GTH_CLK;
+   end generate GEN_GTH_R_CLK;
    
-   refClk <= refClkVec(conv_integer(JESD_REF_SEL_G));
+   refClkR <= refClkVec(conv_integer(JESD_REF_SEL_G));
    amcClk <= amcClkVec(conv_integer(JESD_REF_SEL_G));   
    
    U_PwrUpRst : entity work.PwrUpRst
@@ -265,7 +281,8 @@ begin
          -------
          -- Clocks
          stableClk       => axilClk,
-         refClk          => refClk,
+         refClkR         => refClkR,
+         refClkL         => refClkL,         
          devClk_i        => jesdClk1x,
          devClk2_i       => jesdClk1x,
          devRst_i        => jesdRst1x,

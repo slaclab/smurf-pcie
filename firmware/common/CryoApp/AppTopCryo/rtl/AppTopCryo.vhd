@@ -116,8 +116,8 @@ entity AppTopCryo is
       jesdRxN              : in    Slv10Array(1 downto 0);
       jesdTxP              : out   Slv10Array(1 downto 0);
       jesdTxN              : out   Slv10Array(1 downto 0);
-      jesdClkP             : in    Slv3Array(1 downto 0);
-      jesdClkN             : in    Slv3Array(1 downto 0);
+      jesdClkP             : in    Slv4Array(1 downto 0);
+      jesdClkN             : in    Slv4Array(1 downto 0);
       -- AMC's JTAG Ports
       jtagPri              : inout Slv5Array(1 downto 0);
       jtagSec              : inout Slv5Array(1 downto 0);

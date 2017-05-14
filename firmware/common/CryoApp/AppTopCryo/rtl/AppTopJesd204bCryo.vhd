@@ -70,7 +70,8 @@ entity AppTopJesd204bCryo is
       -------
       -- Clocks
       stableClk       : in  sl;  -- GT needs a stable clock to "boot up"(buffered refClkDiv2) 
-      refClk          : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer   
+      refClkR         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Right
+      refClkL         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Left 
       devClk_i        : in  sl;         -- Device clock also rxUsrClkIn for MGT
       devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT       
       devRst_i        : in  sl;         -- 
@@ -402,7 +403,7 @@ begin
       s_devClkVec(i)             <= devClk_i;
       s_devClk2Vec(i)            <= devClk2_i;
       s_stableClkVec(i)          <= stableClk;
-      s_gtRefClkVec(i)           <= refClk;
+      s_gtRefClkVec(i)           <= refClkR(0) when i<7 else refClkL(1);
       s_allignEnVec(i)           <= not(s_dataValidVec(i));
    end generate RX_LANES_GEN;
 
