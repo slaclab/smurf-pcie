@@ -403,7 +403,7 @@ begin
       s_devClkVec(i)             <= devClk_i;
       s_devClk2Vec(i)            <= devClk2_i;
       s_stableClkVec(i)          <= stableClk;
-      s_gtRefClkVec(i)           <= refClkR(0) when i<7 else refClkL(1);
+      s_gtRefClkVec(i)           <= refClkR when i<7 else refClkL;
       s_allignEnVec(i)           <= not(s_dataValidVec(i));
    end generate RX_LANES_GEN;
 
