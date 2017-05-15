@@ -44,8 +44,10 @@ entity AppTopCryo is
       JESD_DRP_EN_G        : boolean                   := false;
       JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 8);
       JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 8);
-      JESD_RX_POLARITY_G   : Slv10Array(1 downto 0)     := (others => "0000000000");
-      JESD_TX_POLARITY_G   : Slv10Array(1 downto 0)     := (others => "0000000000");
+      JESD_RX_POLARITY_G   : Slv10Array(1 downto 0)    := (others => "0000000000");
+      JESD_TX_POLARITY_G   : Slv10Array(1 downto 0)    := (others => "0000000000");
+      JESD_RX_ROUTES_G     : AppTopJesdRouteCryoArray  := (others => JESD_ROUTES_CRYO_INIT_C);
+      JESD_TX_ROUTES_G     : AppTopJesdRouteCryoArray  := (others => JESD_ROUTES_CRYO_INIT_C);
       JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
       -- Signal Generator Generics
       SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 8);
@@ -360,6 +362,8 @@ begin
             JESD_TX_LANE_G     => JESD_TX_LANE_G(i),
             JESD_RX_POLARITY_G => JESD_RX_POLARITY_G(i),
             JESD_TX_POLARITY_G => JESD_TX_POLARITY_G(i),
+            JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G(i),
+            JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G(i),            
             JESD_REF_SEL_G     => JESD_REF_SEL_G(i))
          port map (
             -- Clock/reset/SYNC

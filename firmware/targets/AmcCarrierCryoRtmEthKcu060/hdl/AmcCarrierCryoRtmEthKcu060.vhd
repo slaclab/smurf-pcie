@@ -149,14 +149,30 @@ end AmcCarrierCryoRtmEthKcu060;
 
 architecture top_level of AmcCarrierCryoRtmEthKcu060 is
    
-   constant JESD_SWAP_4_5_0_1_C : AppTopJesdRouteType := (
-      0 => 4,
-      1 => 5,
-      2 => 2,
-      3 => 3,
-      4 => 0,
-      5 => 1,
-      6 => 6);
+   -- Custom routes for Cryo AMCs
+   constant JESD_TX_ROUTES_C : AppTopJesdRouteCryoType := (
+      0 => 3,
+      1 => 2,
+      2 => 1,
+      3 => 0,
+      4 => 9,
+      5 => 8,
+      6 => 7,
+      7 => 6,
+      8 => 5,
+      9 => 4);
+      
+   constant JESD_RX_ROUTES_C : AppTopJesdRouteCryoType := (
+      0 => 1,
+      1 => 0,
+      2 => 5,
+      3 => 4,
+      4 => 9,
+      5 => 8,
+      6 => 7,
+      7 => 6,
+      8 => 3,
+      9 => 2);
    
    -- AXI-Lite Interface (axilClk domain)
    signal axilClk              : sl;
@@ -220,6 +236,8 @@ begin
          JESD_TX_LANE_G       => (others => 8),  -- Configured by application
          JESD_RX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
          JESD_TX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
+         JESD_RX_ROUTES_G     => (others => JESD_RX_ROUTES_C), -- Custom routes for Cryo AMCs
+         JESD_TX_ROUTES_G     => (others => JESD_TX_ROUTES_C), -- Custom routes for Cryo AMCs
          JESD_REF_SEL_G       => (others => DEV_CLK2_SEL_C),  -- Configured by application
          -- Signal Generator Generics
          SIG_GEN_SIZE_G       => (others => 8),  -- Configured by application

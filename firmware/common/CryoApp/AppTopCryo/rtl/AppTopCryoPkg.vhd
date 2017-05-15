@@ -22,6 +22,34 @@ use work.StdRtlPkg.all;
 
 package AppTopCryoPkg is
 
+   type AppTopJesdRouteCryoType  is array (6 downto 0) of natural;
+   type AppTopJesdRouteCryoArray  is array (1 downto 0) of AppTopJesdRouteCryoType;
+
+   
+   constant JESD_ROUTES_CRYO_INIT_C : AppTopJesdRouteCryoType := (
+      0 => 0,
+      1 => 1,
+      2 => 2,
+      3 => 3,
+      4 => 4,
+      5 => 5,
+      6 => 6,
+      7 => 7,
+      8 => 8,
+      9 => 9);
+
+   constant JESD_CH0_CH1_CRYO_SWAP_C : AppTopJesdRouteCryoType := (
+      0 => 1,  -- Swap CH0 and CH1 to match the front panel labels
+      1 => 0,  -- Swap CH0 and CH1 to match the front panel labels
+      2 => 2,
+      3 => 3,
+      4 => 4,
+      5 => 5,
+      6 => 7,
+      7 => 6,
+      8 => 9,
+      9 => 8);   
+
    type DacSigCtrlCryoType is record
       start : slv(9 downto 0);
    end record;

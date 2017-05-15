@@ -42,6 +42,8 @@ entity AppTopJesdCryo is
       JESD_TX_LANE_G     : natural range 0 to 10 := 8;
       JESD_RX_POLARITY_G : slv(9 downto 0)      := "0000000000";
       JESD_TX_POLARITY_G : slv(9 downto 0)      := "0000000000";
+      JESD_RX_ROUTES_G   : AppTopJesdRouteCryoType  := JESD_ROUTES_CRYO_INIT_C;
+      JESD_TX_ROUTES_G   : AppTopJesdRouteCryoType  := JESD_ROUTES_CRYO_INIT_C;
       JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);
    port (
       -- Clock/reset/SYNC
@@ -121,8 +123,23 @@ architecture mapping of AppTopJesdCryo is
    signal drpDi   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
    signal drpDo   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
 
+   signal rawAdcValids     : slv(9 downto 0)             := (others => '0');
+   signal rawAdcValues    : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   signal rawDacValues    : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   
 begin
+   
+   GEN_ROUTE : for i in 9 downto 0 generate
 
+      adcValids(i) <= rawAdcValids(JESD_RX_ROUTES_G(i));
+      adcValues(i) <= rawAdcValues(JESD_RX_ROUTES_G(i));
+
+      rawDacValues(JESD_TX_ROUTES_G(i)) <= dacValues(i);
+
+   end generate GEN_ROUTE;
+   
+   
+   
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
@@ -273,9 +290,9 @@ begin
          txWriteMaster   => axilWriteMasters(JESD_TX_INDEX_C),
          txWriteSlave    => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => adcValids,
-         sampleDataArr_o => adcValues,
-         sampleDataArr_i => dacValues,
+         dataValidVec_o  => rawAdcValids,
+         sampleDataArr_o => rawAdcValues,
+         sampleDataArr_i => rawDacValues,
          -------
          -- JESD
          -------
