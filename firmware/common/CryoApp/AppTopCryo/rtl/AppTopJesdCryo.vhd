@@ -25,6 +25,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
 use work.AppTopPkg.all;
+use work.AppTopCryoPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;

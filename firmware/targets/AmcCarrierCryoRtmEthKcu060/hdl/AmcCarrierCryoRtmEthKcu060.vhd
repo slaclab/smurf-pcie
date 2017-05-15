@@ -27,6 +27,7 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AppTopPkg.all;
+use work.AppTopCryoPkg.all;
 
 entity AmcCarrierCryoRtmEthKcu060 is
    generic (
