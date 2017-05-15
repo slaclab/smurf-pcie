@@ -159,8 +159,8 @@ begin
             I     => jesdClkP(3),
             IB    => jesdClkN(3),
             CEB   => '0',
-            ODIV2 => refClkL,  -- 185 MHz, Frequency the same as jesdRefClk
-            O     => open);    -- 185 MHz    
+            ODIV2 => open,        -- 185 MHz, Frequency the same as jesdRefClk
+            O     => refClkL);    -- 185 MHz    
    
    -- Choose Right coulumn reference
    GEN_GTH_R_CLK : for i in 2 downto 0 generate
