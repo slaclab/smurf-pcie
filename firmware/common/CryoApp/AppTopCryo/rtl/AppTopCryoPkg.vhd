@@ -22,7 +22,7 @@ use work.StdRtlPkg.all;
 
 package AppTopCryoPkg is
 
-   type AppTopJesdRouteCryoType  is array (6 downto 0) of natural;
+   type AppTopJesdRouteCryoType  is array (9 downto 0) of natural;
    type AppTopJesdRouteCryoArray  is array (1 downto 0) of AppTopJesdRouteCryoType;
 
    
