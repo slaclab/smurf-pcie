@@ -10,7 +10,6 @@
 #schemaversion 3.0.0
 #once AppCore.yaml
 #include AmcCryoCore.yaml
-#include SysgenCryo.yaml
 
 AppCore: &AppCore
   name: AppCore
