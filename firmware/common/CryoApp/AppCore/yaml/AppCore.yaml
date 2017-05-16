@@ -9,7 +9,7 @@
 ##############################################################################
 #schemaversion 3.0.0
 #once AppCore.yaml
-#include AmcCryoDemoCore.yaml
+#include AmcCryoCore.yaml
 #include SysgenCryo.yaml
 
 AppCore: &AppCore
@@ -21,16 +21,16 @@ AppCore: &AppCore
   children:
     ########
     AmcCryoDemoCore:
-      <<: *AmcCryoDemoCore
+      <<: *AmcCryoCore
       at:
         nelms: 2      
         offset: 0x00000000
         stride: 0x00100000
     ##################################################    
-    SysgenCryo:
-      <<: *SysgenCryo
-      at:
-        offset: 0x01000000
+    #SysgenCryo:
+    #  <<: *SysgenCryo
+    #  at:
+    #    offset: 0x01000000
     #########################################################
     #### Internal registers ####
     #########################################################

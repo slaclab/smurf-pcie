@@ -261,7 +261,6 @@ begin
       U_Jesd204bRx : entity work.Jesd204bRx
          generic map (
             TPD_G            => TPD_G,
-            TEST_G           => TEST_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             F_G              => 2,
             K_G              => 32,
@@ -317,6 +316,9 @@ begin
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            TEST_G           => TEST_G,
+            INPUT_REG_G      => true,
+            OUTPUT_REG_G     => true,
             F_G              => 2,
             K_G              => 32,
             L_G              => JESD_TX_LANE_G)

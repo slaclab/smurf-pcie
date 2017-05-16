@@ -35,11 +35,11 @@ mmio: &mmio
             JesdRx:
               instantiate: true              
               metadata:
-                numRxLanes: &numRxLanes 6
+                numRxLanes: &numRxLanes 8
             JesdTx:
               instantiate: true              
               metadata: 
-                numTxLanes: &numTxLanes 2              
+                numTxLanes: &numTxLanes 8              
     ################################################## 
   
 stream: &stream
