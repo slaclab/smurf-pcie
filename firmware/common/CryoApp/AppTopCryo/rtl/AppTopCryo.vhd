@@ -369,7 +369,7 @@ begin
             -- Clock/reset/SYNC
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
-            jesdClk2x       => jesdClk2x(i),
+            jesdClk2x       => jesdClk2x(i), -- Open because it cannot run at 714 MHz
             jesdRst2x       => jesdRst2x(i),
             jesdSysRef      => jesdSysRef(i),
             jesdRxSync      => jesdRxSync(i),
@@ -428,8 +428,8 @@ begin
             -- DAC Signal Generator Interface
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
-            jesdClk2x       => jesdClk2x(i),
-            jesdRst2x       => jesdRst2x(i),
+            jesdClk2x       => jesdClk(i),
+            jesdRst2x       => jesdRst(i),
             dacSigCtrl      => dacSigCtrl(i),
             dacSigStatus    => dacSigStatus(i),
             dacSigValids    => dacSigValids(i),
