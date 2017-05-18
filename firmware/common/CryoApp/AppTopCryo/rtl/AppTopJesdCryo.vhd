@@ -138,9 +138,7 @@ begin
       rawDacValues(JESD_TX_ROUTES_G(i)) <= dacValues(i);
 
    end generate GEN_ROUTE;
-   
-   
-   
+
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
@@ -229,7 +227,7 @@ begin
          NUM_CLOCKS_G       => 2,
          BANDWIDTH_G        => "OPTIMIZED",
          --CLKIN_PERIOD_G     => 3.2,
-         CLKIN_PERIOD_G     => 3.256,
+         CLKIN_PERIOD_G     => 3.2,
          --CLKIN_PERIOD_G     => 6.4,
          DIVCLK_DIVIDE_G    => 1,
          CLKFBOUT_MULT_F_G  => 4.000,

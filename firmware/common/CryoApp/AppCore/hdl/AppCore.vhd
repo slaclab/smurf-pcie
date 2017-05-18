@@ -227,10 +227,9 @@ begin
          TPD_G            => TPD_G,
          AXI_CLK_FREQ_G   => 156.25E+6,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G)
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
          adcRst          => (others => "00"),
-         lmkRef          => "00",
          jesdSysRef      => jesdSysRef,
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => jesdTxSync,
@@ -251,9 +250,7 @@ begin
          syncOutP        => syncOutP,
          syncOutN        => syncOutN,
          spareP          => spareP,
-         spareN          => spareN,
-         amcIoP          => open, -- amcIoP,
-         amcIoN          => open);-- amcIoN
+         spareN          => spareN);
 
    -- DaqMux/Trig Interface
    -- trigPulse 0 and 1 Daq Bay0,1
@@ -269,7 +266,6 @@ begin
    ----------------
    -- System generator wrapper TODO Add when defined
    ----------------   
-
 
    GEN_BAY :
    for i in 1 downto 0 generate

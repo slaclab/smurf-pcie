@@ -58,9 +58,6 @@ entity AmcCarrierCryoRtmEthKcu060 is
       syncInN          : inout Slv4Array(1 downto 0);
       syncOutP         : inout Slv10Array(1 downto 0);
       syncOutN         : inout Slv10Array(1 downto 0);
-      -- AMC's IO Ports kcu60 only 
-      amcIoP           : inout Slv4Array(1 downto 0);
-      amcIoN           : inout Slv4Array(1 downto 0);
       -- AMC's Spare Ports
       spareP           : inout Slv16Array(1 downto 0);
       spareN           : inout Slv16Array(1 downto 0);
@@ -328,9 +325,6 @@ begin
          -- AMC's Spare Ports
          spareP               => spareP,
          spareN               => spareN,
-         -- AMC's IO Ports kcu60 only  
-         amcIoP              => amcIoP,
-         amcIoN              => amcIoN,
          -- RTM's Low Speed Ports
          rtmLsP               => rtmLsP,
          rtmLsN               => rtmLsN,
@@ -474,4 +468,5 @@ begin
          -- SYSMON Ports
          vPIn                 => vPIn,
          vNIn                 => vNIn);
+         ------
 end top_level;

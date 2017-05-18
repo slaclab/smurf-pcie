@@ -248,7 +248,18 @@ architecture mapping of AppTopJesd204bCryo is
 
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
+   
+   type RegType is record
+      jesdGtRxArr : jesdGtRxLaneTypeArray(GT_LANE_G-1 downto 0);
+   end record RegType;
 
+   constant REG_INIT_C : RegType := (
+      jesdGtRxArr  => (others => JESD_GT_RX_LANE_INIT_C)
+   );
+
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
+   
 begin
 
    dataValidVec_o  <= s_dataValidVec;
@@ -278,7 +289,7 @@ begin
             devRst_i          => devRst_i,
             sysRef_i          => s_sysRef,
             sysRefDbg_o       => s_sysRefDbg,
-            r_jesdGtRxArr     => r_jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
+            r_jesdGtRxArr     => r.jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
             gtRxReset_o       => s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0),
             sampleDataArr_o   => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
             dataValidVec_o    => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
@@ -536,5 +547,31 @@ begin
          rxpmaresetdone_out                    => open,
          txoutclk_out                          => open,
          txpmaresetdone_out                    => open);
+         
+         
+         
+   comb : process (r, devRst_i, r_jesdGtRxArr) is
+      variable v : RegType;
+   begin
+      v := r;
+      
+      -- Register/Delay for 1 clock cycle 
+      v.jesdGtRxArr := r_jesdGtRxArr;
+      
+      if (devRst_i = '1') then
+         v := REG_INIT_C;
+      end if;
+      
+      -- Output assignment
+      rin   <= v;
+   end process comb;
+
+   seq : process (devClk_i) is
+   begin
+      if (rising_edge(devClk_i)) then
+         r <= rin after TPD_G;
+      end if;
+   end process seq;
+   
 --------------------------------------------------------------------
 end mapping;

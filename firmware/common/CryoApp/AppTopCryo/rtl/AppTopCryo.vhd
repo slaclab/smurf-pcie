@@ -17,7 +17,6 @@
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
@@ -137,9 +136,6 @@ entity AppTopCryo is
       -- AMC's Spare Ports
       spareP               : inout Slv16Array(1 downto 0);
       spareN               : inout Slv16Array(1 downto 0);
-      -- AMC's IO Ports kcu60 only 
-      amcIoP               : inout Slv4Array(1 downto 0);
-      amcIoN               : inout Slv4Array(1 downto 0);
       -- RTM's Low Speed Ports
       rtmLsP               : inout slv(53 downto 0);
       rtmLsN               : inout slv(53 downto 0);
@@ -554,9 +550,6 @@ begin
          -- AMC's Spare Ports
          spareP              => spareP,
          spareN              => spareN,
-         -- AMC's IO Ports kcu60 only  
-         amcIoP              => amcIoP,
-         amcIoN              => amcIoN,
          -- RTM's Low Speed Ports
          rtmLsP              => rtmLsP,
          rtmLsN              => rtmLsN,
