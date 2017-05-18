@@ -230,6 +230,7 @@ begin
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
          adcRst          => (others => "00"),
+         lmkRef          => "00",
          jesdSysRef      => jesdSysRef,
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => jesdTxSync,

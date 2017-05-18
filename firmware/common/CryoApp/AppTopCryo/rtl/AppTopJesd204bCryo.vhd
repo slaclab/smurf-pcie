@@ -327,8 +327,8 @@ begin
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            INPUT_REG_G      => true,
-            OUTPUT_REG_G     => true,
+            -- INPUT_REG_G      => true,
+            -- OUTPUT_REG_G     => true,
             F_G              => 2,
             K_G              => 32,
             L_G              => JESD_TX_LANE_G)
