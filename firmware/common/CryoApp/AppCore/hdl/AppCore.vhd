@@ -155,6 +155,7 @@ end AppCore;
 
 architecture mapping of AppCore is
 
+
    constant NUM_AXI_MASTERS_C : natural := 4;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 28, 24);  -- [0x8FFFFFFF:0x80000000]
@@ -230,7 +231,6 @@ begin
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
          adcRst          => (others => "00"),
-         lmkRef          => "00",
          jesdSysRef      => jesdSysRef,
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => jesdTxSync,
