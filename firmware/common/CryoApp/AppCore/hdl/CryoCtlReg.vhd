@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : Axi-lite interface for register access  
 -------------------------------------------------------------------------------
--- File       : DemoCtlReg.vhd
+-- File       : CryoCtlReg.vhd
 -- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-01-15
@@ -28,7 +28,7 @@ use ieee.std_logic_arith.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 
-entity DemoCtlReg is
+entity CryoCtlReg is
 generic (
    -- General Configurations
    TPD_G                : time            := 1 ns;
@@ -48,15 +48,16 @@ port (
    devRst   : in sl;
 
    -- Software registers
-   muxSel_o : out sl
+   muxSel_o : out sl;
+   adcRst_o : out slv(1 downto 0)
 );   
-end DemoCtlReg;
+end CryoCtlReg;
 
-architecture rtl of DemoCtlReg is
+architecture rtl of CryoCtlReg is
 
    type RegType is record
       -- Control (RW)
-      muxSel : sl;
+      control : slv(2 downto 0);
 
       -- AXI lite
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -66,7 +67,7 @@ architecture rtl of DemoCtlReg is
   
    constant REG_INIT_C : RegType := (
       -- Control (RW)
-      muxSel => '0',
+      control => (others => '0'),
       
       -- AXI lite      
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -99,7 +100,7 @@ begin
       -- General
       -------------------------------------------------------------------------
       -- Control
-      axiSlaveRegister(regCon, x"00000", 0, v.muxSel);
+      axiSlaveRegister(regCon, x"00000", 0, v.control);
       
       -- Closeout the transaction
       axiSlaveDefault(regCon,v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -133,15 +134,25 @@ begin
   -- Output Sync assignment
   ----------------------------------------------------
   
-   U_Sync_Out0 : entity work.SynchronizerVector
+   U_Sync_Out0 : entity work.Synchronizer
       generic map (
-         TPD_G => TPD_G,
-         WIDTH_G  => 1
+         TPD_G => TPD_G
          )
       port map (
          clk        => devClk,
          rst        => devRst,
-         dataIn(0)  => r.muxSel,   
-         dataOut(0) => muxSel_o);
+         dataIn  => r.control(0),   
+         dataOut => muxSel_o);
+         
+   U_Sync_Out1 : entity work.SynchronizerVector
+      generic map (
+         TPD_G => TPD_G,
+         WIDTH_G  => 2
+         )
+      port map (
+         clk     => devClk,
+         rst     => devRst,
+         dataIn  => r.control(2 downto 1),   
+         dataOut => adcRst_o);
 ---------------------------------------------------------------------
 end rtl;

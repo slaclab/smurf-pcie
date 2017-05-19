@@ -279,6 +279,7 @@ begin
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            DECIMATOR_EN_G   => false,
             N_DATA_IN_G      => 20, -- 2 additional for the 8 lane interface
             N_DATA_OUT_G     => 4)
          port map (

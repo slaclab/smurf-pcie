@@ -19,7 +19,7 @@ AppCore: &AppCore
   configPrio: 1
   children:
     ########
-    AmcCryoDemoCore:
+    AmcCryoCore:
       <<: *AmcCryoCore
       at:
         nelms: 2      
@@ -43,3 +43,14 @@ AppCore: &AppCore
       lsBit: 0
       mode: RW
       description: "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC."
+    #########################################################
+    AdcReset:
+      at:
+        nelms: 2
+        offset: 0x02000000
+        stride: 0x01000000
+      class: IntField
+      sizeBits: 2
+      lsBit: 1
+      mode: RW
+      description: "Reset ADCs. 0x3-both in reset"

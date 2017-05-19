@@ -173,6 +173,7 @@ architecture mapping of AppCore is
    -- Internal signals
    signal s_extTrig      : slv(1 downto 0);
    signal s_muxSel       : slv(1 downto 0);
+   signal s_adcRst       : Slv2Array(1 downto 0);    
    signal s_dacDspValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
    signal s_dacDspValids : Slv8Array(1 downto 0);  
    
@@ -230,7 +231,7 @@ begin
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
-         adcRst          => (others => "00"),
+         adcRst          => s_adcRst,
          jesdSysRef      => jesdSysRef,
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => jesdTxSync,
@@ -299,7 +300,7 @@ begin
       ----------------
       -- Register interface
       ----------------    
-      U_DemoCtlReg: entity work.DemoCtlReg
+      U_DemoCtlReg: entity work.CryoCtlReg
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
@@ -312,7 +313,9 @@ begin
          axilWriteSlave  => axilWriteSlaves(CFG_INDEX0_C+i),
          devClk          => jesdClk(i),
          devRst          => jesdRst(i),
-         muxSel_o        => s_muxSel(i));
+         muxSel_o        => s_muxSel(i),
+         adcRst_o        => s_adcRst(i)       
+         );
    --         
    end generate GEN_BAY;
    
