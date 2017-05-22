@@ -6,7 +6,7 @@
 -------------------------------------------------------------------------------
 -- Description: 
 --
---  Only size SIG_GEN_SIZE_G is increased to 8 lanes.
+--  Only size SIG_GEN_SIZE_G is increased to 10 lanes.
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
@@ -151,16 +151,13 @@ begin
          -- Triggers
          s_trig(i) <= dacSigCtrl.start(i) or s_trigSw(i);
 
-         U_DacSigGenLane : entity work.DacSigGenLane
+         U_DacSigGenLane : entity work.DacSigGenLaneCryo
             generic map (
                TPD_G        => TPD_G,
-               ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G,
-               INTERFACE_G  => SIG_GEN_LANE_MODE_G(i))
+               ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G)
             port map (
                jesdClk         => jesdClk,
                jesdRst         => jesdRst,
-               jesdClk2x       => jesdClk2x,
-               jesdRst2x       => jesdRst2x,
                axilClk         => axilClk,
                axilRst         => axilRst,
                axilReadMaster  => axilReadMasters(1+i),
