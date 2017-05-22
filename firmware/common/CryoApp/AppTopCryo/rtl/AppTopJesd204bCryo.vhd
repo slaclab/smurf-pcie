@@ -398,8 +398,14 @@ begin
    -- GTH TX signals
    -----------------   
    TX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
-      s_txData((i*32)+31 downto (i*32)) <= r_jesdGtTxArr(i).data;
-      s_txDataK((i*8)+7 downto (i*8))   <= x"0" & r_jesdGtTxArr(i).dataK;
+      process(devClk_i)
+      begin
+         if rising_edge(devClk_i) then
+            -- Help with timing
+            s_txData((i*32)+31 downto (i*32)) <= r_jesdGtTxArr(i).data           after TPD_G;
+            s_txDataK((i*8)+7 downto (i*8))   <= (x"0" & r_jesdGtTxArr(i).dataK) after TPD_G;
+         end if;
+      end process;
       s_gtTxReady(i)                    <= s_txDone(0) when i<7 else s_txDone(1);
    end generate TX_LANES_GEN;
 
