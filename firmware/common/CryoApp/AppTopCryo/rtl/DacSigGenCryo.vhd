@@ -169,8 +169,6 @@ begin
                sign_i          => s_sign(i),
                period_i        => s_period(i)(SIG_GEN_ADDR_WIDTH_G-1 downto 0),
                start_i         => s_trig(i),
-               overflow_o      => s_overflow(i),
-               underflow_o     => s_underflow(i),
                running_o       => s_running(i),
                valid_o         => dacSigValids(i),
                dacSigValues_o  => dacSigValues(i));

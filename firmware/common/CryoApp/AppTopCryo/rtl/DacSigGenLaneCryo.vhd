@@ -68,8 +68,6 @@ entity DacSigGenLaneCryo is
       start_i         : in  sl;
       sign_i          : in  sl;
       --
-      overflow_o      : out sl;
-      underflow_o     : out sl;
       running_o       : out sl;
       valid_o         : out sl;
       dacSigValues_o  : out slv(31 downto 0)
@@ -132,7 +130,7 @@ begin
       MODE_G       => "write-first",
       ADDR_WIDTH_G => ADDR_WIDTH_G,
       DATA_WIDTH_G => 32,
-      INIT_G       => x"FFFF")
+      INIT_G       => x"FFFFFFFF")
    port map (
       -- Axi clk domain
       axiClk         => axilClk,
