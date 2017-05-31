@@ -413,21 +413,35 @@ begin
    -- GTH RX signals
    -----------------
    RX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
+      
       r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
       r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).decErr    <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
       r_jesdGtRxArr(i).rstDone   <= s_rxDone(0) when i<7 else s_rxDone(1);
       r_jesdGtRxArr(i).cdrStable <= s_cdrStable(0) when i<7 else s_cdrStable(1);
+      
       s_devClkVec(i)             <= devClk_i;
       s_devClk2Vec(i)            <= devClk2_i;
       s_stableClkVec(i)          <= stableClk;
-      s_gtRefClkVec(i)           <= refClkR when i<7 else refClkL;
-      s_allignEnVec(i)           <= not(s_dataValidVec(i));
+      s_gtRefClkVec(i)           <= refClkR when i<7 else refClkL;  
+     
+      process(devClk_i)
+      begin
+         if rising_edge(devClk_i) then
+            s_allignEnVec(i) <= not(s_dataValidVec(i)) after TPD_G;
+         end if; 
+      end process;      
+      
    end generate RX_LANES_GEN;
 
-   s_gtResetAll <= s_gtTxReset or s_gtRxReset;
-   dummyZeroBit <= devRst_i and uAnd(s_txDone) and uAnd(s_rxDone);
+   process(devClk_i)
+   begin
+      if rising_edge(devClk_i) then
+         s_gtResetAll <= s_gtTxReset or s_gtRxReset                     after TPD_G;
+         dummyZeroBit <= devRst_i and uAnd(s_txDone) and uAnd(s_rxDone) after TPD_G;
+      end if; 
+   end process;    
 
    U_Coregen_Right : JesdCryoCoreRightColumn
       port map (
