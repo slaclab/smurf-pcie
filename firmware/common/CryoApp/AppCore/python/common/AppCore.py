@@ -36,11 +36,17 @@ class AppCore(pr.Device):
         # Variables
         ##############################
 
-        for i in range(2):
-            self.add(AmcCryoCore(
-                                    name         = "AmcCryoCore_%i" % (i),
-                                    offset       =  0x00000000 + (i * 0x00100000),
-                                    ))
+        #for i in range(2):
+        #    self.add(AmcCryoCore(
+        #                            name         = "AmcCryoCore_%i" % (i),
+        #                            offset       =  0x00000000 + (i * 0x00100000),
+        #                            ))
+	# Let's instantiate only bay1
+        i = 1
+        self.add(AmcCryoCore(
+                                name         = "AmcCryoCore_%i" % (i),
+                                offset       =  0x00000000 + (i * 0x00100000),
+                                ))
 
 #        self.add(SysgenCryo(
 #                                offset       =  0x01000000
