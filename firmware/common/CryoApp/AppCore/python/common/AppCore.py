@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from AmcCryoDemo.AmcCryoDemoCore import *
+from AmcCryo.AmcCryoCore import *
 from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
@@ -37,14 +37,14 @@ class AppCore(pr.Device):
         ##############################
 
         for i in range(2):
-            self.add(AmcCryoDemoCore(
-                                    name         = "AmcCryoDemoCore_%i" % (i),
+            self.add(AmcCryoCore(
+                                    name         = "AmcCryoCore_%i" % (i),
                                     offset       =  0x00000000 + (i * 0x00100000),
                                     ))
 
-        self.add(SysgenCryo(
-                                offset       =  0x01000000
-                            ))
+#        self.add(SysgenCryo(
+#                                offset       =  0x01000000
+#                            ))
 
         self.addVariables(  name         = "DacMuxSel",
                             description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
@@ -52,7 +52,19 @@ class AppCore(pr.Device):
                             bitSize      =  1,
                             bitOffset    =  0x00,
                             base         = "hex",
-                            mode         = "RO",
+                            mode         = "RW",
                             number       =  2,
                             stride       =  0x01000000,
                         )
+
+        self.addVariables(  name         = "AdcReset",
+                            description  = "Reset ADCs. 0x3-both in reset",
+                            offset       =  0x02000000,
+                            bitSize      =  2,
+                            bitOffset    =  0x01,
+                            base         = "hex",
+                            mode         = "RW",
+                            number       =  2,
+                            stride       =  0x01000000,
+                        )
+
