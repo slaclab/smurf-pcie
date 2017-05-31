@@ -12,7 +12,6 @@ export MPS_DIR=${PWD}/../firmware/submodules/amc-carrier-core/AppMps
 export APPTOP_DIR=${PWD}/../firmware/submodules/amc-carrier-core/AppTop
 export SIGGEN_DIR=${PWD}/../firmware/submodules/amc-carrier-core/DacSigGen
 export DAQMUX_DIR=${PWD}/../firmware/submodules/amc-carrier-core/DaqMuxV2
-#export DEMOAPP_DIR=${PWD}/../firmware/common/DemoBoardCryoApp
 export APPCORE_DIR=${PWD}/..//firmware/common/CryoApp/AppCore
 export CRYOCORE_DIR=${PWD}/../firmware/submodules/amc-carrier-core/AppHardware/AmcCryo
 export CRYODSP_DIR=${PWD}/../firmware/common/DspCoreLib/CryoDetEth
