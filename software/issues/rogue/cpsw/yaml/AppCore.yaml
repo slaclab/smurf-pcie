@@ -1,0 +1,56 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once AppCore.yaml
+#include AmcCryoCore.yaml
+
+AppCore: &AppCore
+  name: AppCore
+  description: AMC Carrier Cryo Demo Board Application
+  size: 0x10000000
+  class: MMIODev
+  configPrio: 1
+  children:
+    ########
+    AmcCryoCore:
+      <<: *AmcCryoCore
+      at:
+        nelms: 2      
+        offset: 0x00000000
+        stride: 0x00100000
+    ##################################################    
+    #SysgenCryo:
+    #  <<: *SysgenCryo
+    #  at:
+    #    offset: 0x01000000
+    #########################################################
+    #### Internal registers ####
+    #########################################################
+    DacMuxSel:
+      at:
+        nelms: 2
+        offset: 0x02000000
+        stride: 0x01000000
+      class: IntField
+      sizeBits: 1
+      lsBit: 0
+      mode: RW
+      description: "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC."
+    #########################################################
+    AdcReset:
+      at:
+        nelms: 2
+        offset: 0x02000000
+        stride: 0x01000000
+      class: IntField
+      sizeBits: 2
+      lsBit: 1
+      mode: RW
+      description: "Reset ADCs. 0x3-both in reset"
