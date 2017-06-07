@@ -253,7 +253,22 @@ begin
          syncOutN        => syncOutN,
          spareP          => spareP,
          spareN          => spareN);
-
+         
+   -------------------         
+   -- SYSGEN Interface
+   -------------------         
+   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+      port map (
+         axiClk         => axilClk,
+         axiClkRst      => axilRst,
+         axiReadMaster  => axilReadMasters(DSP_INDEX_C),
+         axiReadSlave   => axilReadSlaves(DSP_INDEX_C),
+         axiWriteMaster => axilWriteMasters(DSP_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(DSP_INDEX_C));          
+         
    -- DaqMux/Trig Interface
    -- trigPulse 0 and 1 Daq Bay0,1
    -- External trigger is asynchronous but it gets synced to timingClk in DadMuxV2.

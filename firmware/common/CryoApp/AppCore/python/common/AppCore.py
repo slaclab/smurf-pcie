@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from AmcCryoDemo.AmcCryoDemoCore import *
+from AppHardware.AmcCryo._amcCryoCore import *
 from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
@@ -29,22 +29,15 @@ class AppCore(pr.Device):
                     memBase     =  None, 
                     offset      =  0x0, 
                     hidden      =  False,
+                    expand      =  True,
                 ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
+        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
 
         ##############################
         # Variables
         ##############################
-
-        for i in range(2):
-            self.add(AmcCryoDemoCore(
-                                    name         = "AmcCryoDemoCore_%i" % (i),
-                                    offset       =  0x00000000 + (i * 0x00100000),
-                                    ))
-
-        self.add(SysgenCryo(
-                                offset       =  0x01000000
-                            ))
+        self.add(AmcCryoCore(   offset=0x00100000, expand=True))
+        # self.add(SysgenCryo(    offset=0x01000000))
 
         self.addVariables(  name         = "DacMuxSel",
                             description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
