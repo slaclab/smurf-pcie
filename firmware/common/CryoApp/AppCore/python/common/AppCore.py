@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from AmcCryo.AmcCryoCore import *
+from AppHardware.AmcCryo import *
 from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
@@ -29,6 +29,7 @@ class AppCore(pr.Device):
                     memBase     =  None, 
                     offset      =  0x0, 
                     hidden      =  False,
+                    expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
