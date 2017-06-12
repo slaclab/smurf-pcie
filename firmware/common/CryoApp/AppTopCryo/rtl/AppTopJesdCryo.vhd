@@ -38,7 +38,6 @@ entity AppTopJesdCryo is
       AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
       JESD_DRP_EN_G      : boolean              := false;
-      GT_LANE_G          : natural range 0 to 10 := 10;
       JESD_RX_LANE_G     : natural range 0 to 10 := 8;
       JESD_TX_LANE_G     : natural range 0 to 10 := 8;
       JESD_RX_POLARITY_G : slv(9 downto 0)      := "0000000000";
@@ -56,11 +55,11 @@ entity AppTopJesdCryo is
       jesdRxSync      : out sl;
       jesdTxSync      : in  sl;
       -- ADC Interface
-      adcValids       : out slv(GT_LANE_G-1 downto 0);
-      adcValues       : out sampleDataArray(GT_LANE_G-1 downto 0);
+      adcValids       : out slv(9 downto 0);
+      adcValues       : out sampleDataArray(9 downto 0);
       -- DAC interface
-      dacValids       : in  slv(GT_LANE_G-1 downto 0);
-      dacValues       : in  sampleDataArray(GT_LANE_G-1 downto 0);
+      dacValids       : in  slv(9 downto 0);
+      dacValues       : in  sampleDataArray(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -72,10 +71,10 @@ entity AppTopJesdCryo is
       -- Application Ports --
       -----------------------
       -- JESD High Speed Ports
-      jesdRxP         : in  slv(GT_LANE_G-1 downto 0);
-      jesdRxN         : in  slv(GT_LANE_G-1 downto 0);
-      jesdTxP         : out slv(GT_LANE_G-1 downto 0);
-      jesdTxN         : out slv(GT_LANE_G-1 downto 0);
+      jesdRxP         : in  slv(9 downto 0);
+      jesdRxN         : in  slv(9 downto 0);
+      jesdTxP         : out slv(9 downto 0);
+      jesdTxN         : out slv(9 downto 0);
       jesdClkP        : in  slv(3 downto 0);
       jesdClkN        : in  slv(3 downto 0));
 end AppTopJesdCryo;
@@ -116,13 +115,13 @@ architecture mapping of AppTopJesdCryo is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal drpClk  : slv(GT_LANE_G-1 downto 0)   := (others => '0');
-   signal drpRdy  : slv(GT_LANE_G-1 downto 0)   := (others => '0');
-   signal drpEn   : slv(GT_LANE_G-1 downto 0)   := (others => '0');
-   signal drpWe   : slv(GT_LANE_G-1 downto 0)   := (others => '0');
-   signal drpAddr : slv(GT_LANE_G*9-1 downto 0)  := (others => '0');
-   signal drpDi   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
-   signal drpDo   : slv(GT_LANE_G*16-1 downto 0) := (others => '0');
+   signal drpClk  : slv(9 downto 0)   := (others => '0');
+   signal drpRdy  : slv(9 downto 0)   := (others => '0');
+   signal drpEn   : slv(9 downto 0)   := (others => '0');
+   signal drpWe   : slv(9 downto 0)   := (others => '0');
+   signal drpAddr : slv(10*9-1 downto 0)  := (others => '0');
+   signal drpDi   : slv(10*16-1 downto 0) := (others => '0');
+   signal drpDo   : slv(10*16-1 downto 0) := (others => '0');
 
    signal rawAdcValids     : slv(9 downto 0)             := (others => '0');
    signal rawAdcValues    : sampleDataArray(9 downto 0) := (others => (others => '0'));
@@ -264,7 +263,7 @@ begin
          SYSREF_GEN_G       => false,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
-         GT_LANE_G          => GT_LANE_G,
+         GT_LANE_G          => 10,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
          JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
          AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)

@@ -230,8 +230,8 @@ begin
          MR_LCLS_APP_G        => true,          -- Configured by application
          -- JESD Generics
          JESD_DRP_EN_G        => false,          -- Configured by application
-         JESD_RX_LANE_G       => (others => 8),  -- Configured by application
-         JESD_TX_LANE_G       => (others => 8),  -- Configured by application
+         JESD_RX_LANE_G       => (others => 10),  -- Configured by application
+         JESD_TX_LANE_G       => (others => 10),  -- Configured by application
          JESD_RX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
          JESD_TX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
          JESD_RX_ROUTES_G     => (others => JESD_RX_ROUTES_C), -- Custom routes for Cryo AMCs
