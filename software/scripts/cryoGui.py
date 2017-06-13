@@ -3,7 +3,6 @@ import pyrogue
 import pyrogue.protocols
 import rogue.protocols.srp
 import rogue.protocols.udp
-import pyrogue.mesh
 import PyQt4.QtGui
 import pyrogue.gui
 import sys
@@ -17,14 +16,15 @@ pyrogue.streamConnectBiDir(rssiSrp,udpRssiA.application(0))
 
 cryo = pyrogue.Root('cryo','AMC Carrier')
 
-#cryo.add(AmcCarrierCore(memBase=rssiSrp, offset=0x00000000))
-cryo.add(AppTop(memBase=rssiSrp, offset=0x80000000, numRxLanes=2, numTxLanes=2))
+cryo.add(AmcCarrierCore(memBase=rssiSrp, offset=0x00000000))
+cryo.add(AppTop(memBase=rssiSrp, offset=0x80000000, numRxLanes=[0,10], numTxLanes=[0,10]))
 
 #cryo.setTimeout(5.0)
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
 guiTop = pyrogue.gui.GuiTop(group='cryoMesh')
+guiTop.resize(800, 1000)
 guiTop.addTree(cryo)
 
 print("Starting GUI...\n");
