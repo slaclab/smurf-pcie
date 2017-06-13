@@ -605,7 +605,7 @@ cryo:
             FRAMES_PER_MULTIFRAME: 0x0F    
     AppTopJesd[1]:
       JesdRx:
-        Enable: 0x3FF
+        Enable: 0x173
         # Enable: 0x73
         # Enable: 0x3F3
         # Enable: 0x80 # JESD7 is broken??

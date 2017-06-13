@@ -6,6 +6,7 @@ loadSource      -dir  "$::DIR_PATH/rtl/"
 loadConstraints -dir  "$::DIR_PATH/xdc/"
 
 loadSource      -path "$::DIR_PATH/coregen/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.dcp"
-#loadSource      -path "$::DIR_PATH/coregen/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
+#loadIpCore      -path "$::DIR_PATH/coregen/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
+
 loadSource      -path "$::DIR_PATH/coregen/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.dcp"
-#oadSource      -path "$::DIR_PATH/coregen/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.xci"
+#loadIpCore      -path "$::DIR_PATH/coregen/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.xci"
