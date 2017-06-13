@@ -6,64 +6,57 @@ cryo:
           EnableSync: 0xFF
           EnableSysRef: 0x3
           LmkReg_0x0002: 0x00
-
+          SyncBit: 0x1
           LmkReg_0x0100: 0x08
           LmkReg_0x0101: 0x55
           LmkReg_0x0103: 0x00
           LmkReg_0x0104: 0x22
           LmkReg_0x0105: 0x00
           LmkReg_0x0106: 0x70
-          LmkReg_0x0107: 0x11
-
+          LmkReg_0x0107: 0x06
           LmkReg_0x0108: 0x61
           LmkReg_0x0109: 0x55
           LmkReg_0x010B: 0x01
           LmkReg_0x010C: 0x22
           LmkReg_0x010D: 0x00
           LmkReg_0x010E: 0x70
-          LmkReg_0x010F: 0x66
-          
+          LmkReg_0x010F: 0x9E
           LmkReg_0x0110: 0x61
           LmkReg_0x0111: 0x55
           LmkReg_0x0113: 0x01
           LmkReg_0x0114: 0x22
           LmkReg_0x0115: 0x00
           LmkReg_0x0116: 0x70
-          LmkReg_0x0117: 0x66
-          
-          LmkReg_0x0118: 0x08
+          LmkReg_0x0117: 0x9E
+          LmkReg_0x0118: 0x61
           LmkReg_0x0119: 0x55
-          LmkReg_0x011B: 0x00
+          LmkReg_0x011B: 0x02
           LmkReg_0x011C: 0x22
           LmkReg_0x011D: 0x00
           LmkReg_0x011E: 0x70
-          LmkReg_0x011F: 0x11
-          
+          LmkReg_0x011F: 0x00
           LmkReg_0x0120: 0x61
           LmkReg_0x0121: 0x55
           LmkReg_0x0123: 0x01
           LmkReg_0x0124: 0x22
           LmkReg_0x0125: 0x00
           LmkReg_0x0126: 0x70
-          LmkReg_0x0127: 0x66
-          
+          LmkReg_0x0127: 0x9E
           LmkReg_0x0128: 0x61
           LmkReg_0x0129: 0x55
           LmkReg_0x012B: 0x01
           LmkReg_0x012C: 0x22
           LmkReg_0x012D: 0x00
           LmkReg_0x012E: 0x70
-          LmkReg_0x012F: 0x66
-          
+          LmkReg_0x012F: 0x9E
           LmkReg_0x0130: 0x08
           LmkReg_0x0131: 0x55
           LmkReg_0x0133: 0x00
           LmkReg_0x0134: 0x22
           LmkReg_0x0135: 0x00
           LmkReg_0x0136: 0x70
-          LmkReg_0x0137: 0x11
-          
-          LmkReg_0x0138: 0x05
+          LmkReg_0x0137: 0x16
+          LmkReg_0x0138: 0x00
           LmkReg_0x0139: 0x03
           LmkReg_0x013A: 0x04
           LmkReg_0x013B: 0x00
@@ -88,7 +81,6 @@ cryo:
           LmkReg_0x014E: 0x00
           LmkReg_0x014F: 0x7F
           LmkReg_0x0150: 0x01
-          
           LmkReg_0x0151: 0x02
           LmkReg_0x0152: 0x00
           LmkReg_0x0153: 0x00
@@ -110,14 +102,12 @@ cryo:
           LmkReg_0x0163: 0x00
           LmkReg_0x0164: 0x00
           LmkReg_0x0165: 0x05
-          
           LmkReg_0x0171: 0xAA
           LmkReg_0x0172: 0x02
           LmkReg_0x0173: 0x0 
           LmkReg_0x0174: 0x0 
           LmkReg_0x017C: 0x15
-          LmkReg_0x017D: 0x0f
-          
+          LmkReg_0x017D: 0x33
           LmkReg_0x0166: 0x00
           LmkReg_0x0167: 0x00
           LmkReg_0x0168: 0x05
@@ -127,7 +117,6 @@ cryo:
           LmkReg_0x016C: 0x00
           LmkReg_0x016D: 0x00
           LmkReg_0x016E: 0x13
-          SyncBit: 0x1
         DAC[0]:
           DacReg[0]: 0x0018
           DacReg[1]: 0x0003
@@ -384,8 +373,244 @@ cryo:
           DacReg[124]: 0x0000
           DacReg[125]: 0x0000
           EnableTx: 0x1
+        ADC[0]:
+          SYNCB_POL: 0x1
+          SLOW_SP_EN1: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS
+          SLOW_SP_EN2: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS       
+          JESD_OUTPUT_SWING: 0x4 # 0x4 = 960 mVPP (max. swing)
+          CHA:
+            ########################
+            # DECIMATION FILTER PAGE
+            ########################
+            DDC_EN: 0x1
+            DECIM_FACTOR: 0x0
+            DUAL_BAND_EN: 0x0
+            REAL_OUT_EN: 0x0
+            DDC0_NCO1_LSB: 0x20
+            DDC0_NCO1_MSB: 0x4E
+            DDC0_NCO2_LSB: 0x00
+            DDC0_NCO2_MSB: 0x00
+            DDC0_NCO3_LSB: 0x00
+            DDC0_NCO3_MSB: 0x00
+            DDC0_NCO4_LSB: 0x00
+            DDC0_NCO4_MSB: 0x00
+            NCO_SEL_PIN: 0x00
+            NCO_SEL: 0x00
+            LMFC_RESET_MODE: 0x00
+            DDC0_6DB_GAIN: 0x01
+            DDC1_6DB_GAIN: 0x01
+            DDC_DET_LAT: 0x51
+            WBF_6DB_GAIN: 0x01          
+            CUSTOM_PATTERN1_LSB: 0x00
+            CUSTOM_PATTERN1_MSB: 0x00
+            CUSTOM_PATTERN2_LSB: 0x00
+            CUSTOM_PATTERN2_MSB: 0x00
+            TEST_PATTERN_SEL: 0x00
+            TEST_PAT_RES: 0x00
+            TP_RES_EN: 0x00          
+            ########################
+            # JESD DIGITAL PAGE
+            ########################         
+            JESD_MODE0: 0x0
+            12BIT MODE: 0x0
+            SYNC_REG_EN: 0x0
+            SYNC_REG: 0x0          
+            RAMP_12BIT: 0x0
+            JESD_MODE2: 0x1
+            JESD_MODE1: 0x0
+            LMFC_MASK_RESET: 0x0
+            LINK_LAY_RPAT: 0x0
+            LINK_LAYER_TESTMODE: 0x0
+            40X_MODE: 0x7
+            PLL_MODE: 0x2
+            SEL_EMP_LANE0: 0x7
+            SEL_EMP_LANE1: 0x7
+            SEL_EMP_LANE2: 0x7
+            SEL_EMP_LANE3: 0x7
+            TX_LINK_DIS: 0x0
+            FRAME_ALIGN: 0x0
+            LANE_ALIGN: 0x0
+            TESTMODE_EN: 0x0
+            CTRL_K: 0x1
+            FRAMES_PER_MULTIFRAME: 0x0F
+          CHB:
+            ########################
+            # DECIMATION FILTER PAGE
+            ########################
+            DDC_EN: 0x1
+            DECIM_FACTOR: 0x0
+            DUAL_BAND_EN: 0x0
+            REAL_OUT_EN: 0x0
+            DDC0_NCO1_LSB: 0x20
+            DDC0_NCO1_MSB: 0x4E
+            DDC0_NCO2_LSB: 0x00
+            DDC0_NCO2_MSB: 0x00
+            DDC0_NCO3_LSB: 0x00
+            DDC0_NCO3_MSB: 0x00
+            DDC0_NCO4_LSB: 0x00
+            DDC0_NCO4_MSB: 0x00
+            NCO_SEL_PIN: 0x00
+            NCO_SEL: 0x00
+            LMFC_RESET_MODE: 0x00
+            DDC0_6DB_GAIN: 0x01
+            DDC1_6DB_GAIN: 0x01
+            DDC_DET_LAT: 0x51
+            WBF_6DB_GAIN: 0x01          
+            CUSTOM_PATTERN1_LSB: 0x00
+            CUSTOM_PATTERN1_MSB: 0x00
+            CUSTOM_PATTERN2_LSB: 0x00
+            CUSTOM_PATTERN2_MSB: 0x00
+            TEST_PATTERN_SEL: 0x00
+            TEST_PAT_RES: 0x00
+            TP_RES_EN: 0x00          
+            ########################
+            # JESD DIGITAL PAGE
+            ########################         
+            JESD_MODE0: 0x0
+            12BIT MODE: 0x0
+            SYNC_REG_EN: 0x0
+            SYNC_REG: 0x0          
+            RAMP_12BIT: 0x0
+            JESD_MODE2: 0x1
+            JESD_MODE1: 0x0
+            LMFC_MASK_RESET: 0x0
+            LINK_LAY_RPAT: 0x0
+            LINK_LAYER_TESTMODE: 0x0
+            40X_MODE: 0x7
+            PLL_MODE: 0x2
+            SEL_EMP_LANE0: 0x7
+            SEL_EMP_LANE1: 0x7
+            SEL_EMP_LANE2: 0x7
+            SEL_EMP_LANE3: 0x7
+            TX_LINK_DIS: 0x0
+            FRAME_ALIGN: 0x0
+            LANE_ALIGN: 0x0
+            TESTMODE_EN: 0x0
+            CTRL_K: 0x1
+            FRAMES_PER_MULTIFRAME: 0x0F     
+        ADC[1]:
+          SYNCB_POL: 0x1
+          SLOW_SP_EN1: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS
+          SLOW_SP_EN2: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS       
+          JESD_OUTPUT_SWING: 0x4 # 0x4 = 960 mVPP (max. swing)
+          CHA:
+            ########################
+            # DECIMATION FILTER PAGE
+            ########################
+            DDC_EN: 0x1
+            DECIM_FACTOR: 0x0
+            DUAL_BAND_EN: 0x0
+            REAL_OUT_EN: 0x0
+            DDC0_NCO1_LSB: 0x20
+            DDC0_NCO1_MSB: 0x4E
+            DDC0_NCO2_LSB: 0x00
+            DDC0_NCO2_MSB: 0x00
+            DDC0_NCO3_LSB: 0x00
+            DDC0_NCO3_MSB: 0x00
+            DDC0_NCO4_LSB: 0x00
+            DDC0_NCO4_MSB: 0x00
+            NCO_SEL_PIN: 0x00
+            NCO_SEL: 0x00
+            LMFC_RESET_MODE: 0x00
+            DDC0_6DB_GAIN: 0x01
+            DDC1_6DB_GAIN: 0x01
+            DDC_DET_LAT: 0x51
+            WBF_6DB_GAIN: 0x01          
+            CUSTOM_PATTERN1_LSB: 0x00
+            CUSTOM_PATTERN1_MSB: 0x00
+            CUSTOM_PATTERN2_LSB: 0x00
+            CUSTOM_PATTERN2_MSB: 0x00
+            TEST_PATTERN_SEL: 0x00
+            TEST_PAT_RES: 0x00
+            TP_RES_EN: 0x00          
+            ########################
+            # JESD DIGITAL PAGE
+            ########################         
+            JESD_MODE0: 0x0
+            12BIT MODE: 0x0
+            SYNC_REG_EN: 0x0
+            SYNC_REG: 0x0          
+            RAMP_12BIT: 0x0
+            JESD_MODE2: 0x1
+            JESD_MODE1: 0x0
+            LMFC_MASK_RESET: 0x0
+            LINK_LAY_RPAT: 0x0
+            LINK_LAYER_TESTMODE: 0x0
+            40X_MODE: 0x7
+            PLL_MODE: 0x2
+            SEL_EMP_LANE0: 0x7
+            SEL_EMP_LANE1: 0x7
+            SEL_EMP_LANE2: 0x7
+            SEL_EMP_LANE3: 0x7
+            TX_LINK_DIS: 0x0
+            FRAME_ALIGN: 0x0
+            LANE_ALIGN: 0x0
+            TESTMODE_EN: 0x0
+            CTRL_K: 0x1
+            FRAMES_PER_MULTIFRAME: 0x0F
+          CHB:
+            ########################
+            # DECIMATION FILTER PAGE
+            ########################
+            DDC_EN: 0x1
+            DECIM_FACTOR: 0x0
+            DUAL_BAND_EN: 0x0
+            REAL_OUT_EN: 0x0
+            DDC0_NCO1_LSB: 0x20
+            DDC0_NCO1_MSB: 0x4E
+            DDC0_NCO2_LSB: 0x00
+            DDC0_NCO2_MSB: 0x00
+            DDC0_NCO3_LSB: 0x00
+            DDC0_NCO3_MSB: 0x00
+            DDC0_NCO4_LSB: 0x00
+            DDC0_NCO4_MSB: 0x00
+            NCO_SEL_PIN: 0x00
+            NCO_SEL: 0x00
+            LMFC_RESET_MODE: 0x00
+            DDC0_6DB_GAIN: 0x01
+            DDC1_6DB_GAIN: 0x01
+            DDC_DET_LAT: 0x51
+            WBF_6DB_GAIN: 0x01          
+            CUSTOM_PATTERN1_LSB: 0x00
+            CUSTOM_PATTERN1_MSB: 0x00
+            CUSTOM_PATTERN2_LSB: 0x00
+            CUSTOM_PATTERN2_MSB: 0x00
+            TEST_PATTERN_SEL: 0x00
+            TEST_PAT_RES: 0x00
+            TP_RES_EN: 0x00          
+            ########################
+            # JESD DIGITAL PAGE
+            ########################         
+            JESD_MODE0: 0x0
+            12BIT MODE: 0x0
+            SYNC_REG_EN: 0x0
+            SYNC_REG: 0x0          
+            RAMP_12BIT: 0x0
+            JESD_MODE2: 0x1
+            JESD_MODE1: 0x0
+            LMFC_MASK_RESET: 0x0
+            LINK_LAY_RPAT: 0x0
+            LINK_LAYER_TESTMODE: 0x0
+            40X_MODE: 0x7
+            PLL_MODE: 0x2
+            SEL_EMP_LANE0: 0x7
+            SEL_EMP_LANE1: 0x7
+            SEL_EMP_LANE2: 0x7
+            SEL_EMP_LANE3: 0x7
+            TX_LINK_DIS: 0x0
+            FRAME_ALIGN: 0x0
+            LANE_ALIGN: 0x0
+            TESTMODE_EN: 0x0
+            CTRL_K: 0x1
+            FRAMES_PER_MULTIFRAME: 0x0F    
     AppTopJesd[1]:
       JesdRx:
+        Enable: 0x3FF
+        # Enable: 0x73
+        # Enable: 0x3F3
+        # Enable: 0x80 # JESD7 is broken??
+        # Enable: 0x100
+        # Enable: 0x200 # JESD7 is broken
         InvertAdcData: 0x00
         LinkErrMask: 0x3f
         ScrambleEnable: Disabled
@@ -395,8 +620,9 @@ cryo:
         ReplaceEnable: Enabled
         SubClass: 0x1
         SysrefDelay: 0x00
-        Enable: 0xff      
       JesdTx:
+        Enable: 0x3FF
+        # Enable: 0x0
         InvertDacData: 0x00
         HighAmplitudeVal: 0x0000ffff
         LowAmplitudeVal: 0x00000000
@@ -407,7 +633,6 @@ cryo:
         InvertSync: 0x0
         ResetGTs: 0x0
         ReplaceEnable: 0x1
-        Enable: 0xff
         ClearErrors: 0x0
         SubClass: 0x1      
         
