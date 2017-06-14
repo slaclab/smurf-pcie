@@ -376,7 +376,7 @@ begin
    SELF_TEST_GEN : if SYSREF_GEN_G = true generate
       -- Generate the sysref internally
       -- Sysref period will be 8x K_G.
-      SysrefGen_INST : entity work.LmfcGen
+      SysrefGen_INST : entity work.JesdLmfcGen
          generic map (
             TPD_G => TPD_G,
             K_G   => 256,

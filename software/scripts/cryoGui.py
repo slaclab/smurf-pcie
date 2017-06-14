@@ -16,7 +16,7 @@ pyrogue.streamConnectBiDir(rssiSrp,udpRssiA.application(0))
 
 cryo = pyrogue.Root('cryo','AMC Carrier')
 
-cryo.add(AmcCarrierCore(memBase=rssiSrp, offset=0x00000000))
+cryo.add(AmcCarrierCore(memBase=rssiSrp, offset=0x00000000, enableBsa=False))
 cryo.add(AppTop(        memBase=rssiSrp, offset=0x80000000, numRxLanes=[0,10], numTxLanes=[0,10]))
 
 # Create GUI

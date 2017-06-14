@@ -2,6 +2,8 @@ cryo:
   AppTop:
     AppCore:
       AmcCryoCore:
+        DBG:
+          txSyncMask: 0x2  # Masking off the 2nd DAC, plan to improve link stability later
         LMK:
           EnableSync: 0xFF
           EnableSysRef: 0x3
@@ -118,13 +120,13 @@ cryo:
           LmkReg_0x016D: 0x00
           LmkReg_0x016E: 0x13
         DAC[0]:
-          DacReg[0]: 0x0018
-          DacReg[1]: 0x0003
-          DacReg[2]: 0x2000
-          DacReg[3]: 0xa301
-          DacReg[4]: 0xfcfc
-          DacReg[5]: 0x000d
-          DacReg[6]: 0xfcfc
+          DacReg[0]: 0x0218   # Sets board to 4X interpolation
+          DacReg[1]: 0x0003   
+          DacReg[2]: 0x2050   # 16 bits, mixer on, NCO on, not two's compliment data
+          DacReg[3]: 0xA300   # May need to set to 0xA301, then A300
+          DacReg[4]: 0xF0F0   # This masks lanes 7,6,5,4 fifo and lane errors.  Uros had it masking lanes 7,6,5,4,3,2 because this was for the demo board that only had two lanes I think.
+          DacReg[5]: 0xFF07   # Not sure here.  This is masking some sysref errors, Uros had it only masking serdes block 0 and 1 PLL locks and the DAC PLL lock alarm
+          DacReg[6]: 0xFFFF   # Set as eval board, is making a bunch of alarms 
           DacReg[7]: 0x3800
           DacReg[8]: 0x0000
           DacReg[9]: 0x0000
@@ -140,10 +142,10 @@ cryo:
           DacReg[19]: 0x0000
           DacReg[20]: 0x0000
           DacReg[21]: 0x0000
-          DacReg[22]: 0x0000
+          DacReg[22]: 0x4000  # This is the upper 16 bits of the NCO frequency for the DACAB path
           DacReg[23]: 0x0000
           DacReg[24]: 0x0000
-          DacReg[25]: 0x0000
+          DacReg[25]: 0x0000  # This is the upper 16 bits of the NCO frequency for the DACCD path
           DacReg[26]: 0x0020
           DacReg[27]: 0x0000
           DacReg[28]: 0x0000
@@ -152,10 +154,10 @@ cryo:
           DacReg[31]: 0x9980
           DacReg[32]: 0x8008
           DacReg[33]: 0x0000
-          DacReg[34]: 0x1b14
-          DacReg[35]: 0xffff
-          DacReg[36]: 0x0010
-          DacReg[37]: 0x0000
+          DacReg[34]: 0x1B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
+          DacReg[35]: 0x01FF  # This routes the "sleep terminal signal"  we don't use this so, it doesn't matter.
+          DacReg[36]: 0x0020  # Use only the next sysref pulse.  Uros had it set to NOT use the sysref pulse
+          DacReg[37]: 0x4000  # DACCLK div 4 to get JESD clock Uros had DACCLK=JESDCLK
           DacReg[38]: 0x0000
           DacReg[39]: 0x0000
           DacReg[40]: 0x0013
@@ -177,11 +179,11 @@ cryo:
           DacReg[56]: 0x0000
           DacReg[57]: 0x0000
           DacReg[58]: 0x0000
-          DacReg[59]: 0x0000
-          DacReg[60]: 0x0228
-          DacReg[61]: 0x00a8
-          DacReg[62]: 0x8908
-          DacReg[63]: 0x0001
+          DacReg[59]: 0x1800  # Set's divide amount for SERDES PLL ref clock divider (looks like it's set to 3?)
+          DacReg[60]: 0x0028  # Set's PLL multiply factor - eval set to: 14
+          DacReg[61]: 0x00BD  # Set's EQ and offset correction on, not sure how to configure this
+          DacReg[62]: 0x0108  # JESD termination setting and rate.  Only difference is Uros had LOS enabled.
+          DacReg[63]: 0x0000  # Swaping on JESD polarity.  I don't think we have and DAC JESD lanes swapped.
           DacReg[64]: 0x0000
           DacReg[65]: 0x0000
           DacReg[66]: 0x0000
@@ -191,18 +193,18 @@ cryo:
           DacReg[70]: 0x0044
           DacReg[71]: 0x190a
           DacReg[72]: 0x31c3
-          DacReg[73]: 0x0004
-          DacReg[74]: 0x0321
-          DacReg[75]: 0x0501
-          DacReg[76]: 0x1f01
-          DacReg[77]: 0x0100
+          DacReg[73]: 0x0000  # JESD Link selection.  Seems it should be set like the eval board.
+          DacReg[74]: 0x0f01  # Turns on serdes 0-3 and does NOT reset JESD reset.
+          DacReg[75]: 0x0801  # Number of octates per fram (1) and elastic buffers as set on eval board
+          DacReg[76]: 0x0903  # Number of JESD lanes being use (3 - means 4) and 9 frames per multifame.  
+          DacReg[77]: 0x0300  # Number of converters per link - 4
           DacReg[78]: 0x0f0f
           DacReg[79]: 0x1c61
           DacReg[80]: 0x0000
-          DacReg[81]: 0x0017
+          DacReg[81]: 0x00DC  # Set's which errors cause a sync request (lane 0).  Use eval board settings
           DacReg[82]: 0x00ff
           DacReg[83]: 0x0000
-          DacReg[84]: 0x0017
+          DacReg[84]: 0x00FC  # Set's which errors cause a sync request (lane 1).  Use eval board settings
           DacReg[85]: 0x00ff
           DacReg[86]: 0x0000
           DacReg[87]: 0x00ff
@@ -210,11 +212,11 @@ cryo:
           DacReg[89]: 0x0000
           DacReg[90]: 0x00ff
           DacReg[91]: 0x00ff
-          DacReg[92]: 0x2222
+          DacReg[92]: 0x1133  # Set up sysref mode for links - use eval board settings
           DacReg[93]: 0x0000
           DacReg[94]: 0x0000
-          DacReg[95]: 0x0123
-          DacReg[96]: 0x4567
+          DacReg[95]: 0x0123  # cross switch for JESDlanes, not sure we want this as it may depend on their board - this set up is serds0 to jesdlane4, serdes1 to jesdlane2, serdes2 to jesdlane1, serdes3 to jesdlane0
+          DacReg[96]: 0x5764  # More cross switching SD4 to JD7, SD6 to JD6, SD7 to JD5, SD5 to JD4
           DacReg[97]: 0x0211
           DacReg[98]: 0x0000
           DacReg[99]: 0x0000
@@ -246,13 +248,13 @@ cryo:
           DacReg[125]: 0x0000
           EnableTx: 0x1
         DAC[1]:
-          DacReg[0]: 0x0018
-          DacReg[1]: 0x0003
-          DacReg[2]: 0x2000
-          DacReg[3]: 0xa301
-          DacReg[4]: 0xfcfc
-          DacReg[5]: 0x000d
-          DacReg[6]: 0xfcfc
+          DacReg[0]: 0x0218   # Sets board to 4X interpolation
+          DacReg[1]: 0x0003   
+          DacReg[2]: 0x2052   # 16 bits, mixer on, NCO on, not two's compliment data
+          DacReg[3]: 0xA300   # May need to set to 0xA301, then A300
+          DacReg[4]: 0xF0F0   # This masks lanes 7,6,5,4 fifo and lane errors.  Uros had it masking lanes 7,6,5,4,3,2 because this was for the demo board that only had two lanes I think.
+          DacReg[5]: 0xFF07   # Not sure here.  This is masking some sysref errors, Uros had it only masking serdes block 0 and 1 PLL locks and the DAC PLL lock alarm
+          DacReg[6]: 0xFFFF   # Set as eval board, is making a bunch of alarms 
           DacReg[7]: 0x3800
           DacReg[8]: 0x0000
           DacReg[9]: 0x0000
@@ -268,10 +270,10 @@ cryo:
           DacReg[19]: 0x0000
           DacReg[20]: 0x0000
           DacReg[21]: 0x0000
-          DacReg[22]: 0x0000
+          DacReg[22]: 0x4E20  # This is the upper 16 bits of the NCO frequency for the DACAB path
           DacReg[23]: 0x0000
           DacReg[24]: 0x0000
-          DacReg[25]: 0x0000
+          DacReg[25]: 0x4E20  # This is the upper 16 bits of the NCO frequency for the DACCD path
           DacReg[26]: 0x0020
           DacReg[27]: 0x0000
           DacReg[28]: 0x0000
@@ -280,10 +282,10 @@ cryo:
           DacReg[31]: 0x9980
           DacReg[32]: 0x8008
           DacReg[33]: 0x0000
-          DacReg[34]: 0x1b14
-          DacReg[35]: 0xffff
-          DacReg[36]: 0x0010
-          DacReg[37]: 0x0000
+          DacReg[34]: 0x1B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
+          DacReg[35]: 0x01FF  # This routes the "sleep terminal signal"  we don't use this so, it doesn't matter.
+          DacReg[36]: 0x0020  # Use only the next sysref pulse.  Uros had it set to NOT use the sysref pulse
+          DacReg[37]: 0x4000  # DACCLK div 4 to get JESD clock Uros had DACCLK=JESDCLK
           DacReg[38]: 0x0000
           DacReg[39]: 0x0000
           DacReg[40]: 0x0013
@@ -305,11 +307,11 @@ cryo:
           DacReg[56]: 0x0000
           DacReg[57]: 0x0000
           DacReg[58]: 0x0000
-          DacReg[59]: 0x0000
-          DacReg[60]: 0x0228
-          DacReg[61]: 0x00a8
-          DacReg[62]: 0x8908
-          DacReg[63]: 0x0001
+          DacReg[59]: 0x1800  # Set's divide amount for SERDES PLL ref clock divider (looks like it's set to 3?)
+          DacReg[60]: 0x0028  # Set's PLL multiply factor - eval set to: 14
+          DacReg[61]: 0x00BD  # Set's EQ and offset correction on, not sure how to configure this
+          DacReg[62]: 0x0108  # JESD termination setting and rate.  Only difference is Uros had LOS enabled.
+          DacReg[63]: 0x0000  # Swaping on JESD polarity.  I don't think we have and DAC JESD lanes swapped.
           DacReg[64]: 0x0000
           DacReg[65]: 0x0000
           DacReg[66]: 0x0000
@@ -319,18 +321,18 @@ cryo:
           DacReg[70]: 0x0044
           DacReg[71]: 0x190a
           DacReg[72]: 0x31c3
-          DacReg[73]: 0x0004
-          DacReg[74]: 0x0321
-          DacReg[75]: 0x0501
-          DacReg[76]: 0x1f01
-          DacReg[77]: 0x0100
+          DacReg[73]: 0x0000  # JESD Link selection.  Seems it should be set like the eval board.
+          DacReg[74]: 0x0f01  # Turns on serdes 0-3 and does NOT reset JESD reset.
+          DacReg[75]: 0x0801  # Number of octates per fram (1) and elastic buffers as set on eval board
+          DacReg[76]: 0x0903  # Number of JESD lanes being use (3 - means 4) and 9 frames per multifame.  
+          DacReg[77]: 0x0300  # Number of converters per link - 4
           DacReg[78]: 0x0f0f
           DacReg[79]: 0x1c61
           DacReg[80]: 0x0000
-          DacReg[81]: 0x0017
+          DacReg[81]: 0x00DC  # Set's which errors cause a sync request (lane 0).  Use eval board settings
           DacReg[82]: 0x00ff
           DacReg[83]: 0x0000
-          DacReg[84]: 0x0017
+          DacReg[84]: 0x00FC  # Set's which errors cause a sync request (lane 1).  Use eval board settings
           DacReg[85]: 0x00ff
           DacReg[86]: 0x0000
           DacReg[87]: 0x00ff
@@ -338,11 +340,11 @@ cryo:
           DacReg[89]: 0x0000
           DacReg[90]: 0x00ff
           DacReg[91]: 0x00ff
-          DacReg[92]: 0x2222
+          DacReg[92]: 0x1133  # Set up sysref mode for links - use eval board settings
           DacReg[93]: 0x0000
           DacReg[94]: 0x0000
-          DacReg[95]: 0x0123
-          DacReg[96]: 0x4567
+          DacReg[95]: 0x0123  # cross switch for JESDlanes, not sure we want this as it may depend on their board - this set up is serds0 to jesdlane4, serdes1 to jesdlane2, serdes2 to jesdlane1, serdes3 to jesdlane0
+          DacReg[96]: 0x5764  # More cross switching SD4 to JD7, SD6 to JD6, SD7 to JD5, SD5 to JD4
           DacReg[97]: 0x0211
           DacReg[98]: 0x0000
           DacReg[99]: 0x0000
@@ -373,239 +375,10 @@ cryo:
           DacReg[124]: 0x0000
           DacReg[125]: 0x0000
           EnableTx: 0x1
-        ADC[0]:
-          SYNCB_POL: 0x1
-          SLOW_SP_EN1: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS
-          SLOW_SP_EN2: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS       
-          JESD_OUTPUT_SWING: 0x4 # 0x4 = 960 mVPP (max. swing)
-          CHA:
-            ########################
-            # DECIMATION FILTER PAGE
-            ########################
-            DDC_EN: 0x1
-            DECIM_FACTOR: 0x0
-            DUAL_BAND_EN: 0x0
-            REAL_OUT_EN: 0x0
-            DDC0_NCO1_LSB: 0x20
-            DDC0_NCO1_MSB: 0x4E
-            DDC0_NCO2_LSB: 0x00
-            DDC0_NCO2_MSB: 0x00
-            DDC0_NCO3_LSB: 0x00
-            DDC0_NCO3_MSB: 0x00
-            DDC0_NCO4_LSB: 0x00
-            DDC0_NCO4_MSB: 0x00
-            NCO_SEL_PIN: 0x00
-            NCO_SEL: 0x00
-            LMFC_RESET_MODE: 0x00
-            DDC0_6DB_GAIN: 0x01
-            DDC1_6DB_GAIN: 0x01
-            DDC_DET_LAT: 0x51
-            WBF_6DB_GAIN: 0x01          
-            CUSTOM_PATTERN1_LSB: 0x00
-            CUSTOM_PATTERN1_MSB: 0x00
-            CUSTOM_PATTERN2_LSB: 0x00
-            CUSTOM_PATTERN2_MSB: 0x00
-            TEST_PATTERN_SEL: 0x00
-            TEST_PAT_RES: 0x00
-            TP_RES_EN: 0x00          
-            ########################
-            # JESD DIGITAL PAGE
-            ########################         
-            JESD_MODE0: 0x0
-            12BIT MODE: 0x0
-            SYNC_REG_EN: 0x0
-            SYNC_REG: 0x0          
-            RAMP_12BIT: 0x0
-            JESD_MODE2: 0x1
-            JESD_MODE1: 0x0
-            LMFC_MASK_RESET: 0x0
-            LINK_LAY_RPAT: 0x0
-            LINK_LAYER_TESTMODE: 0x0
-            40X_MODE: 0x7
-            PLL_MODE: 0x2
-            SEL_EMP_LANE0: 0x7
-            SEL_EMP_LANE1: 0x7
-            SEL_EMP_LANE2: 0x7
-            SEL_EMP_LANE3: 0x7
-            TX_LINK_DIS: 0x0
-            FRAME_ALIGN: 0x0
-            LANE_ALIGN: 0x0
-            TESTMODE_EN: 0x0
-            CTRL_K: 0x1
-            FRAMES_PER_MULTIFRAME: 0x0F
-          CHB:
-            ########################
-            # DECIMATION FILTER PAGE
-            ########################
-            DDC_EN: 0x1
-            DECIM_FACTOR: 0x0
-            DUAL_BAND_EN: 0x0
-            REAL_OUT_EN: 0x0
-            DDC0_NCO1_LSB: 0x20
-            DDC0_NCO1_MSB: 0x4E
-            DDC0_NCO2_LSB: 0x00
-            DDC0_NCO2_MSB: 0x00
-            DDC0_NCO3_LSB: 0x00
-            DDC0_NCO3_MSB: 0x00
-            DDC0_NCO4_LSB: 0x00
-            DDC0_NCO4_MSB: 0x00
-            NCO_SEL_PIN: 0x00
-            NCO_SEL: 0x00
-            LMFC_RESET_MODE: 0x00
-            DDC0_6DB_GAIN: 0x01
-            DDC1_6DB_GAIN: 0x01
-            DDC_DET_LAT: 0x51
-            WBF_6DB_GAIN: 0x01          
-            CUSTOM_PATTERN1_LSB: 0x00
-            CUSTOM_PATTERN1_MSB: 0x00
-            CUSTOM_PATTERN2_LSB: 0x00
-            CUSTOM_PATTERN2_MSB: 0x00
-            TEST_PATTERN_SEL: 0x00
-            TEST_PAT_RES: 0x00
-            TP_RES_EN: 0x00          
-            ########################
-            # JESD DIGITAL PAGE
-            ########################         
-            JESD_MODE0: 0x0
-            12BIT MODE: 0x0
-            SYNC_REG_EN: 0x0
-            SYNC_REG: 0x0          
-            RAMP_12BIT: 0x0
-            JESD_MODE2: 0x1
-            JESD_MODE1: 0x0
-            LMFC_MASK_RESET: 0x0
-            LINK_LAY_RPAT: 0x0
-            LINK_LAYER_TESTMODE: 0x0
-            40X_MODE: 0x7
-            PLL_MODE: 0x2
-            SEL_EMP_LANE0: 0x7
-            SEL_EMP_LANE1: 0x7
-            SEL_EMP_LANE2: 0x7
-            SEL_EMP_LANE3: 0x7
-            TX_LINK_DIS: 0x0
-            FRAME_ALIGN: 0x0
-            LANE_ALIGN: 0x0
-            TESTMODE_EN: 0x0
-            CTRL_K: 0x1
-            FRAMES_PER_MULTIFRAME: 0x0F     
-        ADC[1]:
-          SYNCB_POL: 0x1
-          SLOW_SP_EN1: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS
-          SLOW_SP_EN2: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS       
-          JESD_OUTPUT_SWING: 0x4 # 0x4 = 960 mVPP (max. swing)
-          CHA:
-            ########################
-            # DECIMATION FILTER PAGE
-            ########################
-            DDC_EN: 0x1
-            DECIM_FACTOR: 0x0
-            DUAL_BAND_EN: 0x0
-            REAL_OUT_EN: 0x0
-            DDC0_NCO1_LSB: 0x20
-            DDC0_NCO1_MSB: 0x4E
-            DDC0_NCO2_LSB: 0x00
-            DDC0_NCO2_MSB: 0x00
-            DDC0_NCO3_LSB: 0x00
-            DDC0_NCO3_MSB: 0x00
-            DDC0_NCO4_LSB: 0x00
-            DDC0_NCO4_MSB: 0x00
-            NCO_SEL_PIN: 0x00
-            NCO_SEL: 0x00
-            LMFC_RESET_MODE: 0x00
-            DDC0_6DB_GAIN: 0x01
-            DDC1_6DB_GAIN: 0x01
-            DDC_DET_LAT: 0x51
-            WBF_6DB_GAIN: 0x01          
-            CUSTOM_PATTERN1_LSB: 0x00
-            CUSTOM_PATTERN1_MSB: 0x00
-            CUSTOM_PATTERN2_LSB: 0x00
-            CUSTOM_PATTERN2_MSB: 0x00
-            TEST_PATTERN_SEL: 0x00
-            TEST_PAT_RES: 0x00
-            TP_RES_EN: 0x00          
-            ########################
-            # JESD DIGITAL PAGE
-            ########################         
-            JESD_MODE0: 0x0
-            12BIT MODE: 0x0
-            SYNC_REG_EN: 0x0
-            SYNC_REG: 0x0          
-            RAMP_12BIT: 0x0
-            JESD_MODE2: 0x1
-            JESD_MODE1: 0x0
-            LMFC_MASK_RESET: 0x0
-            LINK_LAY_RPAT: 0x0
-            LINK_LAYER_TESTMODE: 0x0
-            40X_MODE: 0x7
-            PLL_MODE: 0x2
-            SEL_EMP_LANE0: 0x7
-            SEL_EMP_LANE1: 0x7
-            SEL_EMP_LANE2: 0x7
-            SEL_EMP_LANE3: 0x7
-            TX_LINK_DIS: 0x0
-            FRAME_ALIGN: 0x0
-            LANE_ALIGN: 0x0
-            TESTMODE_EN: 0x0
-            CTRL_K: 0x1
-            FRAMES_PER_MULTIFRAME: 0x0F
-          CHB:
-            ########################
-            # DECIMATION FILTER PAGE
-            ########################
-            DDC_EN: 0x1
-            DECIM_FACTOR: 0x0
-            DUAL_BAND_EN: 0x0
-            REAL_OUT_EN: 0x0
-            DDC0_NCO1_LSB: 0x20
-            DDC0_NCO1_MSB: 0x4E
-            DDC0_NCO2_LSB: 0x00
-            DDC0_NCO2_MSB: 0x00
-            DDC0_NCO3_LSB: 0x00
-            DDC0_NCO3_MSB: 0x00
-            DDC0_NCO4_LSB: 0x00
-            DDC0_NCO4_MSB: 0x00
-            NCO_SEL_PIN: 0x00
-            NCO_SEL: 0x00
-            LMFC_RESET_MODE: 0x00
-            DDC0_6DB_GAIN: 0x01
-            DDC1_6DB_GAIN: 0x01
-            DDC_DET_LAT: 0x51
-            WBF_6DB_GAIN: 0x01          
-            CUSTOM_PATTERN1_LSB: 0x00
-            CUSTOM_PATTERN1_MSB: 0x00
-            CUSTOM_PATTERN2_LSB: 0x00
-            CUSTOM_PATTERN2_MSB: 0x00
-            TEST_PATTERN_SEL: 0x00
-            TEST_PAT_RES: 0x00
-            TP_RES_EN: 0x00          
-            ########################
-            # JESD DIGITAL PAGE
-            ########################         
-            JESD_MODE0: 0x0
-            12BIT MODE: 0x0
-            SYNC_REG_EN: 0x0
-            SYNC_REG: 0x0          
-            RAMP_12BIT: 0x0
-            JESD_MODE2: 0x1
-            JESD_MODE1: 0x0
-            LMFC_MASK_RESET: 0x0
-            LINK_LAY_RPAT: 0x0
-            LINK_LAYER_TESTMODE: 0x0
-            40X_MODE: 0x7
-            PLL_MODE: 0x2
-            SEL_EMP_LANE0: 0x7
-            SEL_EMP_LANE1: 0x7
-            SEL_EMP_LANE2: 0x7
-            SEL_EMP_LANE3: 0x7
-            TX_LINK_DIS: 0x0
-            FRAME_ALIGN: 0x0
-            LANE_ALIGN: 0x0
-            TESTMODE_EN: 0x0
-            CTRL_K: 0x1
-            FRAMES_PER_MULTIFRAME: 0x0F    
     AppTopJesd[1]:
       JesdRx:
-        Enable: 0x173
+        Enable: 0x33
+        # Enable: 0x33
         # Enable: 0x73
         # Enable: 0x3F3
         # Enable: 0x80 # JESD7 is broken??
@@ -621,12 +394,12 @@ cryo:
         SubClass: 0x1
         SysrefDelay: 0x00
       JesdTx:
-        Enable: 0x3FF
+        Enable: 0x3CF
         # Enable: 0x0
         InvertDacData: 0x00
-        HighAmplitudeVal: 0x0000ffff
-        LowAmplitudeVal: 0x00000000
-        SquarePeriod: 0x0001
+        HighAmplitudeVal: 0xC000
+        LowAmplitudeVal:  0x4000
+        SquarePeriod: 0x0004
         RampStep: 0x0001
         ScrambleEnable: Disabled
         TestSigEnable: 0x1
@@ -634,5 +407,24 @@ cryo:
         ResetGTs: 0x0
         ReplaceEnable: 0x1
         ClearErrors: 0x0
-        SubClass: 0x1      
-        
+        SubClass: 0x1  
+        dataOutMux[0]: TestData
+        dataOutMux[1]: TestData
+        dataOutMux[2]: TestData
+        dataOutMux[3]: TestData
+        dataOutMux[4]: UserData
+        dataOutMux[5]: UserData
+        dataOutMux[6]: UserData
+        dataOutMux[7]: UserData
+        dataOutMux[8]: UserData
+        dataOutMux[9]: UserData
+        testOutMux[0]: SquareWave
+        testOutMux[1]: SquareWave
+        testOutMux[2]: SquareWave
+        testOutMux[3]: SquareWave
+        testOutMux[4]: SawIncrement
+        testOutMux[5]: SawIncrement
+        testOutMux[6]: SawIncrement
+        testOutMux[7]: SawIncrement
+        testOutMux[8]: SawIncrement
+        testOutMux[9]: SawIncrement
