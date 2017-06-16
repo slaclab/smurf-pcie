@@ -119,7 +119,7 @@ cryo:
           LmkReg_0x016C: 0x00
           LmkReg_0x016D: 0x00
           LmkReg_0x016E: 0x13
-        DAC[1:0]:
+        DAC[0:1]:
           DacReg[0]: 0x0218   # Sets board to 4X interpolation
           DacReg[1]: 0x0003   
           DacReg[2]: 0x2050   # 16 bits, mixer on, NCO on, not two's compliment data
@@ -250,12 +250,7 @@ cryo:
     AppTopJesd[1]:
       JesdRx:
         Enable: 0x33
-        # Enable: 0x33
-        # Enable: 0x73
         # Enable: 0x3F3
-        # Enable: 0x80 # JESD7 is broken??
-        # Enable: 0x100
-        # Enable: 0x200 # JESD7 is broken
         InvertAdcData: 0x00
         LinkErrMask: 0x3f
         ScrambleEnable: Disabled
@@ -266,8 +261,8 @@ cryo:
         SubClass: 0x1
         SysrefDelay: 0x00
       JesdTx:
-        Enable: 0x3CF
-        # Enable: 0x0
+        Enable: 0xF
+        # Enable: 0x3CF
         InvertDacData: 0x00
         HighAmplitudeVal: 0xC000
         LowAmplitudeVal:  0x4000
@@ -280,10 +275,10 @@ cryo:
         ReplaceEnable: 0x1
         ClearErrors: 0x0
         SubClass: 0x1  
-        dataOutMux[3:0]: TestData
-        dataOutMux[9:4]: UserData
-        testOutMux[3:0]: SquareWave
-        testOutMux[9:4]: SawIncrement
+        dataOutMux[0:3]: UserData
+        dataOutMux[4:5]: OutputZero
+        dataOutMux[6:9]: UserData
+        testOutMux[0:9]: OutputZero
         txDiffCtrl[:]: 0xFF
         txPreCursor[:]: 0x07
         txPostCursor[:]: 0x07

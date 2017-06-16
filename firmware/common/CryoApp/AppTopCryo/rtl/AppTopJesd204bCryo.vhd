@@ -132,6 +132,8 @@ architecture mapping of AppTopJesd204bCryo is
          txdiffctrl_in : in STD_LOGIC_VECTOR ( 27 downto 0 );
          txpd_in : in STD_LOGIC_VECTOR ( 13 downto 0 );
          txpolarity_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
+         txpostcursor_in : in STD_LOGIC_VECTOR ( 34 downto 0 );
+         txprecursor_in : in STD_LOGIC_VECTOR ( 34 downto 0 );         
          txusrclk_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          txusrclk2_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          drpdo_out : out STD_LOGIC_VECTOR ( 111 downto 0 );
@@ -195,6 +197,8 @@ architecture mapping of AppTopJesd204bCryo is
          txdiffctrl_in : in STD_LOGIC_VECTOR ( 11 downto 0 );
          txpd_in : in STD_LOGIC_VECTOR ( 5 downto 0 );
          txpolarity_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
+         txpostcursor_in : in STD_LOGIC_VECTOR ( 14 downto 0 );
+         txprecursor_in : in STD_LOGIC_VECTOR ( 14 downto 0 );         
          txusrclk_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          txusrclk2_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          drpdo_out : out STD_LOGIC_VECTOR ( 47 downto 0 );
@@ -246,6 +250,14 @@ architecture mapping of AppTopJesd204bCryo is
    signal s_dataValidVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
    signal s_sampleDataArr : sampleDataArray(GT_LANE_G-1 downto 0) := (others => (others => '0'));
 
+   signal txDiffCtrl    : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '1'));
+   signal txPostCursor  : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
+   signal txPreCursor   : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
+   
+   signal gtTxDiffCtrl    : slv(GT_LANE_G*4-1 downto 0) := (others => '1');   
+   signal gtTxPostCursor  : slv(GT_LANE_G*5-1 downto 0) := (others => '0');   
+   signal gtTxPreCursor   : slv(GT_LANE_G*5-1 downto 0) := (others => '0');   
+   
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
    
@@ -350,8 +362,9 @@ begin
             gtTxReady_i          => s_gtTxReady(JESD_TX_LANE_G-1 downto 0),
             gtTxReset_o          => s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0),
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),
-            pulse_o              => open,
-            leds_o               => open);
+            txDiffCtrl           => txDiffCtrl,
+            txPostCursor         => txPostCursor,
+            txPreCursor          => txPreCursor);
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
    end generate;
 
@@ -406,7 +419,12 @@ begin
             s_txDataK((i*8)+7 downto (i*8))   <= (x"0" & r_jesdGtTxArr(i).dataK) after TPD_G;
          end if;
       end process;
-      s_gtTxReady(i)                    <= s_txDone(0) when i<7 else s_txDone(1);
+      
+      s_gtTxReady(i)                   <= s_txDone(0) when (i<7) else s_txDone(1);
+      gtTxDiffCtrl(i*4-1 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
+      gtTxPostCursor(i*5-1 downto i*5) <= txPostCursor(i)(4 downto 0);
+      gtTxPreCursor(i*5-1 downto i*5)  <= txPreCursor(i)(4 downto 0);
+      
    end generate TX_LANES_GEN;
 
    -----------------
@@ -485,9 +503,11 @@ begin
          txctrl0_in                            => (others => '0'),
          txctrl1_in                            => (others => '0'),
          txctrl2_in                            => s_txDataK(55 downto 0),
-         txdiffctrl_in                         => (others => '1'),
+         txdiffctrl_in                         => gtTxDiffCtrl(27 downto 0),
          txpd_in                               => (others => '0'),
          txpolarity_in                         => JESD_TX_POLARITY_G(6 downto 0),
+         txpostcursor_in                       => gtTxPostCursor(34 downto 0),
+         txprecursor_in                        => gtTxPreCursor(34 downto 0),
          txusrclk_in                           => s_devClkVec(6 downto 0),
          txusrclk2_in                          => s_devClk2Vec(6 downto 0),
          drpdo_out                             => drpDo(111 downto 0),
@@ -548,9 +568,11 @@ begin
          txctrl0_in                            => (others => '0'),
          txctrl1_in                            => (others => '0'),
          txctrl2_in                            => s_txDataK(79 downto 56),
-         txdiffctrl_in                         => (others => '1'),
+         txdiffctrl_in                         => gtTxDiffCtrl(39 downto 28),
          txpd_in                               => (others => '0'),
          txpolarity_in                         => JESD_TX_POLARITY_G(9 downto 7),
+         txpostcursor_in                       => gtTxPostCursor(49 downto 35),
+         txprecursor_in                        => gtTxPreCursor(49 downto 35),       
          txusrclk_in                           => s_devClkVec(9 downto 7),
          txusrclk2_in                          => s_devClk2Vec(9 downto 7),
          drpdo_out                             => drpDo(159 downto 112),
