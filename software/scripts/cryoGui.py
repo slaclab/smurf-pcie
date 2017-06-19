@@ -7,29 +7,27 @@ import PyQt4.QtGui
 import pyrogue.gui
 import sys
 
-from AmcCarrierCore import *
-from AppTop import *
+from FpgaTopLevel import *
 
 udpRssiA = pyrogue.protocols.UdpRssiPack("10.0.3.104",8193,1500)
 rssiSrp= rogue.protocols.srp.SrpV3()
 pyrogue.streamConnectBiDir(rssiSrp,udpRssiA.application(0))
 
-cryo = pyrogue.Root('cryo','AMC Carrier')
+root = pyrogue.Root('root','AMC Carrier')
 
-cryo.add(AmcCarrierCore(memBase=rssiSrp, offset=0x00000000, enableBsa=False))
-cryo.add(AppTop(        memBase=rssiSrp, offset=0x80000000, numRxLanes=[0,10], numTxLanes=[0,10]))
-cryo.readAll()
+root.add(FpgaTopLevel(memBase=rssiSrp, offset=0x00000000))
+root.readAll()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
-guiTop = pyrogue.gui.GuiTop(group='cryoMesh')
+guiTop = pyrogue.gui.GuiTop(group='rootMesh')
 guiTop.resize(800, 1000)
-guiTop.addTree(cryo)
+guiTop.addTree(root)
 
 print("Starting GUI...\n");
 
 # Run GUI
 appTop.exec_()
 
-cryo.stop()
+root.stop()
 exit()
