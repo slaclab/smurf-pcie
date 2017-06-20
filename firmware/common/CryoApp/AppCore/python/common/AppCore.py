@@ -29,23 +29,32 @@ class AppCore(pr.Device):
                     memBase     =  None, 
                     offset      =  0x0, 
                     hidden      =  False,
+                    numRxLanes  =  [0,0], 
+                    numTxLanes  =  [0,0],                    
                     expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
 
+        for i in range(2):
+            if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
+                self.add(AmcCryoCore(
+                    name    = "AmcCryoCore[%i]" % (i),
+                    offset  = (i*0x00100000),
+                    expand  = True,
+                ))        
+        # self.add(SysgenCryo(    offset=0x01000000))
+
         ##############################
         # Variables
         ##############################
-        self.add(AmcCryoCore(   offset=0x00100000, expand=True))
-        # self.add(SysgenCryo(    offset=0x01000000))
-
         self.addVariables(  name         = "DacMuxSel",
-                            description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
-                            offset       =  0x02000000,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                            number       =  2,
-                            stride       =  0x01000000,
-                        )
+            description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
+            offset       =  0x02000000,
+            bitSize      =  1,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+            number       =  2,
+            stride       =  0x01000000,
+        )
+ 

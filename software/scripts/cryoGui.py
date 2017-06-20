@@ -13,11 +13,9 @@ udpRssiA = pyrogue.protocols.UdpRssiPack("10.0.3.104",8193,1500)
 rssiSrp= rogue.protocols.srp.SrpV3()
 pyrogue.streamConnectBiDir(rssiSrp,udpRssiA.application(0))
 
-
-
 class AmcCarrier(pyrogue.Root):
     def __init__(self, srp):
-        super().__init__(name='AMC Carrier', pollEn=True)        
+        super().__init__(name='root',description='', pollEn=True)        
         self.add(FpgaTopLevel(memBase=rssiSrp, offset=0x00000000))
 
 root = AmcCarrier(srp=rssiSrp)
