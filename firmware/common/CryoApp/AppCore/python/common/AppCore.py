@@ -20,7 +20,7 @@
 import pyrogue as pr
 
 from AppHardware.AmcCryo._amcCryoCore import *
-from DspCoreLib.SysgenCryo import *
+#from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
     def __init__(   self, 
