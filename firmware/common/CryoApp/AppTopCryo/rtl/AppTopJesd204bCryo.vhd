@@ -83,7 +83,7 @@ entity AppTopJesd204bCryo is
       gtRxN           : in  slv(GT_LANE_G-1 downto 0);  -- GT Serial Receive Negative      
       -- SYSREF for subclass 1 fixed latency
       sysRef_i        : in  sl;
-      -- Synchronisation output combined from all receivers to be connected to ADC/DAC chips
+      -- Synchronization output combined from all receivers to be connected to ADC/DAC chips
       nSync_o         : out sl;         -- Active HIGH
       nSync_i         : in  sl);        -- Active HIGH
 end AppTopJesd204bCryo;
@@ -117,6 +117,7 @@ architecture mapping of AppTopJesd204bCryo is
          gthrxn_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          gthrxp_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          gtrefclk0_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
+         loopback_in : IN STD_LOGIC_VECTOR(20 DOWNTO 0);
          rx8b10ben_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          rxcommadeten_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          rxmcommaalignen_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
@@ -182,6 +183,7 @@ architecture mapping of AppTopJesd204bCryo is
          gthrxn_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          gthrxp_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          gtrefclk0_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
+         loopback_in : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
          rx8b10ben_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          rxcommadeten_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          rxmcommaalignen_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
@@ -253,10 +255,14 @@ architecture mapping of AppTopJesd204bCryo is
    signal txDiffCtrl    : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '1'));
    signal txPostCursor  : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
    signal txPreCursor   : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
-   
+   signal txPolarity    : slv(GT_LANE_G-1 downto 0)       := (others => '0');
+   signal rxPolarity    : slv(GT_LANE_G-1 downto 0)       := (others => '0');
+   signal loopback      : slv(GT_LANE_G-1 downto 0)       := (others => '0');
+             
    signal gtTxDiffCtrl    : slv(GT_LANE_G*4-1 downto 0) := (others => '1');   
    signal gtTxPostCursor  : slv(GT_LANE_G*5-1 downto 0) := (others => '0');   
    signal gtTxPreCursor   : slv(GT_LANE_G*5-1 downto 0) := (others => '0');   
+   signal gtLoopback      : slv(GT_LANE_G*3-1 downto 0) := (others => '0');   
    
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
@@ -295,8 +301,6 @@ begin
             axilReadSlave     => rxReadSlave,
             axilWriteMaster   => rxWriteMaster,
             axilWriteSlave    => rxWriteSlave,
-            rxAxisMasterArr_o => open,
-            rxCtrlArr_i       => (others => AXI_STREAM_CTRL_UNUSED_C),
             devClk_i          => devClk_i,
             devRst_i          => devRst_i,
             sysRef_i          => s_sysRef,
@@ -306,8 +310,7 @@ begin
             sampleDataArr_o   => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
             dataValidVec_o    => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
             nSync_o           => nSync_o,
-            pulse_o           => open,
-            leds_o            => open);
+            rxPolarity        => rxPolarity);
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
    
@@ -352,8 +355,6 @@ begin
             axilReadSlave        => txReadSlave,
             axilWriteMaster      => txWriteMaster,
             axilWriteSlave       => txWriteSlave,
-            txAxisMasterArr_i    => (others => AXI_STREAM_MASTER_INIT_C),
-            txAxisSlaveArr_o     => open,
             extSampleDataArray_i => sampleDataArr_i(JESD_TX_LANE_G-1 downto 0),
             devClk_i             => devClk_i,
             devRst_i             => devRst_i,
@@ -364,7 +365,10 @@ begin
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),
             txDiffCtrl           => txDiffCtrl,
             txPostCursor         => txPostCursor,
-            txPreCursor          => txPreCursor);
+            txPreCursor          => txPreCursor,
+            txPolarity           => txPolarity,   
+            loopback             => loopback);            
+            
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
    end generate;
 
@@ -444,6 +448,8 @@ begin
       s_stableClkVec(i)          <= stableClk;
       s_gtRefClkVec(i)           <= refClkR when i<7 else refClkL;  
      
+      gtLoopback(3*i+1)          <= loopback(i);
+     
       process(devClk_i)
       begin
          if rising_edge(devClk_i) then
@@ -489,14 +495,13 @@ begin
          gthrxn_in                             => gtRxN(6 downto 0),
          gthrxp_in                             => gtRxP(6 downto 0),
          gtrefclk0_in                          => s_gtRefClkVec(6 downto 0),
-         --gtrefclk00_in(0)                      => refClk,
-         --gtrefclk00_in(0)                      => refClk, 
+         loopback_in                           => gtLoopback(20 downto 0),
          rx8b10ben_in                          => (others => '1'),
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec(6 downto 0),
          rxpcommaalignen_in                    => s_allignEnVec(6 downto 0),
          rxpd_in                               => (others => '0'),
-         rxpolarity_in                         => JESD_RX_POLARITY_G(6 downto 0),
+         rxpolarity_in                         => rxPolarity(6 downto 0),
          rxusrclk_in                           => s_devClkVec(6 downto 0),
          rxusrclk2_in                          => s_devClk2Vec(6 downto 0),
          tx8b10ben_in                          => (others => '1'),
@@ -505,7 +510,7 @@ begin
          txctrl2_in                            => s_txDataK(55 downto 0),
          txdiffctrl_in                         => gtTxDiffCtrl(27 downto 0),
          txpd_in                               => (others => '0'),
-         txpolarity_in                         => JESD_TX_POLARITY_G(6 downto 0),
+         txpolarity_in                         => txPolarity(6 downto 0),
          txpostcursor_in                       => gtTxPostCursor(34 downto 0),
          txprecursor_in                        => gtTxPreCursor(34 downto 0),
          txusrclk_in                           => s_devClkVec(6 downto 0),
@@ -554,14 +559,13 @@ begin
          gthrxn_in                             => gtRxN(9 downto 7),
          gthrxp_in                             => gtRxP(9 downto 7),
          gtrefclk0_in                          => s_gtRefClkVec(9 downto 7),
-         --gtrefclk00_in(0)                      => refClk,
-         --gtrefclk00_in(0)                      => refClk, 
+         loopback_in                           => gtLoopback(29 downto 21),
          rx8b10ben_in                          => (others => '1'),
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec(9 downto 7),
          rxpcommaalignen_in                    => s_allignEnVec(9 downto 7),
          rxpd_in                               => (others => '0'),
-         rxpolarity_in                         => JESD_RX_POLARITY_G(9 downto 7),
+         rxpolarity_in                         => rxPolarity(9 downto 7),
          rxusrclk_in                           => s_devClkVec(9 downto 7),
          rxusrclk2_in                          => s_devClk2Vec(9 downto 7),
          tx8b10ben_in                          => (others => '1'),
@@ -570,7 +574,7 @@ begin
          txctrl2_in                            => s_txDataK(79 downto 56),
          txdiffctrl_in                         => gtTxDiffCtrl(39 downto 28),
          txpd_in                               => (others => '0'),
-         txpolarity_in                         => JESD_TX_POLARITY_G(9 downto 7),
+         txpolarity_in                         => txPolarity(9 downto 7),
          txpostcursor_in                       => gtTxPostCursor(49 downto 35),
          txprecursor_in                        => gtTxPreCursor(49 downto 35),       
          txusrclk_in                           => s_devClkVec(9 downto 7),

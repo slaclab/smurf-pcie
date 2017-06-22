@@ -34,5 +34,6 @@ class FpgaTopLevel(pr.Device):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
         
         self.add(AmcCarrierCore(offset=0x00000000, enableBsa=False))
-        self.add(AppTop(        offset=0x80000000, numRxLanes=[10,0], numTxLanes=[10,0]))
+        self.add(AppTop(        offset=0x80000000, numRxLanes=[10,0], numTxLanes=[10,0])) #BAY[0] only
+        # self.add(AppTop(        offset=0x80000000, numRxLanes=[0,10], numTxLanes=[0,10])) #BAY[1] only
     

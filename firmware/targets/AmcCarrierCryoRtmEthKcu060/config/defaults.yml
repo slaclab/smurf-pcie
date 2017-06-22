@@ -45,7 +45,9 @@ root:
       AppCore:
         AmcCryoCore[:]:
           DBG:
-            txSyncMask: 0x0
+            # txSyncMask: 0x0  # Both DAC channels
+            txSyncMask: 0x2  # Only using DAC[0]
+            # txSyncMask: 0x1  # Only using DAC[1]
           LMK:
             EnableSync: 0xFF
             EnableSysRef: 0x3
@@ -242,17 +244,17 @@ root:
             DacReg[78]: 0x0f0f
             DacReg[79]: 0x1c61
             DacReg[80]: 0x0000
-            DacReg[81]: 0x0027  # sync_request_ena_link0
-            DacReg[82]: 0x0027  # error_ena_link0
+            DacReg[81]: 0x0026  # sync_request_ena_link0
+            DacReg[82]: 0x0026  # error_ena_link0
             DacReg[83]: 0x0000
-            DacReg[84]: 0x0027  # sync_request_ena_link1  
-            DacReg[85]: 0x0027  # error_ena_link1
+            DacReg[84]: 0x0026  # sync_request_ena_link1  
+            DacReg[85]: 0x0026  # error_ena_link1
             DacReg[86]: 0x0000
-            DacReg[87]: 0x0027  # sync_request_ena_link2
-            DacReg[88]: 0x0027  # error_ena_link2
+            DacReg[87]: 0x0026  # sync_request_ena_link2
+            DacReg[88]: 0x0026  # error_ena_link2
             DacReg[89]: 0x0000
-            DacReg[90]: 0x0027  # sync_request_ena_link3
-            DacReg[91]: 0x0027  # error_ena_link3
+            DacReg[90]: 0x0026  # sync_request_ena_link3
+            DacReg[91]: 0x0026  # error_ena_link3
             DacReg[92]: 0x1133  # Set up sysref mode for links - use eval board settings
             DacReg[93]: 0x0000
             DacReg[94]: 0x0000
@@ -350,7 +352,9 @@ root:
               FRAMES_PER_MULTIFRAME: 0x0F          
       AppTopJesd[:]:
         JesdRx:
-          Enable: 0x3F3
+          # Enable: 0x3F3 # Both ADC channels
+          Enable: 0x33    # Only using ADC[0]
+          # Enable: 0x3C0 # Only using ADC[1]
           Polarity: 0x100
           InvertAdcData: 0x00
           LinkErrMask: 0x3B # Mask Enable the errors that are required to brake the link. bit 5-0: positionErr - s_bufOvf - s_bufUnf - dispErr - decErr - s_alignErr
@@ -362,8 +366,10 @@ root:
           SubClass: 0x1
           SysrefDelay: 0x00
         JesdTx:
-          Enable: 0x3CF
-          Polarity: 0x2
+          # Enable: 0x3CF # Both DAC channels
+          Enable: 0xF     # Only using DAC[0]
+          # Enable: 0x3C0 # Only using DAC[1]
+          Polarity: 0x2   # JESD1_TO_AMC appears to be inverted???
           Loopback: 0x0
           InvertDacData: 0x0
           HighAmplitudeVal: 0xC000
@@ -379,16 +385,16 @@ root:
           dataOutMux[4]: OutputZero # Unused channel
           dataOutMux[5]: OutputZero # Unused channel
           testOutMux[:]: SquareWave
-          txDiffCtrl[:]: 0xFF
-          txDiffCtrl[4]: 0 # Unused channel
-          txDiffCtrl[5]: 0 # Unused channel          
-          txPreCursor[:]: 0x0F
-          txPreCursor[4]: 0xFF # Unused channel
-          txPreCursor[5]: 0xFF # Unused channel            
-          txPostCursor[:]: 0x07
-          txPostCursor[4]: 0xFF # Unused channel
-          txPostCursor[5]: 0xFF # Unused channel     
-          
+          txDiffCtrl[0:3]: 0xFF
+          txDiffCtrl[4:5]: 0 # Unused channel
+          txDiffCtrl[6:9]: 0xFF
+          txPreCursor[0:3]: 0x0F
+          txPreCursor[4:5]: 0xFF # Unused channel
+          txPreCursor[6:9]: 0x0F 
+          txPostCursor[0:3]: 0x03 # DAC[0]
+          txPostCursor[4:5]: 0xFF # Unused channel
+          txPostCursor[6:9]: 0x07 # DAC[1]
+ 
           # #############################
           # TestSigEnable: 0x1
           # dataOutMux[:]: TestData

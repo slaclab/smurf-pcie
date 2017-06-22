@@ -51,9 +51,9 @@ class AppCore(pr.Device):
             description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
             offset       =  0x02000000,
             bitSize      =  1,
-            bitOffset    =  0x00,
+            bitOffset    =  0,
             base         = "hex",
-            mode         = "RO",
+            mode         = "RW",
             number       =  2,
             stride       =  0x01000000,
         )

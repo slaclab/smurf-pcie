@@ -28,6 +28,7 @@ build.info
 # Vivado Build
 build*
 
-# Only .bit.gz and .mcs.gz should be committed to git
+# Requires a force (-f) git add
 *.bit
 *.mcs
+*.gz
