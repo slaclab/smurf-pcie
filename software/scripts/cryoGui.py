@@ -23,6 +23,7 @@ root.readAll()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
+appTop.setStyle('Fusion')
 guiTop = pyrogue.gui.GuiTop(group='rootMesh')
 guiTop.resize(800, 1000)
 guiTop.addTree(root)
