@@ -292,6 +292,7 @@ root:
             EnableTx: 0x1
           ADC[:]:
             SYNCB_POL: 0x1
+            PDN_SYSREF: 0x1
             SLOW_SP_EN1: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS
             SLOW_SP_EN2: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS       
             JESD_OUTPUT_SWING: 0x4 # 0x4 = 960 mVPP (max. swing)
