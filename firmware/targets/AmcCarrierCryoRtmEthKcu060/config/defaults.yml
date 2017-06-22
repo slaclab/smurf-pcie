@@ -49,7 +49,6 @@ root:
           LMK:
             EnableSync: 0xFF
             EnableSysRef: 0x3
-            LmkReg_0x0002: 0x00
             SyncBit: 0x1
             LmkReg_0x0100: 0x08
             LmkReg_0x0101: 0x55
@@ -162,10 +161,10 @@ root:
             LmkReg_0x016D: 0x00
             LmkReg_0x016E: 0x13
           DAC[:]:
-            DacReg[0]: 0x0218   # Sets board to 4X interpolation
+            DacReg[0]: 0x0218   # Sets board to 4X interpolation (Default: 0x0218)
             DacReg[1]: 0x0003   
-            DacReg[2]: 0x2050   # 16 bits, mixer on, NCO on, not two's compliment data
-            DacReg[3]: 0xA300   # May need to set to 0xA301, then A300
+            DacReg[2]: 0x2052   # 16 bits, mixer on, NCO on, two's compliment data
+            DacReg[3]: 0xA300   
             DacReg[4]: 0xF0F0   # This masks lanes 7,6,5,4 fifo and lane errors.  Uros had it masking lanes 7,6,5,4,3,2 because this was for the demo board that only had two lanes I think.
             DacReg[5]: 0xFF07   # Not sure here.  This is masking some sysref errors, Uros had it only masking serdes block 0 and 1 PLL locks and the DAC PLL lock alarm
             DacReg[6]: 0xFFFF   # Set as eval board, is making a bunch of alarms 
@@ -243,17 +242,17 @@ root:
             DacReg[78]: 0x0f0f
             DacReg[79]: 0x1c61
             DacReg[80]: 0x0000
-            DacReg[81]: 0x00DC  # Set's which errors cause a sync request (lane 0).  Use eval board settings
-            DacReg[82]: 0x00ff
+            DacReg[81]: 0x0027  # sync_request_ena_link0
+            DacReg[82]: 0x0027  # error_ena_link0
             DacReg[83]: 0x0000
-            DacReg[84]: 0x00FC  # Set's which errors cause a sync request (lane 1).  Use eval board settings
-            DacReg[85]: 0x00ff
+            DacReg[84]: 0x0027  # sync_request_ena_link1  
+            DacReg[85]: 0x0027  # error_ena_link1
             DacReg[86]: 0x0000
-            DacReg[87]: 0x00ff
-            DacReg[88]: 0x00ff
+            DacReg[87]: 0x0027  # sync_request_ena_link2
+            DacReg[88]: 0x0027  # error_ena_link2
             DacReg[89]: 0x0000
-            DacReg[90]: 0x00ff
-            DacReg[91]: 0x00ff
+            DacReg[90]: 0x0027  # sync_request_ena_link3
+            DacReg[91]: 0x0027  # error_ena_link3
             DacReg[92]: 0x1133  # Set up sysref mode for links - use eval board settings
             DacReg[93]: 0x0000
             DacReg[94]: 0x0000
@@ -289,8 +288,6 @@ root:
             DacReg[124]: 0x0000
             DacReg[125]: 0x0000
             EnableTx: 0x1
-          # DAC[0]: 
-            # DacReg[62]: 0x0108 # Works better with this termination?
           ADC[:]:
             SYNCB_POL: 0x1
             SLOW_SP_EN1: 0x1 # 0x1 = ADC sampling rates are slower than 2.5 GSPS
@@ -354,7 +351,7 @@ root:
       AppTopJesd[:]:
         JesdRx:
           Enable: 0x3F3
-          # Enable: 0x0
+          Polarity: 0x100
           InvertAdcData: 0x00
           LinkErrMask: 0x3B # Mask Enable the errors that are required to brake the link. bit 5-0: positionErr - s_bufOvf - s_bufUnf - dispErr - decErr - s_alignErr
           ScrambleEnable: Disabled
@@ -366,7 +363,9 @@ root:
           SysrefDelay: 0x00
         JesdTx:
           Enable: 0x3CF
-          InvertDacData: 0x00
+          Polarity: 0x2
+          Loopback: 0x0
+          InvertDacData: 0x0
           HighAmplitudeVal: 0xC000
           LowAmplitudeVal:  0x4000
           SquarePeriod: 0x0004
@@ -389,9 +388,9 @@ root:
           txPostCursor[:]: 0x07
           txPostCursor[4]: 0xFF # Unused channel
           txPostCursor[5]: 0xFF # Unused channel     
-
+          
+          # #############################
           # TestSigEnable: 0x1
           # dataOutMux[:]: TestData
-          # testOutMux[:]: SawIncrement
-
-          
+          # testOutMux[:]: SquareWave
+          # #############################
