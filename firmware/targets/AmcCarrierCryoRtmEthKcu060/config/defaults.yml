@@ -225,7 +225,7 @@ root:
             DacReg[59]: 0x1800  # Set's divide amount for SERDES PLL ref clock divider (looks like it's set to 3?)
             DacReg[60]: 0x0028  # Set's PLL multiply factor - eval set to: 14
             DacReg[61]: 0x00BD  # Set's EQ and offset correction on, not sure how to configure this
-            DacReg[62]: 0x0408  # JESD termination setting and rate.  Only difference is Uros had LOS enabled.
+            DacReg[62]: 0x0108  # JESD termination setting and rate.  Only difference is Uros had LOS enabled.
             DacReg[63]: 0x0000  # Swaping on JESD polarity.  I don't think we have and DAC JESD lanes swapped.
             DacReg[64]: 0x0000
             DacReg[65]: 0x0000
@@ -329,7 +329,8 @@ root:
               ########################
               # JESD DIGITAL PAGE
               ########################         
-              12BIT MODE: 0x0
+              SCRAMBLE_EN: 0x0
+              12BIT_MODE: 0x0
               SYNC_REG_EN: 0x0
               SYNC_REG: 0x0          
               RAMP_12BIT: 0x0
@@ -359,7 +360,7 @@ root:
           Polarity: 0x100
           InvertAdcData: 0x00
           LinkErrMask: 0x3B # Mask Enable the errors that are required to brake the link. bit 5-0: positionErr - s_bufOvf - s_bufUnf - dispErr - decErr - s_alignErr
-          ScrambleEnable: Disabled
+          ScrambleEnable: 0x0
           ResetGTs: 0x0
           ClearErrors: 0x0
           InvertSync: Inverted
@@ -377,7 +378,7 @@ root:
           LowAmplitudeVal:  0x4000
           SquarePeriod: 0x0004
           RampStep: 0x0001
-          ScrambleEnable: Disabled
+          ScrambleEnable: 0x0
           TestSigEnable: 0x0
           InvertSync: 0x0
           ReplaceEnable: 0x1
@@ -386,15 +387,18 @@ root:
           dataOutMux[4]: OutputZero # Unused channel
           dataOutMux[5]: OutputZero # Unused channel
           testOutMux[:]: SquareWave
+          
           txDiffCtrl[0:3]: 0xFF
           txDiffCtrl[4:5]: 0 # Unused channel
           txDiffCtrl[6:9]: 0xFF
+          
           txPreCursor[0:3]: 0x0F
           txPreCursor[4:5]: 0xFF # Unused channel
           txPreCursor[6:9]: 0x0F 
-          txPostCursor[0:3]: 0x03 # DAC[0]
+          
+          txPostCursor[0:3]: 0x0F # DAC[0]
           txPostCursor[4:5]: 0xFF # Unused channel
-          txPostCursor[6:9]: 0x07 # DAC[1]
+          txPostCursor[6:9]: 0x0F # DAC[1]
  
           # #############################
           # TestSigEnable: 0x1
