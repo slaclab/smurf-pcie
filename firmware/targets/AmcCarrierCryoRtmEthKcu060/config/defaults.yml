@@ -1,4 +1,4 @@
-root:
+AMCc:
   FpgaTopLevel:
     AmcCarrierCore:  
       AmcCarrierBsa:
@@ -6,12 +6,12 @@ root:
           WaveformEngineBuffers:
             StartAddr[0]: 0x0000000000000000
             StartAddr[1]: 0x0000000020000000
-            StartAddr[2]: 0x0000000040060000
+            StartAddr[2]: 0x0000000040000000
             StartAddr[3]: 0x0000000080000000
-            EndAddr[0]:   0x0000000000060000
-            EndAddr[1]:   0x0000000020060000
-            EndAddr[2]:   0x0000000040060000
-            EndAddr[3]:   0x0000000080060000
+            EndAddr[0]:   0x0000000000004000
+            EndAddr[1]:   0x0000000020004000
+            EndAddr[2]:   0x0000000040004000
+            EndAddr[3]:   0x0000000080004000
             Enabled[0]: 0x1
             Enabled[1]: 0x1
             Enabled[2]: 0x1
@@ -405,3 +405,9 @@ root:
           # dataOutMux[:]: TestData
           # testOutMux[:]: SquareWave
           # #############################
+      DaqMuxV2[:]:
+        DataBufferSize: 0x1000
+        InputMuxSel[0]: 'Ch0'
+        FormatDataWidth[:]: 'D16-bit'
+        FormatSign[:]: 'Unsigned'
+        DecimationAveraging[:]: 'Disabled'
