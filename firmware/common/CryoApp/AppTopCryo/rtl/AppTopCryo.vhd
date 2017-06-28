@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-04-03
+-- Last update: 2017-06-28
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -34,28 +34,29 @@ use work.AppTopCryoPkg.all;
 entity AppTopCryo is
    generic (
       -- General Generics
-      TPD_G                : time                      := 1 ns;
-      SIM_SPEEDUP_G        : boolean                   := false;
-      SIMULATION_G         : boolean                   := false;
-      MR_LCLS_APP_G        : boolean                   := true;
-      AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
+      TPD_G                  : time                      := 1 ns;
+      SIM_SPEEDUP_G          : boolean                   := false;
+      SIMULATION_G           : boolean                   := false;
+      MR_LCLS_APP_G          : boolean                   := true;
+      WAVEFORM_TDATA_BYTES_G : positive                  := 4;
+      AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
-      JESD_DRP_EN_G        : boolean                   := false;
-      JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 8);
-      JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 8);
-      JESD_RX_POLARITY_G   : Slv10Array(1 downto 0)    := (others => "0000000000");
-      JESD_TX_POLARITY_G   : Slv10Array(1 downto 0)    := (others => "0000000000");
-      JESD_RX_ROUTES_G     : AppTopJesdRouteCryoArray  := (others => JESD_ROUTES_CRYO_INIT_C);
-      JESD_TX_ROUTES_G     : AppTopJesdRouteCryoArray  := (others => JESD_ROUTES_CRYO_INIT_C);
-      JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
+      JESD_DRP_EN_G          : boolean                   := false;
+      JESD_RX_LANE_G         : NaturalArray(1 downto 0)  := (others => 8);
+      JESD_TX_LANE_G         : NaturalArray(1 downto 0)  := (others => 8);
+      JESD_RX_POLARITY_G     : Slv10Array(1 downto 0)    := (others => "0000000000");
+      JESD_TX_POLARITY_G     : Slv10Array(1 downto 0)    := (others => "0000000000");
+      JESD_RX_ROUTES_G       : AppTopJesdRouteCryoArray  := (others => JESD_ROUTES_CRYO_INIT_C);
+      JESD_TX_ROUTES_G       : AppTopJesdRouteCryoArray  := (others => JESD_ROUTES_CRYO_INIT_C);
+      JESD_REF_SEL_G         : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
       -- Signal Generator Generics
-      SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 8);
-      SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
-      SIG_GEN_LANE_MODE_G  : Slv10Array(1 downto 0)    := (others => "0000000000");
+      SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
+      SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
+      SIG_GEN_LANE_MODE_G    : Slv10Array(1 downto 0)    := (others => "0000000000");
       -- Triggering Generics
-      TRIG_SIZE_G          : positive range 1 to 16    := 3;
-      TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
-      TRIG_PULSE_WIDTH_G   : integer range 1 to 32     := 32);
+      TRIG_SIZE_G            : positive range 1 to 16    := 3;
+      TRIG_DELAY_WIDTH_G     : integer range 1 to 32     := 32;
+      TRIG_PULSE_WIDTH_G     : integer range 1 to 32     := 32);
    port (
       ----------------------
       -- Top Level Interface
@@ -277,11 +278,12 @@ begin
       ------------------
       U_DaqMuxV2 : entity work.DaqMuxV2
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            DECIMATOR_EN_G   => true,
-            N_DATA_IN_G      => 20, -- 2 additional for the 8 lane interface
-            N_DATA_OUT_G     => 4)
+            TPD_G                  => TPD_G,
+            AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
+            DECIMATOR_EN_G         => true,
+            WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+            N_DATA_IN_G            => 20,  -- 2 additional for the 8 lane interface
+            N_DATA_OUT_G           => 4)
          port map (
             -- Clocks and Resets
             axiClk              => axilClk,
@@ -315,7 +317,7 @@ begin
             sampleDataArr_i(4)  => adcValues(i, 4),
             sampleDataArr_i(5)  => adcValues(i, 5),
             sampleDataArr_i(6)  => adcValues(i, 6),
-            sampleDataArr_i(7)  => adcValues(i, 7),            
+            sampleDataArr_i(7)  => adcValues(i, 7),
             sampleDataArr_i(8)  => dacValues(i, 0),
             sampleDataArr_i(9)  => dacValues(i, 1),
             sampleDataArr_i(10) => dacValues(i, 2),
@@ -360,13 +362,13 @@ begin
             JESD_RX_POLARITY_G => JESD_RX_POLARITY_G(i),
             JESD_TX_POLARITY_G => JESD_TX_POLARITY_G(i),
             JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G(i),
-            JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G(i),            
+            JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G(i),
             JESD_REF_SEL_G     => JESD_REF_SEL_G(i))
          port map (
             -- Clock/reset/SYNC
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
-            jesdClk2x       => jesdClk2x(i), -- Open because it cannot run at 714 MHz
+            jesdClk2x       => jesdClk2x(i),  -- Open because it cannot run at 714 MHz
             jesdRst2x       => jesdRst2x(i),
             jesdSysRef      => jesdSysRef(i),
             jesdRxSync      => jesdRxSync(i),
@@ -394,7 +396,7 @@ begin
             dacValues(6)    => dacValues(i, 6),
             dacValues(7)    => dacValues(i, 7),
             dacValues(8)    => dacValues(i, 8),
-            dacValues(9)    => dacValues(i, 9),          
+            dacValues(9)    => dacValues(i, 9),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,

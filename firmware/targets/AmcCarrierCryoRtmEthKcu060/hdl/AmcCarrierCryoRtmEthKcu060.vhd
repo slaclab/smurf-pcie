@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCryoRtmEthKcu060.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-09
--- Last update: 2017-05-09
+-- Last update: 2017-06-28
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -- 
@@ -146,7 +146,7 @@ entity AmcCarrierCryoRtmEthKcu060 is
 end AmcCarrierCryoRtmEthKcu060;
 
 architecture top_level of AmcCarrierCryoRtmEthKcu060 is
-   
+
    -- Custom routes for Cryo AMCs
    constant JESD_TX_ROUTES_C : AppTopJesdRouteCryoType := (
       0 => 3,
@@ -159,7 +159,7 @@ architecture top_level of AmcCarrierCryoRtmEthKcu060 is
       7 => 6,
       8 => 5,
       9 => 4);
-      
+
    constant JESD_RX_ROUTES_C : AppTopJesdRouteCryoType := (
       0 => 1,
       1 => 0,
@@ -171,7 +171,7 @@ architecture top_level of AmcCarrierCryoRtmEthKcu060 is
       7 => 6,
       8 => 3,
       9 => 2);
-   
+
    -- AXI-Lite Interface (axilClk domain)
    signal axilClk              : sl;
    signal axilRst              : sl;
@@ -226,25 +226,26 @@ begin
 
    U_AppTop : entity work.AppTopCryo
       generic map (
-         TPD_G                => TPD_G,
-         MR_LCLS_APP_G        => true,          -- Configured by application
+         TPD_G                  => TPD_G,
+         MR_LCLS_APP_G          => false,          -- Configured by application
+         WAVEFORM_TDATA_BYTES_G => 8,
          -- JESD Generics
-         JESD_DRP_EN_G        => false,          -- Configured by application
-         JESD_RX_LANE_G       => (others => 10),  -- Configured by application
-         JESD_TX_LANE_G       => (others => 10),  -- Configured by application
-         JESD_RX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
-         JESD_TX_POLARITY_G   => (others => "0000000000"),  -- Configured by application
-         JESD_RX_ROUTES_G     => (others => JESD_RX_ROUTES_C), -- Custom routes for Cryo AMCs
-         JESD_TX_ROUTES_G     => (others => JESD_TX_ROUTES_C), -- Custom routes for Cryo AMCs
-         JESD_REF_SEL_G       => (others => DEV_CLK2_SEL_C),  -- Configured by application
+         JESD_DRP_EN_G          => false,          -- Configured by application
+         JESD_RX_LANE_G         => (others => 10),  -- Configured by application
+         JESD_TX_LANE_G         => (others => 10),  -- Configured by application
+         JESD_RX_POLARITY_G     => (others => "0000000000"),  -- Configured by application
+         JESD_TX_POLARITY_G     => (others => "0000000000"),  -- Configured by application
+         JESD_RX_ROUTES_G       => (others => JESD_RX_ROUTES_C),  -- Custom routes for Cryo AMCs
+         JESD_TX_ROUTES_G       => (others => JESD_TX_ROUTES_C),  -- Custom routes for Cryo AMCs
+         JESD_REF_SEL_G         => (others => DEV_CLK2_SEL_C),  -- Configured by application
          -- Signal Generator Generics
-         SIG_GEN_SIZE_G       => (others => 8),  -- Configured by application
-         SIG_GEN_ADDR_WIDTH_G => (others => 9),  -- Configured by application
-         SIG_GEN_LANE_MODE_G  => (others => "0000000"),  -- '0': 32 bit, '1': 16 bit
+         SIG_GEN_SIZE_G         => (others => 8),  -- Configured by application
+         SIG_GEN_ADDR_WIDTH_G   => (others => 9),  -- Configured by application
+         SIG_GEN_LANE_MODE_G    => (others => "0000000"),  -- '0': 32 bit, '1': 16 bit
          -- Triggering Generics
-         TRIG_SIZE_G          => 2,     -- Configured by application
-         TRIG_DELAY_WIDTH_G   => 32,    -- Configured by application
-         TRIG_PULSE_WIDTH_G   => 32)    -- Configured by application
+         TRIG_SIZE_G            => 2,   -- Configured by application
+         TRIG_DELAY_WIDTH_G     => 32,  -- Configured by application
+         TRIG_PULSE_WIDTH_G     => 32)  -- Configured by application
       port map (
          ----------------------
          -- Top Level Interface
@@ -339,11 +340,12 @@ begin
 
    U_Core : entity work.AmcCarrierCoreAdv
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         DISABLE_BSA_G=> true,
-         RTM_ETH_G    => true,
-         APP_TYPE_G   => APP_NULL_TYPE_C)  -- Configured by application (refer to AmcCarrierPkg for list of all application types
+         TPD_G                  => TPD_G,
+         BUILD_INFO_G           => BUILD_INFO_G,
+         DISABLE_BSA_G          => true,
+         RTM_ETH_G              => true,
+         WAVEFORM_TDATA_BYTES_G => 8,
+         APP_TYPE_G             => APP_NULL_TYPE_C)  -- Configured by application (refer to AmcCarrierPkg for list of all application types
       port map (
          ----------------------
          -- Top Level Interface
@@ -468,5 +470,5 @@ begin
          -- SYSMON Ports
          vPIn                 => vPIn,
          vNIn                 => vNIn);
-         ------
+
 end top_level;
