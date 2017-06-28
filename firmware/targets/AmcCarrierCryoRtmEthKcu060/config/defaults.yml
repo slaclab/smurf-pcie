@@ -1,6 +1,8 @@
 AMCc:
   FpgaTopLevel:
-    AmcCarrierCore:  
+    AmcCarrierCore:
+      AmcCarrierTiming:
+        enable: False
       AmcCarrierBsa:
         BsaWaveformEngine[:]:
           WaveformEngineBuffers:
@@ -166,7 +168,7 @@ AMCc:
             DacReg[0]: 0x0218   # Sets board to 4X interpolation (Default: 0x0218)
             DacReg[1]: 0x0003   
             DacReg[2]: 0x2052   # 16 bits, mixer on, NCO on, two's compliment data
-            DacReg[3]: 0xA300   
+            DacReg[3]: 0xF300   
             DacReg[4]: 0xF0F0   # This masks lanes 7,6,5,4 fifo and lane errors.  Uros had it masking lanes 7,6,5,4,3,2 because this was for the demo board that only had two lanes I think.
             DacReg[5]: 0xFF07   # Not sure here.  This is masking some sysref errors, Uros had it only masking serdes block 0 and 1 PLL locks and the DAC PLL lock alarm
             DacReg[6]: 0xFFFF   # Set as eval board, is making a bunch of alarms 

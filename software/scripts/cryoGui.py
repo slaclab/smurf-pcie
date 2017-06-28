@@ -15,23 +15,23 @@ pyrogue.streamConnectBiDir(rssiSrp,udpRssiA.application(0))
 
 class AmcCarrier(pyrogue.Root):
     def __init__(self, srp):
-        super().__init__(name='root',description='', pollEn=True)        
+        super().__init__(name='AMCc',description='', pollEn=True)        
         self.add(FpgaTopLevel(memBase=rssiSrp, offset=0x00000000))
 
-root = AmcCarrier(srp=rssiSrp)
-root.readAll()
+AMCc = AmcCarrier(srp=rssiSrp)
+AMCc.readAll()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
 appTop.setStyle('Fusion')
 guiTop = pyrogue.gui.GuiTop(group='rootMesh')
 guiTop.resize(800, 1000)
-guiTop.addTree(root)
+guiTop.addTree(AMCc)
 
 print("Starting GUI...\n");
 
 # Run GUI
 appTop.exec_()
 
-root.stop()
+AMCc.stop()
 exit()
