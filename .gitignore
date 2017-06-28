@@ -32,3 +32,8 @@ build*
 *.bit
 *.mcs
 *.gz
+
+# Sysgen
+.Xil/
+*.r2015b
+*.autosave

@@ -1,0 +1,6 @@
+*.tcl
+*.veo
+*.vho
+*.v
+*.vhd
+sysgen/

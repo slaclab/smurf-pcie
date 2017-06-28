@@ -6,7 +6,7 @@
 format compact
 setupVers = 21; % just a number that goes into a status register
 
-Fadc = 370e6  % ADC clock  frequency
+Fadc = 307.2e6  % ADC clock  frequency
 Ts = 1/Fadc  % ADC sample rate
 Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
 Tclk = 1/Fclk
