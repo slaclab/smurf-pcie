@@ -239,8 +239,8 @@ begin
          JESD_TX_ROUTES_G       => (others => JESD_TX_ROUTES_C),  -- Custom routes for Cryo AMCs
          JESD_REF_SEL_G         => (others => DEV_CLK2_SEL_C),  -- Configured by application
          -- Signal Generator Generics
-         SIG_GEN_SIZE_G         => (others => 8),  -- Configured by application
-         SIG_GEN_ADDR_WIDTH_G   => (others => 9),  -- Configured by application
+         SIG_GEN_SIZE_G         => (0 => 2, 1=> 0),  -- Configured by application
+         SIG_GEN_ADDR_WIDTH_G   => (others => 12),  -- Configured by application
          SIG_GEN_LANE_MODE_G    => (others => "0000000"),  -- '0': 32 bit, '1': 16 bit
          -- Triggering Generics
          TRIG_SIZE_G            => 2,   -- Configured by application
