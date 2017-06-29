@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-06-21
+-- Last update: 2017-06-29
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,6 +22,7 @@
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
@@ -149,39 +150,30 @@ entity AppCore is
       rtmHsTxN            : out   sl := '1';
       -- RTM's Clock Reference 
       genClkP             : in    sl;
-      genClkN             : in    sl
-      );
+      genClkN             : in    sl);
 end AppCore;
 
 architecture mapping of AppCore is
 
-
-   constant NUM_AXI_MASTERS_C : natural := 4;
+   constant NUM_AXI_MASTERS_C : natural := 3;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 28, 24);  -- [0x8FFFFFFF:0x80000000]
 
-   constant AMC_INDEX_C  : natural := 0;
-   constant DSP_INDEX_C  : natural := 1;
-   constant CFG_INDEX0_C : natural := 2;
-   constant CFG_INDEX1_C : natural := 3;
+   constant AMC_INDEX_C : natural := 0;
+   constant DSP_INDEX_C : natural := 1;
+   constant RTM_INDEX_C : natural := 2;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-
-   -- Internal signals
-   signal s_extTrig      : slv(1 downto 0);
-   signal s_muxSel       : slv(1 downto 0);
-   signal s_adcRst       : Slv2Array(1 downto 0);
-   signal s_dacDspValues : sampleDataVectorArray(1 downto 0, 7 downto 0);
-   signal s_dacDspValids : Slv8Array(1 downto 0);
+   signal extTrig          : slv(1 downto 0) := "00";  -- unused
 
 begin
 
-   -- Unconnected outs
-   dacSigCtrl <= (others => DAC_SIG_CTRL_INIT_CRYO_C);
-
+   ---------------------
+   -- Unused Connections
+   ---------------------
    diagnosticClk <= axilClk;
    diagnosticRst <= axilRst;
    diagnosticBus <= DIAGNOSTIC_BUS_INIT_C;
@@ -196,8 +188,19 @@ begin
    ibAppDebugSlave  <= AXI_STREAM_SLAVE_FORCE_C;
 
    mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
-   dacSigCtrl  <= (others => DAC_SIG_CTRL_INIT_CRYO_C);
    timingPhy   <= TIMING_PHY_INIT_C;
+
+   --------------------------------------------------------------------------------
+   -- DaqMux/Trig Interface
+   -- trigPulse 0 and 1 Daq Bay0,1
+   -- External trigger is asynchronous but it gets synced to timingClk in DadMuxV2.
+   --------------------------------------------------------------------------------
+   GEN_TRIG :
+   for i in 1 downto 0 generate
+      -- Daq triggers freeze
+      trigHw(i)   <= extTrig(i) or evrTrig.trigPulse(i);
+      freezeHw(i) <= extTrig(i) or evrTrig.trigPulse(i);
+   end generate GEN_TRIG;
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -231,7 +234,6 @@ begin
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
-         adcRst          => s_adcRst,
          jesdSysRef      => jesdSysRef,
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => jesdTxSync,
@@ -256,96 +258,59 @@ begin
 
    -------------------         
    -- SYSGEN Interface
-   -------------------         
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+   -------------------     
+   U_SysGen : entity work.DspCoreWrapper
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(DSP_INDEX_C).baseAddr)
       port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMasters(DSP_INDEX_C),
-         axiReadSlave   => axilReadSlaves(DSP_INDEX_C),
-         axiWriteMaster => axilWriteMasters(DSP_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
-
-   -- DaqMux/Trig Interface
-   -- trigPulse 0 and 1 Daq Bay0,1
-   -- External trigger is asynchronous but it gets synced to timingClk in DadMuxV2.
-   GEN_TRIG :
-   for i in 1 downto 0 generate
-      -- Daq triggers freeze
-      trigHw(i)   <= s_extTrig(i) or evrTrig.trigPulse(i);
-      freezeHw(i) <= s_extTrig(i) or evrTrig.trigPulse(i);
-   end generate GEN_TRIG;
-
-   ----------------
-   -- System generator wrapper TODO Add when defined
-   ----------------   
-   GEN_BAY :
-   for i in 1 downto 0 generate
-      GEN_CH :
-      for j in 7 downto 0 generate
-         ----------------
-         -- ADC/DAC loopback
-         ----------------
-         s_dacDspValues(i, j) <= adcValues(i, j);
-         --------------
-         -- DAC Multiplexer 
-         -- Chooses between System generator (0) or
-         -- Signal generator (1)
-         --------------
-         dacValues(i, j)      <= s_dacDspValues(i, j) when s_muxSel(i) = '0' else dacSigValues(i, j);
-      end generate GEN_CH;
-      dacValues(i, 8) <= (others => '0');
-      dacValues(i, 9) <= (others => '0');
-
-
-      debugValues(i, 0) <= (others => '0');
-      debugValues(i, 1) <= (others => '0');
-      debugValues(i, 2) <= (others => '0');
-      debugValues(i, 3) <= (others => '0');
-
-      s_dacDspValids(i) <= (others => '1');
-      dacValids(i)      <= (others => '1');
-      debugValids(i)    <= (others => '1');
-
-      ----------------
-      -- Register interface
-      ----------------    
-      U_DemoCtlReg : entity work.CryoCtlReg
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-         port map (
-            axilClk         => axilClk,
-            axilRst         => axilRst,
-            axilReadMaster  => axilReadMasters(CFG_INDEX0_C+i),
-            axilReadSlave   => axilReadSlaves(CFG_INDEX0_C+i),
-            axilWriteMaster => axilWriteMasters(CFG_INDEX0_C+i),
-            axilWriteSlave  => axilWriteSlaves(CFG_INDEX0_C+i),
-            devClk          => jesdClk(i),
-            devRst          => jesdRst(i),
-            muxSel_o        => s_muxSel(i),
-            adcRst_o        => s_adcRst(i)
-            );
-   --         
-   end generate GEN_BAY;
+         -- JESD Clocks and resets   
+         jesdClk         => jesdClk,
+         jesdRst         => jesdRst,
+         -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
+         adcValids       => adcValids,
+         adcValues       => adcValues,
+         dacValids       => dacValids,
+         dacValues       => dacValues,
+         debugValids     => debugValids,
+         debugValues     => debugValues,
+         -- DAC Signal Generator Interface (jesdClk[1:0] domain)
+         dacSigCtrl      => dacSigCtrl,
+         dacSigStatus    => dacSigStatus,
+         dacSigValids    => dacSigValids,
+         dacSigValues    => dacSigValues,
+         -- AXI-Lite Port
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(DSP_INDEX_C),
+         axilReadSlave   => axilReadSlaves(DSP_INDEX_C),
+         axilWriteMaster => axilWriteMasters(DSP_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
 
    ----------------
    -- No RTM core
    ----------------   
-   RtmEmptyCore_INST : entity work.RtmEmptyCore
+   U_RTM : entity work.RtmEmptyCore
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
-         axilClk => axilClk,
-         axilRst => axilRst,
-         rtmLsP  => rtmLsP,
-         rtmLsN  => rtmLsN,
-         genClkP => genClkP,
-         genClkN => genClkN);
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(RTM_INDEX_C),
+         axilReadSlave   => axilReadSlaves(RTM_INDEX_C),
+         axilWriteMaster => axilWriteMasters(RTM_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(RTM_INDEX_C),
+         -----------------------
+         -- Application Ports --
+         -----------------------      
+         -- RTM's Low Speed Ports
+         rtmLsP          => rtmLsP,
+         rtmLsN          => rtmLsN,
+         --  RTM's Clock Reference
+         genClkP         => genClkP,
+         genClkN         => genClkN);
 
--------------------------------------------------------------------
 end mapping;

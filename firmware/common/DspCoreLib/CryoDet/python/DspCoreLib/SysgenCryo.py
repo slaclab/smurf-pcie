@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Title      : PyRogue AMC Carrier Cryo Demo Board Application
 #-----------------------------------------------------------------------------
-# File       : AppCore.py
+# File       : SysgenCryo.py
 # Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
@@ -19,28 +19,34 @@
 
 import pyrogue as pr
 
-from AppHardware.AmcCryo._amcCryoCore import *
-from DspCoreLib.SysgenCryo import *
-
-class AppCore(pr.Device):
+class SysgenCryo(pr.Device):
     def __init__(   self, 
-                    name        = "AppCore", 
-                    description = "AMC Carrier Cryo Demo Board Application", 
+                    name        = "SysgenCryo", 
+                    description = "Cryo SYSGEN Module", 
                     memBase     =  None, 
                     offset      =  0x0, 
-                    hidden      =  False,
-                    numRxLanes  =  [0,0], 
-                    numTxLanes  =  [0,0],                    
+                    hidden      =  False,         
                     expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
 
-        for i in range(2):
-            if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
-                self.add(AmcCryoCore(
-                    name    = "AmcCryoCore[%i]" % (i),
-                    offset  = (i*0x00100000),
-                    expand  = True,
-                ))        
-        self.add(SysgenCryo(    offset=0x01000000))
+        self.addVariable(   
+            name         = "VersionNumber",
+            description  = "Version Number",
+            offset       =  0x000,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = "hex",
+            mode         = "RO",
+        )
+        
+        self.addVariable(   
+            name         = "ScratchPad",
+            description  = "Scratch Pad Register",
+            offset       =  0xFFC,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = "hex",
+            mode         = "RW",
+        )        
         
