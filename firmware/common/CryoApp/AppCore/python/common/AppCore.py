@@ -19,8 +19,8 @@
 
 import pyrogue as pr
 
-from AppHardware.AmcCryo import *
-from DspCoreLib.SysgenCryo import *
+from AppHardware.AmcCryo._amcCryoCore import *
+#from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
     def __init__(   self, 
@@ -29,49 +29,32 @@ class AppCore(pr.Device):
                     memBase     =  None, 
                     offset      =  0x0, 
                     hidden      =  False,
+                    numRxLanes  =  [0,0], 
+                    numTxLanes  =  [0,0],                    
                     expand      =  True,
                 ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
+        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+
+        for i in range(2):
+            if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
+                self.add(AmcCryoCore(
+                    name    = "AmcCryoCore[%i]" % (i),
+                    offset  = (i*0x00100000),
+                    expand  = True,
+                ))        
+        # self.add(SysgenCryo(    offset=0x01000000))
 
         ##############################
         # Variables
         ##############################
-
-        #for i in range(2):
-        #    self.add(AmcCryoCore(
-        #                            name         = "AmcCryoCore_%i" % (i),
-        #                            offset       =  0x00000000 + (i * 0x00100000),
-        #                            ))
-	# Let's instantiate only bay1
-        i = 1
-        self.add(AmcCryoCore(
-                                name         = "AmcCryoCore_%i" % (i),
-                                offset       =  0x00000000 + (i * 0x00100000),
-                                ))
-
-#        self.add(SysgenCryo(
-#                                offset       =  0x01000000
-#                            ))
-
         self.addVariables(  name         = "DacMuxSel",
-                            description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
-                            offset       =  0x02000000,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RW",
-                            number       =  2,
-                            stride       =  0x01000000,
-                        )
-
-        self.addVariables(  name         = "AdcReset",
-                            description  = "Reset ADCs. 0x3-both in reset",
-                            offset       =  0x02000000,
-                            bitSize      =  2,
-                            bitOffset    =  0x01,
-                            base         = "hex",
-                            mode         = "RW",
-                            number       =  2,
-                            stride       =  0x01000000,
-                        )
-
+            description  = "Select between: 0 System Generator to DAC, 1 Signal Generator to DAC.",
+            offset       =  0x02000000,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = "hex",
+            mode         = "RW",
+            number       =  2,
+            stride       =  0x01000000,
+        )
+ 
