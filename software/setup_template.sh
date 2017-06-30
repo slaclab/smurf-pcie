@@ -7,7 +7,7 @@ export SURF_DIR=${PWD}/../firmware/submodules/surf
 export AMCC_DIR=${PWD}/../firmware/submodules/amc-carrier-core
 export TIMING_DIR=${PWD}/../firmware/submodules/lcls-timing-core
 export APPCORE_DIR=${PWD}/..//firmware/common/CryoApp/AppCore
-export CRYODSP_DIR=${PWD}/../firmware/common/DspCoreLib/CryoDetEth
+export CRYODSP_DIR=${PWD}/../firmware/common/DspCoreLib/CryoDet
 export TOP_DIR=${PWD}/../firmware/targets/AmcCarrierCryoRtmEthKcu060
 
 # Setup python path
