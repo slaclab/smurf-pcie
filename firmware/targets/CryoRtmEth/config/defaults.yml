@@ -408,7 +408,6 @@ AMCc:
           # testOutMux[:]: SquareWave
           # #############################
       DaqMuxV2[:]:
-        DataBufferSize: 0x1000
         InputMuxSel[0]: 'Ch0'
         FormatDataWidth[:]: 'D16-bit'
         FormatSign[:]: 'Unsigned'

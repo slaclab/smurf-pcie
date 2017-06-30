@@ -9,8 +9,7 @@ import sys
 AMCc = pr.Root('AMCc','')
 
 # Add device
-AMCc.add(FpgaTopLevel(ipAddr="10.0.3.104"))
-AMCc.readAll()
+AMCc.add(FpgaTopLevel(simGui=True))
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)

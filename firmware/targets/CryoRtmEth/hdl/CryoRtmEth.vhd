@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierCryoRtmEthKcu060.vhd
+-- File       : CryoRtmEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-09
 -- Last update: 2017-06-28
@@ -27,9 +27,8 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AppTopPkg.all;
-use work.AppTopCryoPkg.all;
 
-entity AmcCarrierCryoRtmEthKcu060 is
+entity CryoRtmEth is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -143,12 +142,12 @@ entity AmcCarrierCryoRtmEthKcu060 is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end AmcCarrierCryoRtmEthKcu060;
+end CryoRtmEth;
 
-architecture top_level of AmcCarrierCryoRtmEthKcu060 is
+architecture top_level of CryoRtmEth is
 
    -- Custom routes for Cryo AMCs
-   constant JESD_TX_ROUTES_C : AppTopJesdRouteCryoType := (
+   constant JESD_TX_ROUTES_C : AppTopJesdRouteType := (
       0 => 3,
       1 => 2,
       2 => 1,
@@ -160,7 +159,7 @@ architecture top_level of AmcCarrierCryoRtmEthKcu060 is
       8 => 5,
       9 => 4);
 
-   constant JESD_RX_ROUTES_C : AppTopJesdRouteCryoType := (
+   constant JESD_RX_ROUTES_C : AppTopJesdRouteType := (
       0 => 1,
       1 => 0,
       2 => 5,
@@ -224,7 +223,7 @@ architecture top_level of AmcCarrierCryoRtmEthKcu060 is
 
 begin
 
-   U_AppTop : entity work.AppTopCryo
+   U_AppTop : entity work.AppTop
       generic map (
          TPD_G                  => TPD_G,
          MR_LCLS_APP_G          => false,          -- Configured by application

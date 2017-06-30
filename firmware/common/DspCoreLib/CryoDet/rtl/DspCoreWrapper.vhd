@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-06-29
+-- Last update: 2017-06-30
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ use ieee.std_logic_arith.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.Jesd204bPkg.all;
-use work.AppTopCryoPkg.all;
+use work.AppTopPkg.all;
 
 entity DspCoreWrapper is
    generic (
@@ -42,8 +42,8 @@ entity DspCoreWrapper is
       debugValids     : out Slv4Array(1 downto 0);
       debugValues     : out sampleDataVectorArray(1 downto 0, 3 downto 0);
       -- DAC Signal Generator Interface (jesdClk[1:0] domain)
-      dacSigCtrl      : out DacSigCtrlCryoArray(1 downto 0);
-      dacSigStatus    : in  DacSigStatusCryoArray(1 downto 0);
+      dacSigCtrl      : out DacSigCtrlArray(1 downto 0);
+      dacSigStatus    : in  DacSigStatusArray(1 downto 0);
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- AXI-Lite Port
@@ -219,14 +219,15 @@ begin
    -----------------------------------
    -- Signal Generator BAY[1] not used
    -----------------------------------
-   dacSigCtrl(1) <= DAC_SIG_CTRL_INIT_CRYO_C;
+   dacSigCtrl(1) <= DAC_SIG_CTRL_INIT_C;
 
    ----------------------
    -- ASYNC AXI-Lite Jump
    ----------------------
    U_AxiLiteAsync : entity work.AxiLiteAsync
       generic map (
-         TPD_G => TPD_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_RESP_OK_C)
       port map (
          -- Slave Port
          sAxiClk         => axilClk,

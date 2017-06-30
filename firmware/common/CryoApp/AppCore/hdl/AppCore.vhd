@@ -35,7 +35,7 @@ use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.jesd204bpkg.all;
 use work.AppTopPkg.all;
-use work.AppTopCryoPkg.all;
+use work.AppTopPkg.all;
 
 entity AppCore is
    generic (
@@ -71,8 +71,8 @@ entity AppCore is
       -- DAC Signal Generator Interface
       -- If SIG_GEN_LANE_MODE_G = '0', (jesdClk[1:0] domain)
       -- If SIG_GEN_LANE_MODE_G = '1', (jesdClk2x[1:0] domain)
-      dacSigCtrl          : out   DacSigCtrlCryoArray(1 downto 0);
-      dacSigStatus        : in    DacSigStatusCryoArray(1 downto 0);
+      dacSigCtrl          : out   DacSigCtrlArray(1 downto 0);
+      dacSigStatus        : in    DacSigStatusArray(1 downto 0);
       dacSigValids        : in    Slv10Array(1 downto 0);
       dacSigValues        : in    sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- AXI-Lite Interface (axilClk domain) [0x8FFFFFFF:0x80000000]

@@ -8,7 +8,7 @@ setenv AMCC_DIR     ${PWD}/../firmware/submodules/amc-carrier-core/
 setenv TIMING_DIR   ${PWD}/../firmware/submodules/lcls-timing-core
 setenv APPCORE_DIR  ${PWD}/..//firmware/common/CryoApp/AppCore
 setenv CRYODSP_DIR  ${PWD}/../firmware/common/DspCoreLib/CryoDet
-setenv TOP_DIR      ${PWD}/../firmware/targets/AmcCarrierCryoRtmEthKcu060
+setenv TOP_DIR      ${PWD}/../firmware/targets/CryoRtmEth
 
 # Setup python path
 setenv PYTHONPATH ${PWD}/python:${SURF_DIR}/python:${AMCC_DIR}/python:${TIMING_DIR}/python:${APPCORE_DIR}/python:${CRYODSP_DIR}/python:${TOP_DIR}/python:${PYTHONPATH}
