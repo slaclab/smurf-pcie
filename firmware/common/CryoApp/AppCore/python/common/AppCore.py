@@ -24,16 +24,23 @@ from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
     def __init__(   self, 
-                    name        = "AppCore", 
-                    description = "AMC Carrier Cryo Demo Board Application", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False,
-                    numRxLanes  =  [0,0], 
-                    numTxLanes  =  [0,0],                    
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+        name        = "AppCore", 
+        description = "AMC Carrier Cryo Demo Board Application", 
+        memBase     =  None, 
+        offset      =  0x0, 
+        hidden      =  False,
+        numRxLanes  =  [0,0], 
+        numTxLanes  =  [0,0],                    
+        expand      =  True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
 
         for i in range(2):
             if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
