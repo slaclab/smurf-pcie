@@ -59,3 +59,16 @@ $ make
 ```
 $ make gui
 ```
+
+# How to reprogram your AMC Carrier's FPGA
+https://confluence.slac.stanford.edu/x/aYZwD
+
+# How to run the QT GUI Software
+https://confluence.slac.stanford.edu/x/sXFODQ
+
+# How to take data using the development ROGUE QT GUI
+https://confluence.slac.stanford.edu/x/v3FODQ
+
+# How to run EPICS Software
+https://confluence.slac.stanford.edu/x/tHFODQ
+
