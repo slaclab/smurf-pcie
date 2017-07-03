@@ -28,7 +28,7 @@ $ git clone --recursive git@github.com:slaclab/cryo-det
 
 1) Update your submodules to the latest version
 ```
-$ cryo-det/
+$ cd cryo-det/
 $ ./set_submodule_tags
 ```
 
