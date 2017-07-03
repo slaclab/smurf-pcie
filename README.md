@@ -15,7 +15,47 @@
 > https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
 5) Setup for large filesystems on github
-> $ git lfs install
+```
+$ git lfs install
+```
 
 # Clone the GIT repository
-> $ git clone --recursive git@github.com:slaclab/cryo-det
+```
+$ git clone --recursive git@github.com:slaclab/cryo-det
+```
+
+# How to build the firmware
+
+1) Update your submodules to the latest version
+```
+$ cryo-det/
+$ ./set_submodule_tags
+```
+
+2) Setup Xilinx licensing
+
+> In C-Shell: 
+```
+$ source cryo-det/firmware/setup_env_slac.csh
+```
+
+> In Bash:
+```
+$ source cryo-det/firmware/setup_env_slac.sh
+```
+
+3) If not done yet, make a symbolic link to the firmware/
+```
+$ ln -s /u1/$USER/build cryo-det/firmware/build
+```
+
+4) Go to the target directory and make the firmware:
+```
+$ cd cryo-det/firmware/targets/CryoRtmEth/
+$ make
+```
+
+5) Optional: Review the results in GUI mode
+```
+$ make gui
+```
