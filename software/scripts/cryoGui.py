@@ -10,6 +10,7 @@ AMCc = pr.Root('AMCc','')
 
 # Add device
 AMCc.add(FpgaTopLevel(ipAddr="10.0.3.104"))
+AMCc.start()
 AMCc.readAll()
 
 # Create GUI

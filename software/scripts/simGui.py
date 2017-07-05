@@ -10,6 +10,7 @@ AMCc = pr.Root('AMCc','')
 
 # Add device
 AMCc.add(FpgaTopLevel(simGui=True))
+AMCc.start()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)

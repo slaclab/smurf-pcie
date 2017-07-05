@@ -47,6 +47,31 @@ class SysgenCryo(pr.Device):
             mode         = "RO",
         )
         
+        self.addVariable(  
+            name         = "muxSelect",
+            description  = "Sets the DAC outputs",
+            offset       =  0x080,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = "enum",
+            mode         = "RW",
+            enum         = {
+                0 : "Adc",
+                1 : "SigGen",
+            },
+        )        
+        
+        self.addVariable(   
+            name         = "StartSigGenReg",
+            description  = "Version Number",
+            offset       =  0x080,
+            bitSize      =  1,
+            bitOffset    =  1,
+            base         = "hex",
+            mode         = "RW",
+            hidden       =  True,
+        )        
+        
         self.addVariable(   
             name         = "ScratchPad",
             description  = "Scratch Pad Register",
@@ -55,5 +80,13 @@ class SysgenCryo(pr.Device):
             bitOffset    =  0,
             base         = "hex",
             mode         = "RW",
-        )        
+        )
+        
+        ##############################
+        # Commands
+        ##############################
+        @self.command(name="StartSigGen", description="Starts the signal generator pattern",)
+        def CmdClearErrors():    
+            self.StartSigGen.set(1)
+            self.StartSigGen.set(0)        
         
