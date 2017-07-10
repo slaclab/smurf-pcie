@@ -40,43 +40,17 @@ set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 #################################
 ## Set the clock for the ILA core
 #################################
-SetDebugCoreClk ${ilaName} {U_AppTop/U_AmcBay[1].U_JesdCore/jesdClk}
+SetDebugCoreClk ${ilaName} {U_AppTop/U_AmcBay[0].U_JesdCore/jesdClk}
 
 #######################
 ## Set the debug Probes
 #######################
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[state][*]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[addr][*]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[tid][*]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[tidDly][*]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[reqSize][*]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[memResp][*]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[timeout]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[eofe]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[frameError]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[verMismatch]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[reqSizeError]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[ignoreMemResp]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[rxRst]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[overflowDet]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/r[skip]}
 
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxTLastTUser[*]}
-
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/axisMaster[tLast]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/axisMaster[tValid]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/axisMaster[tUser][0]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/axisMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/axisSlave[tReady]}
-
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/sCtrl[overflow]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxCtrl[overflow]}
-
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxMaster[tLast]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxMaster[tValid]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxMaster[tUser][0]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_Core/U_Core/U_Eth/U_RssiServer/U_SRPv3/rxSlave[tReady]}
+ConfigProbe ${ilaName} {U_AppTop/adcValids[0][*]}
+ConfigProbe ${ilaName} {U_AppTop/adcValues[0,0][*]}
+ConfigProbe ${ilaName} {U_AppTop/adcValues[0,1][*]}
+ConfigProbe ${ilaName} {U_AppTop/adcValues[0,2][*]}
+ConfigProbe ${ilaName} {U_AppTop/adcValues[0,3][*]}
 
 ##########################
 ## Write the port map file

@@ -52,6 +52,8 @@ entity AppCore is
       jesdRst             : in    slv(1 downto 0);
       jesdClk2x           : in    slv(1 downto 0);
       jesdRst2x           : in    slv(1 downto 0);
+      jesdUsrClk          : in    slv(1 downto 0);
+      jesdUsrRst          : in    slv(1 downto 0);
       -- DaqMux/Trig Interface (timingClk domain) 
       freezeHw            : out   slv(1 downto 0);
       evrTrig             : in    AppTopTrigType;
