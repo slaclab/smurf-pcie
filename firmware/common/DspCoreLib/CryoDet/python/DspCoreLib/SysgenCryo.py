@@ -37,50 +37,49 @@ class SysgenCryo(pr.Device):
             expand      = expand,
         )
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "VersionNumber",
             description  = "Version Number",
             offset       =  0x000,
             bitSize      =  32,
             bitOffset    =  0,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
         
-        self.addVariable(  
+        self.add(pr.RemoteVariable(   
             name         = "muxSelect",
             description  = "Sets the DAC outputs",
             offset       =  0x080,
             bitSize      =  1,
             bitOffset    =  0,
-            base         = "enum",
             mode         = "RW",
             enum         = {
                 0 : "Adc",
                 1 : "SigGen",
             },
-        )        
+        ))        
         
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "StartSigGenReg",
             description  = "Version Number",
             offset       =  0x080,
             bitSize      =  1,
             bitOffset    =  1,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RW",
             hidden       =  True,
-        )        
+        ))        
         
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "ScratchPad",
             description  = "Scratch Pad Register",
             offset       =  0xFFC,
             bitSize      =  32,
             bitOffset    =  0,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RW",
-        )
+        ))
         
         ##############################
         # Commands
