@@ -187,7 +187,7 @@ AMCc:
             DacReg[19]: 0x0000
             DacReg[20]: 0x0000
             DacReg[21]: 0x0000
-            DacReg[22]: 0x4000  # This is the upper 16 bits of the NCO frequency for the DACAB path
+            DacReg[22]: 0x2ee0  # This is the upper 16 bits of the NCO frequency for the DACAB path
             DacReg[23]: 0x0000
             DacReg[24]: 0x0000
             DacReg[25]: 0x0000  # This is the upper 16 bits of the NCO frequency for the DACCD path
@@ -306,8 +306,8 @@ AMCc:
               DECIM_FACTOR: 0x0
               DUAL_BAND_EN: 0x0
               REAL_OUT_EN: 0x0
-              DDC0_NCO1_LSB: 0x20
-              DDC0_NCO1_MSB: 0x4E
+              DDC0_NCO1_LSB: 0xE0
+              DDC0_NCO1_MSB: 0x2E
               DDC0_NCO2_LSB: 0x00
               DDC0_NCO2_MSB: 0x00
               DDC0_NCO3_LSB: 0x00
@@ -385,6 +385,7 @@ AMCc:
           InvertSync: 0x0
           ReplaceEnable: 0x1
           SubClass: 0x1  
+          
           dataOutMux[:]: UserData
           dataOutMux[4]: OutputZero # Unused channel
           dataOutMux[5]: OutputZero # Unused channel
