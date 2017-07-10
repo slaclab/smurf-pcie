@@ -243,7 +243,7 @@ AMCc:
             DacReg[75]: 0x0801  # Number of octates per fram (1) and elastic buffers as set on eval board
             DacReg[76]: 0x0903  # Number of JESD lanes being use (3 - means 4) and 9 frames per multifame.  
             DacReg[77]: 0x0300  # Number of converters per link - 4
-            DacReg[78]: 0x0f0f
+            DacReg[78]: 0x0f2f  # Enable scrambler
             DacReg[79]: 0x1c61
             DacReg[80]: 0x0000
             DacReg[81]: 0x0026  # sync_request_ena_link0
@@ -331,7 +331,7 @@ AMCc:
               ########################
               # JESD DIGITAL PAGE
               ########################         
-              SCRAMBLE_EN: 0x0
+              SCRAMBLE_EN: 0x1
               12BIT_MODE: 0x0
               SYNC_REG_EN: 0x0
               SYNC_REG: 0x0          
@@ -362,7 +362,7 @@ AMCc:
           Polarity: 0x100
           InvertAdcData: 0x00
           LinkErrMask: 0x3B # Mask Enable the errors that are required to brake the link. bit 5-0: positionErr - s_bufOvf - s_bufUnf - dispErr - decErr - s_alignErr
-          ScrambleEnable: 0x0
+          ScrambleEnable: 0x1
           ResetGTs: 0x0
           ClearErrors: 0x0
           InvertSync: Inverted
@@ -380,7 +380,7 @@ AMCc:
           LowAmplitudeVal:  0x4000
           SquarePeriod: 0x0004
           RampStep: 0x0001
-          ScrambleEnable: 0x0
+          ScrambleEnable: 0x1
           TestSigEnable: 0x0
           InvertSync: 0x0
           ReplaceEnable: 0x1
