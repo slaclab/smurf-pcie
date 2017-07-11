@@ -6,7 +6,8 @@
 format compact
 setupVers = 21; % just a number that goes into a status register
 
-Fadc = 307.2e6  % ADC clock  frequency
+%Fadc = 312.5e6  % ADC clock  frequency / Demo System
+Fadc = 307.2e6  % ADC clock  frequency / NEW AMC System
 Ts = 1/Fadc  % ADC sample rate
 Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
 Tclk = 1/Fclk
@@ -16,22 +17,26 @@ Tclk = 1/Fclk
 Fnotch = 70e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch
 a = 0.1  % transmission at minimum
 notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
-figure(22), bode(notch); grid, title('Simulted resonator transfer function')
+figure(1), bode(notch); grid, title('Simulted resonator transfer function Notch 1')
 
 % Simulate another resonator notch in simulink
 Fnotch2 = 70.3e6, BW = 1e6, Q = Fnotch2/BW, wNotch = 2*pi*Fnotch2
 a = 0.2  % transmission at minimum
 notch2 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
-figure(23), bode([notch; notch2]); grid, title('Simulted resonator transfer functions')
+figure(2), bode([notch; notch2]); grid, title('Simulted resonator transfer functions Notch 1 & 2')
 
 % Simulate more resonator notches in simulink
 Fnotch3 = 80.0e6, BW = 1e6, Q = Fnotch3/BW, wNotch = 2*pi*Fnotch3
 a = 0.1  % transmission at minimum
 notch3 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+figure(3), bode([notch3]); grid, title('Simulted resonator transfer functions Notch 3')
+
 
 Fnotch4 = 80.2e6, BW = 1e6, Q = Fnotch4/BW, wNotch = 2*pi*Fnotch4
 a = 0.1  % transmission at minimum
 notch4 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
+figure(4), bode([notch4]); grid, title('Simulted resonator transfer functions Notch 4')
+
 
 freqBits = 24  % number of bits for frequency
 %freqBits = 20  % number of bits for frequency (20 bits gives ~180 Hz freq resolution)
