@@ -354,6 +354,12 @@ AMCc:
               TESTMODE_EN: 0x0
               CTRL_K: 0x1
               FRAMES_PER_MULTIFRAME: 0x0F          
+        ###########################################
+        ## System Generator Configuration Registers
+        ###########################################
+        SysgenCryo:      
+          ScratchPad: 0xDEADBEEF
+        ###########################################
       AppTopJesd[:]:
         JesdRx:
           # Enable: 0x3F3 # Both ADC channels
