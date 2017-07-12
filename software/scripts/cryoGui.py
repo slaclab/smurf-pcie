@@ -6,7 +6,7 @@ from FpgaTopLevel import *
 import sys
 
 # Set base
-AMCc = pr.Root('AMCc','')
+AMCc = pr.Root(name='AMCc',description='')
 
 # Add device
 AMCc.add(FpgaTopLevel(ipAddr="10.0.3.104"))

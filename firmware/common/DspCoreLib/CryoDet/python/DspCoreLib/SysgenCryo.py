@@ -21,21 +21,10 @@ import pyrogue as pr
 
 class SysgenCryo(pr.Device):
     def __init__(   self, 
-        name        = "SysgenCryo", 
-        description = "Cryo SYSGEN Module", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False,         
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "SysgenCryo", 
+            description = "Cryo SYSGEN Module", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         self.add(pr.RemoteVariable(    
             name         = "VersionNumber",
