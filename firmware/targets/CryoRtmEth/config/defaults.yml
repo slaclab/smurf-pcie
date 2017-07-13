@@ -46,6 +46,7 @@ AMCc:
     AppTop:
       AppCore:
         AmcCryoCore[:]:
+          enable: 'True'
           DBG:
             # txSyncMask: 0x0  # Both DAC channels
             txSyncMask: 0x2  # Only using DAC[0]
@@ -416,6 +417,7 @@ AMCc:
           # #############################
       DaqMuxV2[:]:
         InputMuxSel[0]: 'Ch0'
+        InputMuxSel[1]: 'Ch1'
         FormatDataWidth[:]: 'D16-bit'
         FormatSign[:]: 'Unsigned'
         DecimationAveraging[:]: 'Disabled'
