@@ -332,7 +332,7 @@ AMCc:
               ########################
               # JESD DIGITAL PAGE
               ########################         
-              SCRAMBLE_EN: 0x1
+              SCRAMBLE_EN: 0x0
               12BIT_MODE: 0x0
               SYNC_REG_EN: 0x0
               SYNC_REG: 0x0          
@@ -369,7 +369,7 @@ AMCc:
           Polarity: 0x100
           InvertAdcData: 0x00
           LinkErrMask: 0x3B # Mask Enable the errors that are required to brake the link. bit 5-0: positionErr - s_bufOvf - s_bufUnf - dispErr - decErr - s_alignErr
-          ScrambleEnable: 0x1
+          ScrambleEnable: 0x0
           ResetGTs: 0x0
           ClearErrors: 0x0
           InvertSync: Inverted
@@ -421,3 +421,8 @@ AMCc:
         FormatDataWidth[:]: 'D16-bit'
         FormatSign[:]: 'Unsigned'
         DecimationAveraging[:]: 'Disabled'
+      DacSigGen:
+        EnableMask: 0x3   # Enable both channels
+        ModeMask:   0x3   # Set both channels into 'Periodic Mode'
+        SignFormat: 0x0   # Set both channels to 'Signed 2's complement' format
+        PeriodSize: 0xFFF # 4096 Period size (Zero inclusive)
