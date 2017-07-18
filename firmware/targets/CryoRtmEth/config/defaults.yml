@@ -200,7 +200,7 @@ AMCc:
             DacReg[31]: 0x9980
             DacReg[32]: 0x8008
             DacReg[33]: 0x0000
-            DacReg[34]: 0x1B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
+            DacReg[34]: 0x4B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
             DacReg[35]: 0x01FF  # This routes the "sleep terminal signal"  we don't use this so, it doesn't matter.
             DacReg[36]: 0x0020  # Use only the next sysref pulse.  Uros had it set to NOT use the sysref pulse
             DacReg[37]: 0x4000  # DACCLK div 4 to get JESD clock Uros had DACCLK=JESDCLK
@@ -332,7 +332,7 @@ AMCc:
               ########################
               # JESD DIGITAL PAGE
               ########################         
-              SCRAMBLE_EN: 0x0
+              SCRAMBLE_EN: 0x1
               12BIT_MODE: 0x0
               SYNC_REG_EN: 0x0
               SYNC_REG: 0x0          
@@ -345,16 +345,16 @@ AMCc:
               LINK_LAYER_TESTMODE: 0x0
               40X_MODE: 0x7
               PLL_MODE: 0x2
-              SEL_EMP_LANE0: 0xF
-              SEL_EMP_LANE1: 0xF
-              SEL_EMP_LANE2: 0xF
-              SEL_EMP_LANE3: 0xF
+              SEL_EMP_LANE0: 0x3
+              SEL_EMP_LANE1: 0x1F # Unused lane 
+              SEL_EMP_LANE2: 0x3
+              SEL_EMP_LANE3: 0x1F # Unused lane
               TX_LINK_DIS: 0x0
               FRAME_ALIGN: 0x0
               LANE_ALIGN: 0x0
               TESTMODE_EN: 0x0
               CTRL_K: 0x1
-              FRAMES_PER_MULTIFRAME: 0x0F          
+              FRAMES_PER_MULTIFRAME: 0x0F
         ###########################################
         ## System Generator Configuration Registers
         ###########################################
@@ -369,13 +369,13 @@ AMCc:
           Polarity: 0x100
           InvertAdcData: 0x00
           LinkErrMask: 0x3B # Mask Enable the errors that are required to brake the link. bit 5-0: positionErr - s_bufOvf - s_bufUnf - dispErr - decErr - s_alignErr
-          ScrambleEnable: 0x0
+          ScrambleEnable: 0x1
           ResetGTs: 0x0
           ClearErrors: 0x0
           InvertSync: Inverted
           ReplaceEnable: Enabled
           SubClass: 0x1
-          SysrefDelay: 0x00
+          SysrefDelay: 0xB
         JesdTx:
           # Enable: 0x3CF # Both DAC channels
           Enable: 0xF     # Only using DAC[0]
@@ -398,17 +398,17 @@ AMCc:
           dataOutMux[5]: OutputZero # Unused channel
           testOutMux[:]: SquareWave
           
-          txDiffCtrl[0:3]: 0xFF
-          txDiffCtrl[4:5]: 0 # Unused channel
-          txDiffCtrl[6:9]: 0xFF
+          txDiffCtrl[:]: 0xFF
+          txDiffCtrl[4]: 0 # Unused channel
+          txDiffCtrl[5]: 0 # Unused channel
           
-          txPreCursor[0:3]: 0x0F
-          txPreCursor[4:5]: 0xFF # Unused channel
-          txPreCursor[6:9]: 0x0F 
+          txPreCursor[:]: 0x0F
+          txPreCursor[4]: 0xFF # Unused channel
+          txPreCursor[5]: 0xFF # Unused channel
           
-          txPostCursor[0:3]: 0x0F # DAC[0]
-          txPostCursor[4:5]: 0xFF # Unused channel
-          txPostCursor[6:9]: 0x0F # DAC[1]
+          txPostCursor[:]: 0x0F
+          txPostCursor[4]: 0xFF # Unused channel
+          txPostCursor[5]: 0xFF # Unused channel
  
           # #############################
           # TestSigEnable: 0x1
