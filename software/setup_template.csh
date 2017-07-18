@@ -1,4 +1,5 @@
 # Setup enivorment
+#source /u/re/ruckman/projects/temp/rogue/setup_env.csh
 source /afs/slac/g/reseng/rogue/master/setup_env.csh
 #source /afs/slac/g/reseng/rogue/v2.1.0/setup_env.csh
 
