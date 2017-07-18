@@ -191,7 +191,7 @@ AMCc:
             DacReg[22]: 0x2ee0  # This is the upper 16 bits of the NCO frequency for the DACAB path
             DacReg[23]: 0x0000
             DacReg[24]: 0x0000
-            DacReg[25]: 0x0000  # This is the upper 16 bits of the NCO frequency for the DACCD path
+            DacReg[25]: 0x2ee0  # This is the upper 16 bits of the NCO frequency for the DACCD path
             DacReg[26]: 0x0020
             DacReg[27]: 0x0000
             DacReg[28]: 0x0000
