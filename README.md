@@ -80,6 +80,10 @@ $ ssh tid-pc93130 -Y
 # Program the FPGA
 $ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --cpu tid-pc93130 --addr 2 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000009-20170717202225-ruckman-dirty.mcs
 
+# Check the IPMI status
+$ source /afs/slac/g/reseng/IPMC/env.csh
+$ amcc_dump_bsi --all shm-b084-sp07/4
+
 # Go to software directory
 $ cd /afs/slac/g/lcls/package/pyrogue/control-server/current
 
