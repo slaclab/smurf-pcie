@@ -360,6 +360,7 @@ AMCc:
         ###########################################
         SysgenCryo:      
           ScratchPad: 0xDEADBEEF
+          muxSelect: SigGen
         ###########################################
       AppTopJesd[:]:
         JesdRx:
@@ -426,4 +427,5 @@ AMCc:
         ModeMask:   0x3   # Set both channels into 'Periodic Mode'
         SignFormat: 0x0   # Set both channels to 'Signed 2's complement' format
         PeriodSize: 0xFFF # 4096 Period size (Zero inclusive)
-        CsvFilePath: '/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv'
+        # CsvFilePath: '/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv'
+        CsvFilePath: '/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv'
