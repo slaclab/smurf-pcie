@@ -51,7 +51,7 @@ class SysgenCryo(pr.Device):
         
         self.add(pr.RemoteVariable(    
             name         = "StartSigGenReg",
-            description  = "Version Number",
+            description  = "Triggers signal generator when the signal generator is in trigger mode (not periodic)",
             offset       =  0x080,
             bitSize      =  1,
             bitOffset    =  1,
@@ -75,6 +75,6 @@ class SysgenCryo(pr.Device):
         ##############################
         @self.command(name="StartSigGen", description="Starts the signal generator pattern",)
         def CmdClearErrors():    
-            self.StartSigGen.set(1)
-            self.StartSigGen.set(0)        
+            self.StartSigGenReg.set(1)
+            self.StartSigGenReg.set(0)        
         
