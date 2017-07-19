@@ -72,3 +72,21 @@ https://confluence.slac.stanford.edu/x/v3FODQ
 # How to run EPICS Software
 https://confluence.slac.stanford.edu/x/tHFODQ
 
+# How to program FPGA and run the QT GUI (example)
+```
+# Log into PC
+$ ssh tid-pc93130 -Y
+
+# Program the FPGA
+$ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --cpu tid-pc93130 --addr 2 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000009-20170717202225-ruckman-dirty.mcs
+
+# Go to software directory
+$ cd /afs/slac/g/lcls/package/pyrogue/control-server/current
+
+# Launch the GUI
+$ ./start_server.sh -a 10.0.3.104 -t ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000009-20170717202225-ruckman-dirty.pyrogue.tar.gz
+
+# Use these default configurations
+/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/defaults.yml
+
+```
