@@ -27,13 +27,14 @@ class FpgaTopLevel(app.TopLevel):
         super().__init__(
             simGui          = simGui,
             ipAddr          = ipAddr,
-            numRxLanes      = [10,0],   # 10x JESD  on BAY[0] only
-            numTxLanes      = [10,0],   # 10x JESD  on BAY[0] only
-            numSigGen       = [2,0],    # 2x SIGGEN on BAY[0] Only
-            sizeSigGen      = [2**13,0],# 2^12 buffer size for BAY[0] Only
-            numTrigPulse    = 2,        # Set to 2 in FW
-            enableBsa       = False,    # BSA not built in FW
-            enableMps       = False,    # MPS not built in FW
-            enableEvr       = False,    # EVR not built in FW
+            numRxLanes      = [10,0],      # 10x JESD  on BAY[0] only
+            numTxLanes      = [10,0],      # 10x JESD  on BAY[0] only
+            numSigGen       = [2,0],       # 2x SIGGEN on BAY[0] Only
+            sizeSigGen      = [2**13,0],   # 2^12 buffer size for BAY[0] Only
+            modeSigGen      = [True,False],# True = 32-bit RAM, True =16-bit RAM
+            numTrigPulse    = 2,           # Set to 2 in FW
+            enableBsa       = False,       # BSA not built in FW
+            enableMps       = False,       # MPS not built in FW
+            enableEvr       = False,       # EVR not built in FW
         )
         

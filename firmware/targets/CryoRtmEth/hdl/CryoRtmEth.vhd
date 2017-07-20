@@ -240,7 +240,8 @@ begin
          -- Signal Generator Generics
          SIG_GEN_SIZE_G         => (0 => 2, 1 => 0),  -- Configured by application
          SIG_GEN_ADDR_WIDTH_G   => (others => 13),  -- Configured by application
-         SIG_GEN_LANE_MODE_G    => (others => "0000000"),  -- '0': 32 bit, '1': 16 bit
+         SIG_GEN_LANE_MODE_G    => (others => "0000000000"),  -- '0': 32 bit mode
+         SIG_GEN_RAM_CLK_G      => (others => "1111111111"),  -- '1': RAM using jesdClk (not jesdClk2x)
          -- Triggering Generics
          TRIG_SIZE_G            => 2,   -- Configured by application
          TRIG_DELAY_WIDTH_G     => 32,  -- Configured by application
