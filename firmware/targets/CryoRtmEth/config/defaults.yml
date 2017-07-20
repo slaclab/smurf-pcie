@@ -416,7 +416,7 @@ AMCc:
           # dataOutMux[:]: TestData
           # testOutMux[:]: SquareWave
           # #############################
-      DaqMuxV2[:]:
+      DaqMuxV2:
         InputMuxSel[0]: 'Ch0'
         InputMuxSel[1]: 'Ch1'
         FormatDataWidth[:]: 'D16-bit'
@@ -427,5 +427,11 @@ AMCc:
         ModeMask:   0x3   # Set both channels into 'Periodic Mode'
         SignFormat: 0x0   # Set both channels to 'Signed 2's complement' format
         PeriodSize: 0xFFF # 4096 Period size (Zero inclusive)
-        # CsvFilePath: '/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv'
-        CsvFilePath: '/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv'
+        #####################################################
+        #####################################################
+        #####################################################
+        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv
+        #####################################################
+        #####################################################
+        #####################################################
