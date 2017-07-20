@@ -30,7 +30,7 @@ class FpgaTopLevel(app.TopLevel):
             numRxLanes      = [10,0],   # 10x JESD  on BAY[0] only
             numTxLanes      = [10,0],   # 10x JESD  on BAY[0] only
             numSigGen       = [2,0],    # 2x SIGGEN on BAY[0] Only
-            sizeSigGen      = [2**12,0],# 2^12 buffer size for BAY[0] Only
+            sizeSigGen      = [2**13,0],# 2^12 buffer size for BAY[0] Only
             numTrigPulse    = 2,        # Set to 2 in FW
             enableBsa       = False,    # BSA not built in FW
             enableMps       = False,    # MPS not built in FW

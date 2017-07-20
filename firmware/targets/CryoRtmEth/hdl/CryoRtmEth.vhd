@@ -2,7 +2,7 @@
 -- File       : CryoRtmEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-09
--- Last update: 2017-06-28
+-- Last update: 2017-07-20
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -- 
@@ -226,10 +226,10 @@ begin
    U_AppTop : entity work.AppTop
       generic map (
          TPD_G                  => TPD_G,
-         MR_LCLS_APP_G          => false,          -- Configured by application
+         MR_LCLS_APP_G          => false,  -- Configured by application
          WAVEFORM_TDATA_BYTES_G => 8,
          -- JESD Generics
-         JESD_DRP_EN_G          => false,          -- Configured by application
+         JESD_DRP_EN_G          => false,  -- Configured by application
          JESD_RX_LANE_G         => (others => 10),  -- Configured by application
          JESD_TX_LANE_G         => (others => 10),  -- Configured by application
          JESD_RX_POLARITY_G     => (others => "0000000000"),  -- Configured by application
@@ -238,8 +238,8 @@ begin
          JESD_TX_ROUTES_G       => (others => JESD_TX_ROUTES_C),  -- Custom routes for Cryo AMCs
          JESD_REF_SEL_G         => (others => DEV_CLK2_SEL_C),  -- Configured by application
          -- Signal Generator Generics
-         SIG_GEN_SIZE_G         => (0 => 2, 1=> 0),  -- Configured by application
-         SIG_GEN_ADDR_WIDTH_G   => (others => 12),  -- Configured by application
+         SIG_GEN_SIZE_G         => (0 => 2, 1 => 0),  -- Configured by application
+         SIG_GEN_ADDR_WIDTH_G   => (others => 13),  -- Configured by application
          SIG_GEN_LANE_MODE_G    => (others => "0000000"),  -- '0': 32 bit, '1': 16 bit
          -- Triggering Generics
          TRIG_SIZE_G            => 2,   -- Configured by application
