@@ -78,7 +78,7 @@ https://confluence.slac.stanford.edu/x/tHFODQ
 $ ssh tid-pc93130 -Y
 
 # Program the FPGA
-$ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --cpu tid-pc93130 --addr 2 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-c3610e2.mcs
+$ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --cpu tid-pc93130 --addr 2 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-3fc2f4b.mcs
 
 # Check the IPMI status
 $ source /afs/slac/g/reseng/IPMC/env.csh
@@ -88,7 +88,7 @@ $ amcc_dump_bsi --all shm-b084-sp07/4
 $ cd /afs/slac/g/lcls/package/pyrogue/control-server/current
 
 # Launch the GUI
-$ ./start_server.sh -a 10.0.3.104 -t ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-c3610e2.pyrogue.tar.gz
+$ ./start_server.sh -a 10.0.3.104 -t ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-3fc2f4b.pyrogue.tar.gz
 
 # Use these default configurations
 /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/defaults.yml
