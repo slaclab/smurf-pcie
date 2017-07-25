@@ -6,38 +6,19 @@ AMCc:
       AmcCarrierBsa:
         BsaWaveformEngine[:]:
           WaveformEngineBuffers:
+            Enabled[0]: 0x1 # Enabled:  Full rate only supports 2x channels of streaming
+            Enabled[1]: 0x1 # Enabled:  Full rate only supports 2x channels of streaming
+            Enabled[2]: 0x0 # Disabled: Full rate only supports 2x channels of streaming
+            Enabled[3]: 0x0 # Disabled: Full rate only supports 2x channels of streaming
             StartAddr[0]: 0x0000000000000000
             StartAddr[1]: 0x0000000020000000
-            StartAddr[2]: 0x0000000040000000
-            StartAddr[3]: 0x0000000080000000
             EndAddr[0]:   0x0000000000004000
             EndAddr[1]:   0x0000000020004000
-            EndAddr[2]:   0x0000000040004000
-            EndAddr[3]:   0x0000000080004000
-            Enabled[0]: 0x1
-            Enabled[1]: 0x1
-            Enabled[2]: 0x1
-            Enabled[3]: 0x1
-            Mode[0]: DoneWhenFull
-            Mode[1]: DoneWhenFull
-            Mode[2]: DoneWhenFull
-            Mode[3]: DoneWhenFull
-            Init[0]: 0x0
-            Init[1]: 0x0
-            Init[2]: 0x0
-            Init[3]: 0x0
-            SoftTrigger[0]: 0x0
-            SoftTrigger[1]: 0x0
-            SoftTrigger[2]: 0x0
-            SoftTrigger[3]: 0x0
-            MsgDest[0]: Auto-Readout
-            MsgDest[1]: Auto-Readout
-            MsgDest[2]: Auto-Readout
-            MsgDest[3]: Auto-Readout
-            FramesAfterTrigger[0]: 0x0
-            FramesAfterTrigger[1]: 0x0
-            FramesAfterTrigger[2]: 0x0
-            FramesAfterTrigger[3]: 0x0
+            Mode[:]: DoneWhenFull
+            Init[:]: 0x0
+            SoftTrigger[:]: 0x0
+            MsgDest[:]: Auto-Readout
+            FramesAfterTrigger[:]: 0x0
       AxiSy56040:
         OutputConfig[0]: 0x0
         OutputConfig[1]: 0x3
