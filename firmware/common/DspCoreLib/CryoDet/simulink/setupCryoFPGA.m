@@ -1,7 +1,14 @@
-% script   setupCryoNew
-% set up parameters for CryoDetNew.slx
-
-%new as of Feb 3, 2016
+%--------------------------------------------------------------------
+%
+%script   setupCryoNew
+% set up parameters for CryoDet<xyz>.slx
+% Original 2-3-2016 / SSmith
+% Copied & Modlfied for new AMC HW Alg / JED May 2017
+%
+% Update History:
+%   <07-31-2017 JED>: added simulink_period var
+%
+%--------------------------------------------------------------------
 
 format compact
 setupVers = 21; % just a number that goes into a status register
@@ -9,8 +16,11 @@ setupVers = 21; % just a number that goes into a status register
 %Fadc = 312.5e6  % ADC clock  frequency / Demo System
 Fadc = 307.2e6  % ADC clock  frequency / NEW AMC System
 Ts = 1/Fadc  % ADC sample rate
-Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
+%Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
+Fclk = Fadc  % same rate for new HW (non-Demo HW)
 Tclk = 1/Fclk
+%--added simulink_period var in order to make clock probe work / JED 07-31-2017
+simulink_period = Ts;
 
 
 % Simulate resonator notch in simulink

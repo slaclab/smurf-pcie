@@ -61,6 +61,77 @@ class SysgenCryo(pr.Device):
         ))        
         
         self.add(pr.RemoteVariable(    
+            name         = "Ch0MuxSel",
+            description  = "Mux Selects for Ch0 ADC & DAC Only",
+            offset       =  0x080,
+            bitSize      =  2,
+            bitOffset    =  2,
+            mode         = "RW",
+            enum         = {
+                0 : "AtoDThru",
+                1 : "DACMem",
+				2 : "DUC",
+				3 : "SineGen",
+            },
+        ))        
+		
+        self.add(pr.RemoteVariable(   
+            name         = "Ch0B1CjEn",
+            description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
+            offset       =  0x084,
+            bitSize      =  1,
+            bitOffset    =  0,
+            mode         = "RW",
+            enum         = {
+                0 : "CH0_B1_Norm",
+                1 : "CH0_B1_Conj",
+            },
+        ))        
+
+        self.add(pr.RemoteVariable(   
+            name         = "Ch0B2CjEn",
+            description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
+            offset       =  0x084,
+            bitSize      =  1,
+            bitOffset    =  1,
+            mode         = "RW",
+            enum         = {
+                0 : "CH0_B2_Norm",
+                1 : "CH0_B2_Conj",
+            },
+        ))        
+
+        self.add(pr.RemoteVariable(    
+            name         = "Ch0FLO1",
+            description  = "Sets DDS frequency for LO1",
+            offset       =  0x088,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "W",
+        ))
+		
+        self.add(pr.RemoteVariable(    
+            name         = "Ch0FLO2",
+            description  = "Sets DDS frequency for LO2",
+            offset       =  0x08C,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "W",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "SineGenFreq",
+            description  = "Sets DDS frequency for Prog IQ Sinewave Generator",
+            offset       =  0x090,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "W",
+        ))
+		
+        self.add(pr.RemoteVariable(    
             name         = "ScratchPad",
             description  = "Scratch Pad Register",
             offset       =  0xFFC,
