@@ -13,10 +13,10 @@ import os, sys
 from subprocess import check_call
 
 ## Define the GIT submodule path and TAG-ing
-tagConfig = [ ['/firmware/submodules/amc-carrier-core', 'pre-release-lcls2'],
-              ['/firmware/submodules/lcls-timing-core', 'pre-release-lcls2'],
-              ['/firmware/submodules/ruckus',           'v1.3.1'],
-              ['/firmware/submodules/surf',             'cryo-det-dev'],
+tagConfig = [ ['/firmware/submodules/amc-carrier-core', 'release-lcls2'],
+              ['/firmware/submodules/lcls-timing-core', 'release-lcls2'],
+              ['/firmware/submodules/ruckus',           'v1.3.3'],
+              ['/firmware/submodules/surf',             'v1.3.5'],
               ['/firmware/submodules/sysgen-dsp-lib',   'v1.0.1'] ]
 
 # Check that the submodule paths exists
