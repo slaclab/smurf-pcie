@@ -342,12 +342,14 @@ AMCc:
         SysgenCryo:      
           ScratchPad: 0xDEADBEEF
           muxSelect: SigGen
-		  Ch0MuxSel: DUC
+		  Ch0MuxSel: SineGen
 		  Ch0B1CjEn: CH0_B1_Norm
 		  Ch0B2CjEn: CH0_B2_Norm
 		  Ch0FLO1: 0x00085555
 		  Ch0FLO2: 0x00535555
-		  SineGenFreq: 0x00085555
+		  SineGenFreq: 0x000010AB
+		  LO1_Poff: 0x00085553
+		  LO2_Poff: 0x00535541
         ###########################################
       AppTopJesd[:]:
         JesdRx:

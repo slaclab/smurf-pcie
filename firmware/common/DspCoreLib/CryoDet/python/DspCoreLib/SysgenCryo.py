@@ -122,9 +122,29 @@ class SysgenCryo(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(    
-            name         = "SineGenFreq",
-            description  = "Sets DDS frequency for Prog IQ Sinewave Generator",
+            name         = "SineGenPhsInc",
+            description  = "Sets DDS frequency (via phase increment value)for Prog IQ Sinewave Generator",
             offset       =  0x090,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "W",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "LO1_Poff",
+            description  = "LO1 Phase offset setting",
+            offset       =  0x094,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "W",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "LO2_Poff",
+            description  = "LO2 Phase offset setting",
+            offset       =  0x098,
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
