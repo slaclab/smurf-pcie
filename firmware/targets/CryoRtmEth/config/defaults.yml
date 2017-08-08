@@ -409,6 +409,7 @@ AMCc:
         FormatDataWidth[:]: 'D16-bit'
         FormatSign[:]: 'Unsigned'
         DecimationAveraging[:]: 'Disabled'
+        PacketHeaderEn: 'Disabled'
       DacSigGen:
         EnableMask: 0x3   # Enable both channels
         ModeMask:   0x3   # Set both channels into 'Periodic Mode'
