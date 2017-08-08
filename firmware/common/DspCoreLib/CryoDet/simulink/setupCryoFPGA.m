@@ -1,4 +1,4 @@
-%--------------------------------------------------------------------
+%Fs--------------------------------------------------------------------
 %
 %script   setupCryoNew
 % set up parameters for CryoDet<xyz>.slx
@@ -21,6 +21,9 @@ Fclk = Fadc  % same rate for new HW (non-Demo HW)
 Tclk = 1/Fclk
 %--added simulink_period var in order to make clock probe work / JED 07-31-2017
 simulink_period = Ts;
+
+%--pass-thru signal (sin/cos) generator freq parametee / added JED 08-08-2017
+Fgen = 20e6;
 
 
 % Simulate resonator notch in simulink
