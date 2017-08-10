@@ -108,7 +108,7 @@ class SysgenCryo(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "W",
+            mode         = "WO",
         ))
 		
         self.add(pr.RemoteVariable(    
@@ -118,7 +118,7 @@ class SysgenCryo(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "W",
+            mode         = "WO",
         ))
 
         self.add(pr.RemoteVariable(    
@@ -128,7 +128,7 @@ class SysgenCryo(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "W",
+            mode         = "WO",
         ))
 
         self.add(pr.RemoteVariable(    
@@ -138,7 +138,7 @@ class SysgenCryo(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "W",
+            mode         = "WO",
         ))
 
         self.add(pr.RemoteVariable(    
@@ -148,7 +148,7 @@ class SysgenCryo(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "W",
+            mode         = "WO",
         ))
 		
         self.add(pr.RemoteVariable(    
