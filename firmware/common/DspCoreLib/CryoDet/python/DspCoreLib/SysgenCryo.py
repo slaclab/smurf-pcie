@@ -70,11 +70,11 @@ class SysgenCryo(pr.Device):
             enum         = {
                 0 : "AtoDThru",
                 1 : "DACMem",
-				2 : "DUC",
-				3 : "SineGen",
+                2 : "DUC",
+                3 : "SineGen",
             },
         ))        
-		
+        
         self.add(pr.RemoteVariable(   
             name         = "Ch0B1CjEn",
             description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
@@ -110,7 +110,7 @@ class SysgenCryo(pr.Device):
             base         = pr.UInt,
             mode         = "WO",
         ))
-		
+        
         self.add(pr.RemoteVariable(    
             name         = "Ch0FLO2",
             description  = "Sets DDS frequency for LO2",
@@ -150,7 +150,7 @@ class SysgenCryo(pr.Device):
             base         = pr.UInt,
             mode         = "WO",
         ))
-		
+        
         self.add(pr.RemoteVariable(    
             name         = "ScratchPad",
             description  = "Scratch Pad Register",
