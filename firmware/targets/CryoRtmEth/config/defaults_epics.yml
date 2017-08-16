@@ -6,19 +6,38 @@ AMCc:
       AmcCarrierBsa:
         BsaWaveformEngine[:]:
           WaveformEngineBuffers:
-            Enabled[0]: 0x1 # Enabled:  Full rate only supports 2x channels of streaming
-            Enabled[1]: 0x1 # Enabled:  Full rate only supports 2x channels of streaming
-            Enabled[2]: 0x0 # Disabled: Full rate only supports 2x channels of streaming
-            Enabled[3]: 0x0 # Disabled: Full rate only supports 2x channels of streaming
             StartAddr[0]: 0x0000000000000000
             StartAddr[1]: 0x0000000020000000
+            StartAddr[2]: 0x0000000040000000
+            StartAddr[3]: 0x0000000080000000
             EndAddr[0]:   0x0000000000004000
             EndAddr[1]:   0x0000000020004000
-            Mode[:]: DoneWhenFull
-            Init[:]: 0x0
-            SoftTrigger[:]: 0x0
-            MsgDest[:]: Auto-Readout
-            FramesAfterTrigger[:]: 0x0
+            EndAddr[2]:   0x0000000040004000
+            EndAddr[3]:   0x0000000080004000
+            Enabled[0]: 0x1
+            Enabled[1]: 0x1
+            Enabled[2]: 0x1
+            Enabled[3]: 0x1
+            Mode[0]: DoneWhenFull
+            Mode[1]: DoneWhenFull
+            Mode[2]: DoneWhenFull
+            Mode[3]: DoneWhenFull
+            Init[0]: 0x0
+            Init[1]: 0x0
+            Init[2]: 0x0
+            Init[3]: 0x0
+            SoftTrigger[0]: 0x0
+            SoftTrigger[1]: 0x0
+            SoftTrigger[2]: 0x0
+            SoftTrigger[3]: 0x0
+            MsgDest[0]: Auto-Readout
+            MsgDest[1]: Auto-Readout
+            MsgDest[2]: Auto-Readout
+            MsgDest[3]: Auto-Readout
+            FramesAfterTrigger[0]: 0x0
+            FramesAfterTrigger[1]: 0x0
+            FramesAfterTrigger[2]: 0x0
+            FramesAfterTrigger[3]: 0x0
       AxiSy56040:
         OutputConfig[0]: 0x0
         OutputConfig[1]: 0x3
@@ -26,7 +45,7 @@ AMCc:
         OutputConfig[3]: 0x1    
     AppTop:
       AppCore:
-        AmcCryoCore[:]:
+        AmcCryoCore[0]:
           enable: 'True'
           DBG:
             # txSyncMask: 0x0  # Both DAC channels
@@ -181,7 +200,7 @@ AMCc:
             DacReg[31]: 0x9980
             DacReg[32]: 0x8008
             DacReg[33]: 0x0000
-            DacReg[34]: 0x4B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
+            DacReg[34]: 0x1B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
             DacReg[35]: 0x01FF  # This routes the "sleep terminal signal"  we don't use this so, it doesn't matter.
             DacReg[36]: 0x0020  # Use only the next sysref pulse.  Uros had it set to NOT use the sysref pulse
             DacReg[37]: 0x4000  # DACCLK div 4 to get JESD clock Uros had DACCLK=JESDCLK
@@ -342,14 +361,6 @@ AMCc:
         SysgenCryo:      
           ScratchPad: 0xDEADBEEF
           muxSelect: SigGen
-          # Ch0MuxSel: SineGen
-          # Ch0B1CjEn: CH0_B1_Norm
-          # Ch0B2CjEn: CH0_B2_Norm
-          # Ch0FLO1: 0x00085555
-          # Ch0FLO2: 0x00535555
-          # SineGenFreq: 0x000010AB
-          # LO1_Poff: 0x00085553
-          # LO2_Poff: 0x00535541
         ###########################################
       AppTopJesd[:]:
         JesdRx:
@@ -406,6 +417,7 @@ AMCc:
           # testOutMux[:]: SquareWave
           # #############################
       DaqMuxV2:
+        # DataBufferSize: '0x20000'
         InputMuxSel[0]: 'Ch0'
         InputMuxSel[1]: 'Ch1'
         FormatDataWidth[:]: 'D16-bit'
@@ -419,13 +431,21 @@ AMCc:
         #####################################################
         #####################################################
         #####################################################
-        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/multitones_500_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/multitones_500_baseband.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_ones_Qs_ones.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_Ones_Qs_zeros.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_zeros_Qs_ones.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_zeros_Qs_zeros.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/IsandQsVary.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_499_baseband_16k.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/broad_noise_trig2.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/broad_noise1.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_2_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_13333_baseband.csv
+        CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_247_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_238_baseband_4ksamp.csv
         #####################################################
         #####################################################
         #####################################################
