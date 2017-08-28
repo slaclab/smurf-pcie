@@ -339,7 +339,8 @@ begin
          dacSigTrigArm   => dacSigTrigArm,
          dacSigTrigDelay => dacSigTrigDelay,
          dacSigStatus    => dacSigStatus(0),
-         evrTrig         => evrTrig.trigPulse(0),
+         -- evrTrig         => evrTrig.trigPulse(0),
+         evrTrig         => '0',-- ignore EVR
          trigHw          => trigHw(0),
          freezeHw        => freezeHw(0));
 end mapping;

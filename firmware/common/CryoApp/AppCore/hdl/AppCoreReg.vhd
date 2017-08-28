@@ -29,7 +29,7 @@ entity AppCoreReg is
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Configuration/Status
-      dacSigTrigArm   : out  sl;
+      dacSigTrigArm   : out sl;
       dacSigTrigDelay : out slv(23 downto 0);
       -- AXI-Lite Register Interface
       axilClk         : in  sl;
@@ -78,7 +78,7 @@ begin
 
       -- Map the read registers
       axiSlaveRegisterR(regCon, x"00", 0, r.dacSigTrigDelay);
-      axiSlaveRegisterR(regCon, x"04", 0, r.dacSigTrigArm);
+      axiSlaveRegister(regCon, x"04", 0, v.dacSigTrigArm);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
