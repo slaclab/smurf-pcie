@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-06-29
+-- Last update: 2017-08-28
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
 use work.AppTopPkg.all;
 
 entity AppCore is
@@ -157,19 +156,22 @@ end AppCore;
 
 architecture mapping of AppCore is
 
-   constant NUM_AXI_MASTERS_C : natural := 3;
+   constant NUM_AXI_MASTERS_C : natural := 4;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 28, 24);  -- [0x8FFFFFFF:0x80000000]
 
    constant AMC_INDEX_C : natural := 0;
    constant DSP_INDEX_C : natural := 1;
    constant RTM_INDEX_C : natural := 2;
+   constant REG_INDEX_C : natural := 3;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal extTrig          : slv(1 downto 0) := "00";  -- unused
+
+   signal dacSigTrigArm   : sl;
+   signal dacSigTrigDelay : slv(23 downto 0);
 
 begin
 
@@ -192,17 +194,8 @@ begin
    mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
    timingPhy   <= TIMING_PHY_INIT_C;
 
-   --------------------------------------------------------------------------------
-   -- DaqMux/Trig Interface
-   -- trigPulse 0 and 1 Daq Bay0,1
-   -- External trigger is asynchronous but it gets synced to timingClk in DadMuxV2.
-   --------------------------------------------------------------------------------
-   GEN_TRIG :
-   for i in 1 downto 0 generate
-      -- Daq triggers freeze
-      trigHw(i)   <= extTrig(i) or evrTrig.trigPulse(i);
-      freezeHw(i) <= extTrig(i) or evrTrig.trigPulse(i);
-   end generate GEN_TRIG;
+   trigHw(1)   <= evrTrig.trigPulse(1);
+   freezeHw(1) <= evrTrig.trigPulse(1);
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -290,9 +283,9 @@ begin
          axilWriteMaster => axilWriteMasters(DSP_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
 
-   ----------------
+   --------------
    -- No RTM core
-   ----------------   
+   --------------
    U_RTM : entity work.RtmEmptyCore
       generic map (
          TPD_G            => TPD_G,
@@ -315,4 +308,38 @@ begin
          genClkP         => genClkP,
          genClkN         => genClkN);
 
+   ------------------
+   -- Local Registers
+   ------------------   
+   U_REG : entity work.AppCoreReg
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+      port map (
+         -- Configuration/Status
+         dacSigTrigArm   => dacSigTrigArm,
+         dacSigTrigDelay => dacSigTrigDelay,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(REG_INDEX_C),
+         axilReadSlave   => axilReadSlaves(REG_INDEX_C),
+         axilWriteMaster => axilWriteMasters(REG_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(REG_INDEX_C));
+
+   -----------------
+   -- Trigger Module
+   -----------------
+   U_TRIG : entity work.AppCoreTrig
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         jesdClk         => jesdClk(0),
+         jesdRst         => jesdRst(0),
+         dacSigTrigArm   => dacSigTrigArm,
+         dacSigTrigDelay => dacSigTrigDelay,
+         dacSigStatus    => dacSigStatus(0),
+         evrTrig         => evrTrig.trigPulse(0),
+         trigHw          => trigHw(0),
+         freezeHw        => freezeHw(0));
 end mapping;

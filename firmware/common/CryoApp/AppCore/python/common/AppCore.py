@@ -40,3 +40,31 @@ class AppCore(pr.Device):
                 ))        
         self.add(SysgenCryo(    offset=0x01000000))
         
+        self.add(pr.RemoteVariable(    
+            name         = "DacSigTrigDelay",
+            description  = "DacSig TrigDelay",
+            offset       = 0x03000000,
+            bitSize      = 24,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RW",
+            units        = "1/(307MHz)",
+        )) 
+
+        self.add(pr.RemoteVariable(    
+            name         = "DacSigTrigArm",
+            description  = "DacSig TrigArm",
+            offset       = 0x03000004,
+            bitSize      = 1,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "WO",
+            hidden       = True,
+        ))         
+        
+        ##############################
+        # Commands
+        ##############################
+        @self.command(description="Arms for a DAC SIG Trigger to the DAQ MUX",)
+        def CmdDacSigTrigArm():    
+            self.DacSigTrigArm.set(1)         
