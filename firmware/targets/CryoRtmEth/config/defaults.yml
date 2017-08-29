@@ -406,12 +406,38 @@ AMCc:
           # testOutMux[:]: SquareWave
           # #############################
       DaqMuxV2:
-        InputMuxSel[0]: 'Ch0'
-        InputMuxSel[1]: 'Ch1'
-        FormatDataWidth[:]: 'D16-bit'
-        FormatSign[:]: 'Unsigned'
-        DecimationAveraging[:]: 'Disabled'
-        PacketHeaderEn: 'Disabled'
+        enable: 'True'
+        TriggerSw: '0x0'
+        TriggerCascMask: Enabled
+        TriggerHwAutoRearm: Enabled
+        TriggerHwArm: '0x1'
+        TriggerClearStatus: '0x0'
+        DaqMode: TriggeredMode
+        PacketHeaderEn: Disabled
+        FreezeSw: '0x0'
+        FreezeHwMask: Enabled
+        DecimationRateDiv: '0x1'
+        DataBufferSize: '0x0'
+        InputMuxSel[0]: Ch0
+        InputMuxSel[1]: Ch1
+        InputMuxSel[2]: Disabled
+        InputMuxSel[3]: Disabled
+        FormatSignWidth[0]: '0x0'
+        FormatSignWidth[1]: '0x0'
+        FormatSignWidth[2]: '0x0'
+        FormatSignWidth[3]: '0x0'
+        FormatDataWidth[0]: D16-bit
+        FormatDataWidth[1]: D16-bit
+        FormatDataWidth[2]: D16-bit
+        FormatDataWidth[3]: D16-bit
+        FormatSign[0]: Signed
+        FormatSign[1]: Signed
+        FormatSign[2]: Signed
+        FormatSign[3]: Signed
+        DecimationAveraging[0]: Disabled
+        DecimationAveraging[1]: Disabled
+        DecimationAveraging[2]: Disabled
+        DecimationAveraging[3]: Disabled     
       DacSigGen:
         EnableMask: 0x3   # Enable both channels
         ModeMask:   0x3   # Set both channels into 'Periodic Mode'
