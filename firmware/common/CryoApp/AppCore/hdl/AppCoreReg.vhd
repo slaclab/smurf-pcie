@@ -77,7 +77,7 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read registers
-      axiSlaveRegisterR(regCon, x"00", 0, r.dacSigTrigDelay);
+      axiSlaveRegister(regCon, x"00", 0, v.dacSigTrigDelay);
       axiSlaveRegister(regCon, x"04", 0, v.dacSigTrigArm);
 
       -- Closeout the transaction
