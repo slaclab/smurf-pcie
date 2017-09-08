@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from AppHardware.MicrowaveMux._microwaveMuxDualCore import *
+from AppHardware.MicrowaveMux._microwaveMuxCore import *
 from DspCoreLib.SysgenMicrowaveMux import *
 
 class AppCore(pr.Device):
