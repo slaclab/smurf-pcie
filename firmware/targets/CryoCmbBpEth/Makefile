@@ -54,7 +54,8 @@ export RTM_INTF = Version1
 ##########################################################################################
 
 # COMMON_FILE is defined by application
-export COMMON_FILE = CryoApp
+export COMMON_FILE   = CryoApp
+export CRYO_DET_TYPE = CryoDetCmb
 
 ##########################################################################################
 # Application have the option to remove unused source code from Vivado project

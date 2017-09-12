@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : CryoRtmEth.vhd
+-- File       : CryoCmbRtmEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-09
 -- Last update: 2017-07-20
@@ -28,7 +28,7 @@ use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AppTopPkg.all;
 
-entity CryoRtmEth is
+entity CryoCmbRtmEth is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -142,9 +142,9 @@ entity CryoRtmEth is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end CryoRtmEth;
+end CryoCmbRtmEth;
 
-architecture top_level of CryoRtmEth is
+architecture top_level of CryoCmbRtmEth is
 
    -- Custom routes for Cryo AMCs
    constant JESD_TX_ROUTES_C : AppTopJesdRouteType := (
