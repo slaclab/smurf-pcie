@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-08-28
+-- Last update: 2017-09-21
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -173,6 +173,9 @@ architecture mapping of AppCore is
    signal dacSigTrigArm   : sl;
    signal dacSigTrigDelay : slv(23 downto 0);
 
+   signal rtmDin  : slv(15 downto 0) := x"0000";
+   signal rtmDout : slv(15 downto 0) := x"0000";
+
 begin
 
    ---------------------
@@ -275,6 +278,9 @@ begin
          dacSigStatus    => dacSigStatus,
          dacSigValids    => dacSigValids,
          dacSigValues    => dacSigValues,
+         -- Digital I/O Interface
+         rtmDout         => rtmDout,
+         rtmDin          => rtmDin,
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -283,14 +289,17 @@ begin
          axilWriteMaster => axilWriteMasters(DSP_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
 
-   --------------
-   -- No RTM core
-   --------------
-   U_RTM : entity work.RtmEmptyCore
+   --------------------
+   -- Digital Debug RTM
+   --------------------
+   U_RTM : entity work.RtmDigitalDebugV1
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
+         -- Digital I/O Interface
+         dout            => rtmDout(15 downto 0),
+         din             => rtmDin(15 downto 0),
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -340,7 +349,7 @@ begin
          dacSigTrigDelay => dacSigTrigDelay,
          dacSigStatus    => dacSigStatus(0),
          -- evrTrig         => evrTrig.trigPulse(0),
-         evrTrig         => '0',-- ignore EVR
+         evrTrig         => '0',        -- ignore EVR
          trigHw          => trigHw(0),
          freezeHw        => freezeHw(0));
 end mapping;

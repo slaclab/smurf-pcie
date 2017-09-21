@@ -46,7 +46,7 @@ export AMC_TYPE_BAY1 = MicrowaveMux
 export AMC_INTF_BAY1 = 
 
 # RTM_TYPE & RTM_INTF are defined by application
-export RTM_TYPE = RtmEmpty
+export RTM_TYPE = RtmDigitalDebug
 export RTM_INTF = Version1
 
 ##########################################################################################
