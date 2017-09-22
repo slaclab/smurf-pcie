@@ -4,3 +4,4 @@
 *.v
 *.vhd
 sysgen/
+hdl_netlist/
