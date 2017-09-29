@@ -3,20 +3,29 @@ function [freq, chanOut] = lineTrackingFeedback( channelNo, deltaF, FBen, Finiti
 % updates the transmission frequency for a resonant line
 
 %Latency 2(?)
+%
+% --Change Historty / Notes:
+%   
+%   <09-27-2017 JED>: -Fixed bug in channelNo CASE block
+%                     -Expanded to 16 channels (int1 Mux & df2 demux)
+%                     -chan(x) vars expanded to 5-bits
+%                     -Removed items that were commented out
+%
+
+
+maxNumChans = 16;
 
 dfType = {xlSigned, 32, 30, xlTruncate, xlSaturate};   % data type for frequency offset from no9minal center frequency
 
 persistent Df1, Df1 = xl_state(0, dfType); % provisional freq offset in pipeline stage 1
 persistent Df2, Df2 = xl_state(0, dfType); % provisional freq offset in pipeline stage 2
 
-persistent chan1, chan1 = xl_state(15, {xlUnsigned, 4, 0});
-persistent chan2, chan2 = xl_state(15, {xlUnsigned, 4, 0});
+persistent chan1, chan1 = xl_state(15, {xlUnsigned, 5, 0}); % channel # state vars
+persistent chan2, chan2 = xl_state(15, {xlUnsigned, 5, 0});
 
 persistent Fp1, Fp1 = xl_state(0, {xlUnsigned, 24, 24});
 persistent Fp2, Fp2 = xl_state(0, {xlUnsigned, 24, 24});
 
-persistent int1DF, int1DF = xl_state(zeros(1,12), dfType, 12); %first integrator
-persistent int2DF, int2DF = xl_state(zeros(1,12), dfType, 12); %second integrator )not yet used)
 
 %can't seem to make vector state work, try scalar states for offset
 %frequencies
@@ -32,6 +41,10 @@ persistent intdf8, intdf8 = xl_state(0, dfType);
 persistent intdf9, intdf9 = xl_state(0, dfType);
 persistent intdf10, intdf10 = xl_state(0, dfType);
 persistent intdf11, intdf11 = xl_state(0, dfType);
+persistent intdf12, intdf12 = xl_state(0, dfType);
+persistent intdf13, intdf13 = xl_state(0, dfType);
+persistent intdf14, intdf14 = xl_state(0, dfType);
+persistent intdf15, intdf15 = xl_state(0, dfType);
 
 
 % query the state variables
@@ -42,18 +55,10 @@ df2 = Df2;
 fp1 = Fp1;
 fp2 = Fp2;
 
-if channelNo ==1  % unused conditional just for debugging breakpoint
-    a=c1;%dummy code to hold a breakpoint
+if channelNo == 1  % unused conditional just for debugging breakpoint
+    a=c1; %dummy code to hold a breakpoint
 end
 
-%if channelNo <12  %%%% vector states don't appear to work
-%%next try chan = xfix({xlUnsigned, 4, 0}, channelNo); %then use as index,is Matlab confused about types?
-%    int1 = int1DF(channelNo);
-%    int2 = int2DF(channelNo);
-%else
-%    int1 = xfix(dfType, 0);
-%    int2 = xfix(dfType, 0);
-%end
 
 switch channelNo    %can't seem to make vector states work so punt to a few scalar states
     case 0  
@@ -69,17 +74,26 @@ switch channelNo    %can't seem to make vector states work so punt to a few scal
     case 5
         int1 = intdf5;
     case 6  
-        int1 = intdf0;
+        int1 = intdf6;
     case 7
-        int1 = intdf1;
+        int1 = intdf7;
     case 8
-        int1 = intdf2;
+        int1 = intdf8;
     case 9
-        int1 = intdf3;
+        int1 = intdf9;
     case 10
-        int1 = intdf4;
+        int1 = intdf10;
     case 11
-        int1 = intdf5;
+        int1 = intdf11;
+    case 12
+        int1 = intdf12;
+    case 13
+        int1 = intdf13;
+    case 14
+        int1 = intdf14;
+    case 15
+        int1 = intdf15;
+        
     otherwise
         int1 = xfix(dfType, 0);
 end  % end punting
@@ -88,9 +102,9 @@ end  % end punting
 %decode Finitial for this channel
 en = xfix({xlBoolean}, xl_slice(Finitial, 24, 24)); % specific channel enable bit is 24th bit of Finitial word
 F0 = xl_force(xl_slice(Finitial, 23, 0), xlUnsigned, 24); %low 24 bits are the initial frequency for the channel
-% in fraction of FPGA clock rate of 185 MHz
+% in fraction of FPGA clock rate of 307.2 MHz
 
-if channelNo <=1  %diagnostic
+if channelNo <= 1  %diagnostic
     disp('channelNo, F0');disp(channelNo); disp(F0);
 end
 
@@ -100,7 +114,8 @@ if channelNo == 0  %diagnostic
     disp(F0)
 end
 
-if  ~FBen | ~en | channelNo >=12  % feedback disabled or invalid cahnnel number
+%if  ~FBen | ~en | channelNo >=16  % feedback disabled or invalid cahnnel number
+if  ~FBen | ~en | channelNo >= maxNumChans  % feedback disabled or invalid cahnnel number
     Df1 = xfix(dfType, 0);   % in case of reset or FB not enabled output initial frequency
 else
     %compute new freq offset
@@ -118,8 +133,8 @@ else
 end
 
 % pipeline stage 3 ________________________________________________________
-if c2 < 12    % test for valid channel number   
-%    int1DF(c2) = df2;
+%if c2 < 16    % test for valid channel number
+if c2 < maxNumChans
         
     switch c2    %can't seem to make vector states work so punt to a few scalar states
         case 0  
@@ -146,6 +161,14 @@ if c2 < 12    % test for valid channel number
             intdf10 = df2;
         case 11
             intdf11 = df2;
+        case 12
+            intdf12 = df2;
+        case 13
+            intdf13 = df2;
+        case 14
+            intdf14 = df2;
+        case 15
+            intdf15 = df2;
         otherwise  % unused channel number
     end  % end punting
 

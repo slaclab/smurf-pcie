@@ -56,7 +56,7 @@ freqBits = 24  % number of bits for frequency
 IQbits = 16  %number of bits for DDS I&Q
 %IQbits = 15  % number of bits for DDS I&Q (16 bits takes up too much BRAM)
 Nlines = 12   % max number of resonator lines per ADC
-freqBusAddrBits = 4  %number of bits of address space for a frequency bus
+freqBusAddrBits = 5  %number of bits of address space for a frequency bus / changed to 5b 09-25-2017
 
 %white noise generator paramters
 noiseLen = 128   % length of vector of random phases for white noise generator
