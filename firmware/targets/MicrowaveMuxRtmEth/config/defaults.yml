@@ -52,8 +52,8 @@ AMCc:
         MicrowaveMuxCore[:]:
           enable: 'True'
           DBG:
-            # txSyncMask: 0x0  # Both DAC channels
-            txSyncMask: 0x2  # Only using DAC[0]
+            txSyncMask: 0x0    # Both DAC channels
+            # txSyncMask: 0x2  # Only using DAC[0]
             # txSyncMask: 0x1  # Only using DAC[1]
           LMK:
             EnableSync: 0xFF
@@ -359,12 +359,12 @@ AMCc:
               TESTMODE_EN: 0x0
               CTRL_K: 0x1
               FRAMES_PER_MULTIFRAME: 0x0F
-        ###########################################
-        ## System Generator Configuration Registers
-        ###########################################
-        # SysgenMicrowaveMux:      
-          # ScratchPad: 0xDEADBEEF
-          # muxSelect: SigGen
+        ##########################################
+        # System Generator Configuration Registers
+        ##########################################
+        SysgenMicrowaveMux:      
+          ScratchPad: 0xDEADBEEF
+          muxSelect: SigGen
           # Ch0MuxSel: SineGen
           # Ch0B1CjEn: CH0_B1_Norm
           # Ch0B2CjEn: CH0_B2_Norm
@@ -376,8 +376,8 @@ AMCc:
         ###########################################
       AppTopJesd[:]:
         JesdRx:
-          # Enable: 0x3F3 # Both ADC channels
-          Enable: 0x33    # Only using ADC[0]
+          Enable: 0x3F3 # Both ADC channels
+          # Enable: 0x33  # Only using ADC[0]
           # Enable: 0x3C0 # Only using ADC[1]
           Polarity: 0x100
           InvertAdcData: 0x00
@@ -388,10 +388,10 @@ AMCc:
           InvertSync: Inverted
           ReplaceEnable: Enabled
           SubClass: 0x1
-          SysrefDelay: 0xB
+          SysrefDelay: 0x4
         JesdTx:
-          # Enable: 0x3CF # Both DAC channels
-          Enable: 0xF     # Only using DAC[0]
+          Enable: 0x3CF # Both DAC channels
+          # Enable: 0xF   # Only using DAC[0]
           # Enable: 0x3C0 # Only using DAC[1]
           Polarity: 0x2   # JESD1_TO_AMC appears to be inverted???
           Loopback: 0x0
@@ -412,8 +412,8 @@ AMCc:
           testOutMux[:]: SquareWave
           
           txDiffCtrl[:]: 0xFF
-          txDiffCtrl[4]: 0 # Unused channel
-          txDiffCtrl[5]: 0 # Unused channel
+          txDiffCtrl[4]: 0x00 # Unused channel
+          txDiffCtrl[5]: 0x00 # Unused channel
           
           txPreCursor[:]: 0x0F
           txPreCursor[4]: 0xFF # Unused channel
@@ -447,13 +447,13 @@ AMCc:
         #####################################################
         #####################################################
         #####################################################
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/multitones_500_baseband.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_ones_Qs_ones.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_Ones_Qs_zeros.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_zeros_Qs_ones.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_zeros_Qs_zeros.csv
+        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/multitones_500_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_2Tones_4096pts.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_1Tones_10MHzoffset.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_ones_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_Ones_Qs_zeros.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_zeros_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_zeros_Qs_zeros.csv
         #####################################################
         #####################################################
         #####################################################
