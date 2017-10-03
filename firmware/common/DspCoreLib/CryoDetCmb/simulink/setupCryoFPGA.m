@@ -27,7 +27,7 @@ Fgen = 20e6;
 
 
 % Simulate resonator notch in simulink
-Fnotch = 70e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch
+Fnotch = 70.1e6, BW = 1e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch
 a = 0.1  % transmission at minimum
 notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
 figure(1), bode(notch); grid, title('Simulted resonator transfer function Notch 1')
