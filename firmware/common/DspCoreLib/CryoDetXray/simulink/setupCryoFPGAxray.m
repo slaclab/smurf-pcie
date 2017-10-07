@@ -9,6 +9,8 @@
 
 %   <07-31-2017 JED>: added simulink_period var
 %   <09-22-2017 SRS>: change notch BW to 4 MHz, Nlines = 16
+%  <10-07-2017 SRS>;   remove notch filter transfer functions, parameterize
+%  these in a simulink block instead
 %
 %--------------------------------------------------------------------
 
@@ -29,29 +31,6 @@ Fgen = 20e6;
 
 % Simulate resonator notches in simulink
 BW = 4e6  % Notch bandwidth in Hz
-
-Fnotch = 70e6, Q = Fnotch/BW, wNotch = 2*pi*Fnotch
-a = 0.1  % transmission at minimum
-notch = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
-figure(1), bode(notch); grid, title('Simulted resonator transfer function Notch 1')
-
-% Simulate another resonator notch in simulink
-Fnotch2 = 70.3e6,  Q = Fnotch2/BW, wNotch = 2*pi*Fnotch2
-a = 0.2  % transmission at minimum
-notch2 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
-figure(2), bode([notch; notch2]); grid, title('Simulted resonator transfer functions Notch 1 & 2')
-
-% Simulate more resonator notches in simulink
-Fnotch3 = 80.0e6, Q = Fnotch3/BW, wNotch = 2*pi*Fnotch3
-a = 0.1  % transmission at minimum
-notch3 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
-figure(3), bode([notch3]); grid, title('Simulted resonator transfer functions Notch 3')
-
-Fnotch4 = 80.2e6, Q = Fnotch4/BW, wNotch = 2*pi*Fnotch4
-a = 0.1  % transmission at minimum
-notch4 = tf( [1 a*wNotch/Q wNotch^2], [1 wNotch/Q wNotch^2])
-figure(4), bode([notch4]); grid, title('Simulted resonator transfer functions Notch 4')
-
 
 freqBits = 24  % number of bits for frequency (24 bits ==> 18 Hz LSB freq resolution)
 IQbits = 16  %number of bits for DDS I&Q
