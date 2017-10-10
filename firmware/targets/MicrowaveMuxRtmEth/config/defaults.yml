@@ -50,219 +50,63 @@ AMCc:
     AppTop:
       AppCore:
         MicrowaveMuxCore[:]:
-          enable: 'True'
+          enable: 'True'          
           PLL[0]:
-            enable: True
-            AUTOCAL: 0x0
-            PRESCALER: 0x0
-            Integer16bValue: 0x22
-            FRAC1: 0x962AAA
-            FRAC2: 0x800
-            MOD2: 0xc00
-            SDLoadReset: 0x0
-            PhaseResync: 0x0
-            PhaseAdjust: 0x0
-            PHASE: 0x0
-            MUXOUT: 0x6
-            ReferenceDoubler: 0x0
-            RDIV2: 0x0
-            RCounter: 0x0
-            DoubleBuffer: 0x0
-            ChargePumpCurrent: 0x2
-            RefMode: 0x0
-            MuxLogic: 0x1
-            PhaseDetPolarity: 0x0
-            PowerDown: 0x0
-            ChargePumpTri: 0x0
-            CounterReset: 0x0
-            REG5_RESERVED: 0x00800025
-            GatedBleed: 0x0
-            NegativeBleed: 0x1
-            REG6_RESERVED: 0xA
-            FeedbackSelect: 0x0
-            DividerSelect: 0x0
-            ChargePumpBleedCurrent: 0x1C
-            MuteTillLockDetect: 0x0
-            RFOutputBEnable: 0x0
-            RFOutputAEnable: 0x1
-            OutputPower: 0x3
-            REG7_RESERVED: 0x4
-            LESync: 0x1
-            LockDetectCount: 0x0
-            LossOfLockMode: 0x0
-            LockDetectPrecision: 0x0
-            LockDetectMode: 0x0
-            REG8_RESERVED: 0x102D0428
-            VcoBandDivision: 0x34
-            Timeout: 0xCD
-            AutomaticLevelCalibrationTimeout: 0x1E
-            SynthesizerLockTimeout: 0xC
-            REG10_RESERVED: 0x300
-            ADC_CLK_DIV: 0xFF
-            ADCConversionEnable: 0x1
-            ADCEnable: 0x1
-            REG11_RESERVED: 0x0061300B
-            PhaseResyncClockDivider: 0x1
-            REG12_RESERVED: 0x41
+            REG[0]:  0x00000220
+            REG[1]:  0x0962AAA1
+            REG[2]:  0x1FFCC002
+            REG[3]:  0x00000003
+            REG[4]:  0x30008B84
+            REG[5]:  0x00800025
+            REG[6]:  0x35038076
+            REG[7]:  0x12000007
+            REG[8]:  0x102D0428
+            REG[9]:  0x34337CC9
+            REG[10]: 0x00C03FFA
+            REG[11]: 0x0061300B
+            REG[12]: 0x0001041C
           PLL[1]:
-            enable: True
-            AUTOCAL: 0x0
-            PRESCALER: 0x0
-            Integer16bValue: 0x26
-            FRAC1: 0xA7D555
-            FRAC2: 0x400
-            MOD2: 0xc00
-            SDLoadReset: 0x0
-            PhaseResync: 0x0
-            PhaseAdjust: 0x0
-            PHASE: 0x0
-            MUXOUT: 0x6
-            ReferenceDoubler: 0x0
-            RDIV2: 0x0
-            RCounter: 0x0
-            DoubleBuffer: 0x0
-            ChargePumpCurrent: 0x2
-            RefMode: 0x0
-            MuxLogic: 0x1
-            PhaseDetPolarity: 0x0
-            PowerDown: 0x0
-            ChargePumpTri: 0x0
-            CounterReset: 0x0
-            REG5_RESERVED: 0x00800025
-            GatedBleed: 0x0
-            NegativeBleed: 0x1
-            REG6_RESERVED: 0xA
-            FeedbackSelect: 0x0
-            DividerSelect: 0x0
-            ChargePumpBleedCurrent: 0x19
-            MuteTillLockDetect: 0x0
-            RFOutputBEnable: 0x0
-            RFOutputAEnable: 0x1
-            OutputPower: 0x3
-            REG7_RESERVED: 0x4
-            LESync: 0x1
-            LockDetectCount: 0x0
-            LossOfLockMode: 0x0
-            LockDetectPrecision: 0x0
-            LockDetectMode: 0x0
-            REG8_RESERVED: 0x102D0428
-            VcoBandDivision: 0x34
-            Timeout: 0xCD
-            AutomaticLevelCalibrationTimeout: 0x1E
-            SynthesizerLockTimeout: 0xC
-            REG10_RESERVED: 0x300
-            ADC_CLK_DIV: 0xFF
-            ADCConversionEnable: 0x1
-            ADCEnable: 0x1
-            REG11_RESERVED: 0x0061300B
-            PhaseResyncClockDivider: 0x1
-            REG12_RESERVED: 0x41
+            REG[0]:  0x00000260
+            REG[1]:  0x0A7D5551
+            REG[2]:  0x1000C002
+            REG[3]:  0x00000003
+            REG[4]:  0x30008B84
+            REG[5]:  0x00800025
+            REG[6]:  0x35032076
+            REG[7]:  0x12000007
+            REG[8]:  0x102D0428
+            REG[9]:  0x34337CC9
+            REG[10]: 0x00C03FFA
+            REG[11]: 0x0061300B
+            REG[12]: 0x0001041C
           PLL[2]:
-            enable: True
-            AUTOCAL: 0x0
-            PRESCALER: 0x0
-            Integer16bValue: 0x2A
-            FRAC1: 0xB98000
-            FRAC2: 0x0
-            MOD2: 0xc00
-            SDLoadReset: 0x0
-            PhaseResync: 0x0
-            PhaseAdjust: 0x0
-            PHASE: 0x0
-            MUXOUT: 0x6
-            ReferenceDoubler: 0x0
-            RDIV2: 0x0
-            RCounter: 0x0
-            DoubleBuffer: 0x0
-            ChargePumpCurrent: 0x2
-            RefMode: 0x0
-            MuxLogic: 0x1
-            PhaseDetPolarity: 0x0
-            PowerDown: 0x0
-            ChargePumpTri: 0x0
-            CounterReset: 0x0
-            REG5_RESERVED: 0x00800025
-            GatedBleed: 0x0
-            NegativeBleed: 0x1
-            REG6_RESERVED: 0xA
-            FeedbackSelect: 0x0
-            DividerSelect: 0x0
-            ChargePumpBleedCurrent: 0x16
-            MuteTillLockDetect: 0x0
-            RFOutputBEnable: 0x0
-            RFOutputAEnable: 0x1
-            OutputPower: 0x3
-            REG7_RESERVED: 0x4
-            LESync: 0x1
-            LockDetectCount: 0x0
-            LossOfLockMode: 0x0
-            LockDetectPrecision: 0x0
-            LockDetectMode: 0x0
-            REG8_RESERVED: 0x102D0428
-            VcoBandDivision: 0x34
-            Timeout: 0xCD
-            AutomaticLevelCalibrationTimeout: 0x1E
-            SynthesizerLockTimeout: 0xC
-            REG10_RESERVED: 0x300
-            ADC_CLK_DIV: 0xFF
-            ADCConversionEnable: 0x1
-            ADCEnable: 0x1
-            REG11_RESERVED: 0x0061300B
-            PhaseResyncClockDivider: 0x1
-            REG12_RESERVED: 0x41
+            REG[0]:  0x000002A0
+            REG[1]:  0x0B980001
+            REG[2]:  0x0000C002
+            REG[3]:  0x00000003
+            REG[4]:  0x30008B84
+            REG[5]:  0x00800025
+            REG[6]:  0x3502E076
+            REG[7]:  0x12000007
+            REG[8]:  0x102D0428
+            REG[9]:  0x34337CC9
+            REG[10]: 0x00C03FFA
+            REG[11]: 0x0061300B
+            REG[12]: 0x0001041C
           PLL[3]:
-            enable: True
-            AUTOCAL: 0x0
-            PRESCALER: 0x0
-            Integer16bValue: 0x2E
-            FRAC1: 0xCB2AAA
-            FRAC2: 0x800
-            MOD2: 0xc00
-            SDLoadReset: 0x0
-            PhaseResync: 0x0
-            PhaseAdjust: 0x0
-            PHASE: 0x0
-            MUXOUT: 0x6
-            ReferenceDoubler: 0x0
-            RDIV2: 0x0
-            RCounter: 0x0
-            DoubleBuffer: 0x0
-            ChargePumpCurrent: 0x2
-            RefMode: 0x0
-            MuxLogic: 0x1
-            PhaseDetPolarity: 0x0
-            PowerDown: 0x0
-            ChargePumpTri: 0x0
-            CounterReset: 0x0
-            REG5_RESERVED: 0x00800025
-            GatedBleed: 0x0
-            NegativeBleed: 0x1
-            REG6_RESERVED: 0xA
-            FeedbackSelect: 0x0
-            DividerSelect: 0x0
-            ChargePumpBleedCurrent: 0x15
-            MuteTillLockDetect: 0x0
-            RFOutputBEnable: 0x0
-            RFOutputAEnable: 0x1
-            OutputPower: 0x3
-            REG7_RESERVED: 0x4
-            LESync: 0x1
-            LockDetectCount: 0x0
-            LossOfLockMode: 0x0
-            LockDetectPrecision: 0x0
-            LockDetectMode: 0x0
-            REG8_RESERVED: 0x102D0428
-            VcoBandDivision: 0x34
-            Timeout: 0xCD
-            AutomaticLevelCalibrationTimeout: 0x1E
-            SynthesizerLockTimeout: 0xC
-            REG10_RESERVED: 0x300
-            ADC_CLK_DIV: 0xFF
-            ADCConversionEnable: 0x1
-            ADCEnable: 0x1
-            REG11_RESERVED: 0x0061300B
-            PhaseResyncClockDivider: 0x1
-            REG12_RESERVED: 0x41          
+            REG[0]:  0x000002E0
+            REG[1]:  0x0CB2AAA1
+            REG[2]:  0x1FFCC002
+            REG[3]:  0x00000003
+            REG[4]:  0x30008B84
+            REG[5]:  0x00800025
+            REG[6]:  0x3502A076
+            REG[7]:  0x12000007
+            REG[8]:  0x102D0428
+            REG[9]:  0x34337CC9
+            REG[10]: 0x00C03FFA
+            REG[11]: 0x0061300B
+            REG[12]: 0x0001041C
           DBG:
             txSyncMask: 0x0    # Both DAC channels
             # txSyncMask: 0x2  # Only using DAC[0]
@@ -292,13 +136,13 @@ AMCc:
             LmkReg_0x0115: 0x00
             LmkReg_0x0116: 0x70
             LmkReg_0x0117: 0x9E
-            LmkReg_0x0118: 0x61
+            LmkReg_0x0118: 0x74
             LmkReg_0x0119: 0x55
-            LmkReg_0x011B: 0x02
+            LmkReg_0x011B: 0x00
             LmkReg_0x011C: 0x22
             LmkReg_0x011D: 0x00
             LmkReg_0x011E: 0x70
-            LmkReg_0x011F: 0x00
+            LmkReg_0x011F: 0x06
             LmkReg_0x0120: 0x61
             LmkReg_0x0121: 0x55
             LmkReg_0x0123: 0x01
@@ -366,21 +210,21 @@ AMCc:
             LmkReg_0x0163: 0x00
             LmkReg_0x0164: 0x00
             LmkReg_0x0165: 0x05
-            LmkReg_0x0171: 0xAA
-            LmkReg_0x0172: 0x02
-            LmkReg_0x0173: 0x0 
-            LmkReg_0x0174: 0x0 
-            LmkReg_0x017C: 0x15
-            LmkReg_0x017D: 0x33
             LmkReg_0x0166: 0x00
             LmkReg_0x0167: 0x00
             LmkReg_0x0168: 0x05
             LmkReg_0x0169: 0x59
             LmkReg_0x016A: 0x20
-            LmkReg_0x016B: 0x00
-            LmkReg_0x016C: 0x00
-            LmkReg_0x016D: 0x00
+            LmkReg_0x017D: 0x33
+            LmkReg_0x017C: 0x15
+            LmkReg_0x0174: 0x00
+            LmkReg_0x0173: 0x00
+            LmkReg_0x0172: 0x02
+            LmkReg_0x0171: 0xAA
             LmkReg_0x016E: 0x13
+            LmkReg_0x016D: 0x00
+            LmkReg_0x016C: 0x00
+            LmkReg_0x016B: 0x00
           DAC[:]:
             DacReg[0]: 0x0218   # Sets board to 4X interpolation (Default: 0x0218)
             DacReg[1]: 0x0003   
