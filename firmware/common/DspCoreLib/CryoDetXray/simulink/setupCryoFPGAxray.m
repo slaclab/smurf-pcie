@@ -22,6 +22,8 @@ Ts = 1/Fadc  % ADC sample rate
 
 Fclk = Fadc  % same rate for new HW (non-Demo HW)
 Tclk = 1/Fclk
+%add rate divider for AXI bus
+Naxi = 8;
 
 %--added simulink_period var in order to make clock probe work / JED 07-31-2017
 simulink_period = Ts;
