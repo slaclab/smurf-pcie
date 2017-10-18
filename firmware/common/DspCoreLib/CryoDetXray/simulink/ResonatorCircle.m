@@ -5,10 +5,11 @@
 %
 Sig = ScopeData2.signals(1).values; size(Sig)
 Ref = ScopeData2.signals(2).values;
+freq =ScopeData2.signals(3).values; %vector of frequency set for channel 0
 time = ScopeData2.time;
 
-%choose a start time to eleiminate initial transient
-start = 1.3e-6
+%choose a start time to eliminate initial transient
+start = 1.5e-6
 first = find(time>=start,1);
 last = length(time);
 range = first:last;
@@ -28,7 +29,7 @@ Ref = Ref(range,:);
 cSig = 1i*Sig(:,1) + Sig(:,2);
 cRef = 1i*Ref(:,1) + Ref(:,2);
 S21 = cSig ./ cRef;
-freq = 60e6 + time*8e6/20e-6; % later mod to record stimulus freq
+freq = freq(range);
 
 %find minimum response
 idx = find(abs(S21)==min(abs(S21)),1);
