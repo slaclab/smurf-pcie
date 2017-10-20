@@ -44,3 +44,10 @@ freqBusAddrBits = 4  %number of bits of address space for a frequency bus
 noiseLen = 128   % length of vector of random phases for white noise generator
 noiseSteps = 32  %every noiseSteps clocks (of 185 MHz) change random phase shift (try 37 later)
 noise = exp(2i*pi*rand(1, noiseLen)); %complex random phases
+
+%setup parameters for simulation of continuous-time analog antialias filter
+[num,den] = besself(3,2*pi*250e6)
+lpf = tf(num,den);
+figure(20), bode(lpf),grid
+lpf.num{1}
+lpf.den{1}
