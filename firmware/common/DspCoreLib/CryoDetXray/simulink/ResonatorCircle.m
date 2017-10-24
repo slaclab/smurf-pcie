@@ -30,6 +30,7 @@ cSig = 1i*Sig(:,1) + Sig(:,2);
 cRef = 1i*Ref(:,1) + Ref(:,2);
 S21 = cSig ./ cRef;
 freq = freq(range);
+figure(12), plot(freq, real(S21), freq, imag(S21)),grid, title('S21')
 
 %find minimum response
 idx = find(abs(S21)==min(abs(S21)),1);
