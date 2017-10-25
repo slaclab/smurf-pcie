@@ -101,9 +101,9 @@ begin
             clk            => jesdClk,
             rst            => jesdRst,
             we             => ramWe(i),
-            addr           => ramAddr((8*i)-1 downto (8*i)),
-            din            => ramDin((32*i)-1 downto (32*i)),
-            dout           => ramDout((32*i)-1 downto (32*i)),
+            addr           => ramAddr((8*(i+1))-1 downto (8*i)),
+            din            => ramDin((32*(i+1))-1 downto (32*i)),
+            dout           => ramDout((32*(i+1))-1 downto (32*i)),
             -- AXI-Lite Interface
             axiClk         => axilClk,
             axiRst         => axilRst,

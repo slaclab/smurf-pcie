@@ -94,10 +94,10 @@ begin
             -- Clock and Reset
             jesdClk         => jesdClk,
             jesdRst         => jesdRst,
-            ramWe           => ramWe((8*i)-1 downto (8*i)),
-            ramAddr         => ramAddr((8*8*i)-1 downto (8*8*i)),
-            ramDin          => ramDin((32*8*i)-1 downto (32*8*i)),
-            ramDout         => ramDout((32*8*i)-1 downto (32*8*i)),
+            ramWe           => ramWe((8*(i+1))-1 downto (8*i)),
+            ramAddr         => ramAddr((8*8*(i+1))-1 downto (8*8*i)),
+            ramDin          => ramDin((32*8*(i+1))-1 downto (32*8*i)),
+            ramDout         => ramDout((32*8*(i+1))-1 downto (32*8*i)),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
