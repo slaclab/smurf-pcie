@@ -13,8 +13,8 @@
 format compact
 setupVers = 21; % just a number that goes into a status register
 
-%Fadc = 312.5e6  % ADC clock  frequency / Demo System
-Fadc = 307.2e6  % ADC clock  frequency / NEW AMC System
+Fadc = 312.5e6  % ADC clock  frequency / Demo System
+%Fadc = 307.2e6  % ADC clock  frequency / NEW AMC System
 Ts = 1/Fadc  % ADC sample rate
 %Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
 Fclk = Fadc  % same rate for new HW (non-Demo HW)
@@ -56,21 +56,12 @@ freqBits = 24  % number of bits for frequency
 IQbits = 16  %number of bits for DDS I&Q
 %IQbits = 15  % number of bits for DDS I&Q (16 bits takes up too much BRAM)
 Nlines = 12   % max number of resonator lines per ADC
-freqBusAddrBits = 5  %number of bits of address space for a frequency bus / changed to 5b 09-25-2017
+freqBusAddrBits = 4  %number of bits of address space for a frequency bus / changed to 5b 09-25-2017
 freqBusAddrBitsOld = 4  %number of bits of address space for a frequency bus / changed to 5b 09-25-2017
+
 
 %white noise generator paramters
 noiseLen = 128   % length of vector of random phases for white noise generator
 noiseSteps = 32  %every noiseSteps clocks (of 185 MHz) change random phase shift (try 37 later)
 noise = exp(2i*pi*rand(1, noiseLen)); %complex random phases
-
-%--AXI Interface downsample ratio
-% Specifies what fraction of sample clock to run AXI ifc gateways (IN only)
-% We lower the rate for timing closure
-% mult period by this factor to elongate
-%
-ds_axi = 16;
-
-%--AXI interface gateway OUTPUT downsample factor
-Naxi = 16;
 
