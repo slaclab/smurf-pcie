@@ -52,61 +52,61 @@ AMCc:
         MicrowaveMuxCore[:]:
           enable: 'True'          
           PLL[0]:
-            REG[0]:  0x00000220
-            REG[1]:  0x0962AAA1
-            REG[2]:  0x1FFCC002
+            REG[0]:  0x000001C0
+            REG[1]:  0x07BAAAA1
+            REG[2]:  0x2000C002
             REG[3]:  0x00000003
             REG[4]:  0x30008B84
-            REG[5]:  0x00800025
-            REG[6]:  0x35038076
+            REG[5]:  0x800025
+            REG[6]:  0x35046076
             REG[7]:  0x12000007
             REG[8]:  0x102D0428
             REG[9]:  0x34337CC9
-            REG[10]: 0x00C03FFA
-            REG[11]: 0x0061300B
-            REG[12]: 0x0001041C
+            REG[10]:  0x00C03FFA
+            REG[11]:  0x61300B
+            REG[12]:  0x0001041C
           PLL[1]:
-            REG[0]:  0x00000260
-            REG[1]:  0x0A7D5551
+            REG[0]:  0x00000200
+            REG[1]:  0x08D55551
             REG[2]:  0x1000C002
             REG[3]:  0x00000003
             REG[4]:  0x30008B84
-            REG[5]:  0x00800025
-            REG[6]:  0x35032076
+            REG[5]:  0x800025
+            REG[6]:  0x3503C076
             REG[7]:  0x12000007
             REG[8]:  0x102D0428
             REG[9]:  0x34337CC9
-            REG[10]: 0x00C03FFA
-            REG[11]: 0x0061300B
-            REG[12]: 0x0001041C
+            REG[10]:  0x00C03FFA
+            REG[11]:  0x61300B
+            REG[12]:  0x0001041C
           PLL[2]:
-            REG[0]:  0x000002A0
-            REG[1]:  0x0B980001
+            REG[0]:  0x00000240
+            REG[1]:  0x09F00001
             REG[2]:  0x0000C002
             REG[3]:  0x00000003
             REG[4]:  0x30008B84
-            REG[5]:  0x00800025
-            REG[6]:  0x3502E076
+            REG[5]:  0x800025
+            REG[6]:  0x35036076
             REG[7]:  0x12000007
             REG[8]:  0x102D0428
             REG[9]:  0x34337CC9
-            REG[10]: 0x00C03FFA
-            REG[11]: 0x0061300B
-            REG[12]: 0x0001041C
+            REG[10]:  0x00C03FFA
+            REG[11]:  0x61300B
+            REG[12]:  0x0001041C
           PLL[3]:
-            REG[0]:  0x000002E0
-            REG[1]:  0x0CB2AAA1
+            REG[0]:  0x00000280
+            REG[1]:  0x0B0AAAA1
             REG[2]:  0x1FFCC002
             REG[3]:  0x00000003
             REG[4]:  0x30008B84
-            REG[5]:  0x00800025
-            REG[6]:  0x3502A076
+            REG[5]:  0x800025
+            REG[6]:  0x35030076
             REG[7]:  0x12000007
             REG[8]:  0x102D0428
             REG[9]:  0x34337CC9
-            REG[10]: 0x00C03FFA
-            REG[11]: 0x0061300B
-            REG[12]: 0x0001041C
+            REG[10]:  0x00C03FFA
+            REG[11]:  0x61300B
+            REG[12]:  0x0001041C
           DBG:
             txSyncMask: 0x0    # Both DAC channels
             # txSyncMask: 0x2  # Only using DAC[0]
@@ -248,10 +248,10 @@ AMCc:
             DacReg[19]: 0x0000
             DacReg[20]: 0x0000
             DacReg[21]: 0x0000
-            DacReg[22]: 0x2ee0  # This is the upper 16 bits of the NCO frequency for the DACAB path
+            DacReg[22]: 0x4e20  # This is the upper 16 bits of the NCO frequency for the DACAB path
             DacReg[23]: 0x0000
             DacReg[24]: 0x0000
-            DacReg[25]: 0x2ee0  # This is the upper 16 bits of the NCO frequency for the DACCD path
+            DacReg[25]: 0x4e20  # This is the upper 16 bits of the NCO frequency for the DACCD path
             DacReg[26]: 0x0020
             DacReg[27]: 0x0000
             DacReg[28]: 0x0000
@@ -260,7 +260,7 @@ AMCc:
             DacReg[31]: 0x9980
             DacReg[32]: 0x8008
             DacReg[33]: 0x0000
-            DacReg[34]: 0x4B1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
+            DacReg[34]: 0x1b1B  # Sets where samples go from JESD.  Datapath D goes to DACD, Datapath C goes to DACC, DatapathB goes to DACB and DatapathA goes to DACA
             DacReg[35]: 0x01FF  # This routes the "sleep terminal signal"  we don't use this so, it doesn't matter.
             DacReg[36]: 0x0020  # Use only the next sysref pulse.  Uros had it set to NOT use the sysref pulse
             DacReg[37]: 0x4000  # DACCLK div 4 to get JESD clock Uros had DACCLK=JESDCLK
@@ -367,8 +367,8 @@ AMCc:
               DECIM_FACTOR: 0x0
               DUAL_BAND_EN: 0x0
               REAL_OUT_EN: 0x0
-              DDC0_NCO1_LSB: 0xE0
-              DDC0_NCO1_MSB: 0x2E
+              DDC0_NCO1_LSB: 0x20
+              DDC0_NCO1_MSB: 0x4e
               DDC0_NCO2_LSB: 0x00
               DDC0_NCO2_MSB: 0x00
               DDC0_NCO3_LSB: 0x00
@@ -449,7 +449,7 @@ AMCc:
           Enable: 0x3CF # Both DAC channels
           # Enable: 0xF   # Only using DAC[0]
           # Enable: 0x3C0 # Only using DAC[1]
-          Polarity: 0x2   # JESD1_TO_AMC appears to be inverted???
+          Polarity: 0x82   # JESD1_TO_AMC appears to be inverted???
           Loopback: 0x0
           InvertDacData: 0x0
           HighAmplitudeVal: 0xC000
@@ -503,7 +503,10 @@ AMCc:
         #####################################################
         #####################################################
         #####################################################
-        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/multitones_500_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/multitones_500_baseband.csv
+        CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_Missing_tones_fullscale_random_spacing_baseband16k.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/Is_zeros_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/broad_noise4.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_2Tones_4096pts.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_1Tones_10MHzoffset.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_ones_Qs_ones.csv
