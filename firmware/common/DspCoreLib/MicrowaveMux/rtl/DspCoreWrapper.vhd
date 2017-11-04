@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-09-21
+-- Last update: 2017-11-03
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -47,8 +47,11 @@ entity DspCoreWrapper is
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      rtmDout         : out slv(15 downto 0);
-      rtmDin          : in  slv(15 downto 0);
+      kRelay          : in  slv(1 downto 0);
+      startRamp       : out sl;
+      selectRamp      : out sl;
+      lemo1           : in  sl;
+      lemo2           : out sl;
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -62,8 +65,11 @@ architecture mapping of DspCoreWrapper is
 
    component dspcore
       port (
-         rtmDin                : in  std_logic_vector(16-1 downto 0);
-         rtmDout               : out std_logic_vector(16-1 downto 0);
+         kRelay                : in  std_logic_vector(2-1 downto 0);
+         startRamp             : out std_logic_vector(1-1 downto 0);
+         selectRamp            : out std_logic_vector(1-1 downto 0);
+         lemo1                 : in  std_logic_vector(1-1 downto 0);
+         lemo2                 : out std_logic_vector(1-1 downto 0);
          adc0                  : in  std_logic_vector(32-1 downto 0);
          adc1                  : in  std_logic_vector(32-1 downto 0);
          adc10                 : in  std_logic_vector(32-1 downto 0);
@@ -305,9 +311,12 @@ begin
          sigGenStart(0)        => sigGenStart,
          sigGen0               => sigGen(0),
          sigGen1               => sigGen(1),
-         -- Digital I/O Interface
-         rtmDin                => rtmDin,
-         rtmDout               => rtmDout,
+         -- Digital I/O Interface         
+         kRelay                => kRelay,
+         startRamp(0)          => startRamp,
+         selectRamp(0)         => selectRamp,
+         lemo1(0)              => lemo1,
+         lemo2(0)              => lemo2,
          -- AXI-Lite Interface
          dspcore_s_axi_awaddr  => writeMaster.awaddr(11 downto 0),
          dspcore_s_axi_awvalid => writeMaster.awvalid,

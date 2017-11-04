@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-09-21
+-- Last update: 2017-11-03
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -174,8 +174,11 @@ architecture mapping of AppCore is
    signal dacSigTrigArm   : sl;
    signal dacSigTrigDelay : slv(23 downto 0);
 
-   signal rtmDin  : slv(15 downto 0) := x"0000";
-   signal rtmDout : slv(15 downto 0) := x"0000";
+   signal kRelay     : slv(1 downto 0);
+   signal startRamp  : sl;
+   signal selectRamp : sl;
+   signal lemo1      : sl;
+   signal lemo2      : sl;
 
 begin
 
@@ -226,7 +229,7 @@ begin
    ----------------
    -- AMC Interface
    ----------------
-   U_DUAL_AMC : entity work.MicrowaveMuxDualCore
+   U_DUAL_AMC : entity work.AmcMicrowaveMuxDualCore
       generic map (
          TPD_G            => TPD_G,
          AXI_CLK_FREQ_G   => 156.25E+6,
@@ -280,8 +283,11 @@ begin
          dacSigValids    => dacSigValids,
          dacSigValues    => dacSigValues,
          -- Digital I/O Interface
-         rtmDout         => rtmDout,
-         rtmDin          => rtmDin,
+         kRelay          => kRelay,
+         startRamp       => startRamp,
+         selectRamp      => selectRamp,
+         lemo1           => lemo1,
+         lemo2           => lemo2,
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -293,14 +299,21 @@ begin
    --------------------
    -- Digital Debug RTM
    --------------------
-   U_RTM : entity work.RtmDigitalDebugV1
+   U_RTM : entity work.RtmCryoDet
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(RTM_INDEX_C).baseAddr)
       port map (
+         -- JESD Clocks and resets   
+         jesdClk         => jesdClk(0),
+         jesdRst         => jesdRst(0),
          -- Digital I/O Interface
-         dout            => rtmDout(15 downto 0),
-         din             => rtmDin(15 downto 0),
+         kRelay          => kRelay,
+         startRamp       => startRamp,
+         selectRamp      => selectRamp,
+         lemo1           => lemo1,
+         lemo2           => lemo2,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -353,4 +366,5 @@ begin
          evrTrig         => '0',        -- ignore EVR
          trigHw          => trigHw(0),
          freezeHw        => freezeHw(0));
+
 end mapping;
