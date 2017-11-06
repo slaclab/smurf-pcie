@@ -9,7 +9,7 @@ import sys
 AMCc = pr.Root(name='AMCc',description='')
 
 # Add device
-AMCc.add(FpgaTopLevel(ipAddr="10.0.3.104"))
+AMCc.add(FpgaTopLevel(ipAddr="10.0.3.106"))
 AMCc.start()
 AMCc.readAll()
 

@@ -362,9 +362,9 @@ AMCc:
         ###########################################
         ## System Generator Configuration Registers
         ###########################################
-        SysgenCryo:      
-          ScratchPad: 0xDEADBEEF
-          muxSelect: SigGen
+        # SysgenCryo:      
+          # ScratchPad: 0xDEADBEEF
+          # muxSelect: SigGen
           # Ch0MuxSel: SineGen
           # Ch0B1CjEn: CH0_B1_Norm
           # Ch0B2CjEn: CH0_B2_Norm
@@ -447,13 +447,13 @@ AMCc:
         #####################################################
         #####################################################
         #####################################################
-        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/multitones_500_baseband.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_ones_Qs_ones.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_Ones_Qs_zeros.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_zeros_Qs_ones.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_zeros_Qs_zeros.csv
+        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/multitones_500_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_2Tones_4096pts.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_1Tones_10MHzoffset.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_ones_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_Ones_Qs_zeros.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_zeros_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_zeros_Qs_zeros.csv
         #####################################################
         #####################################################
         #####################################################

@@ -19,7 +19,8 @@
 
 import pyrogue as pr
 
-from AppHardware.MicrowaveMux._microwaveMuxCore import *
+from AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCore import *
+from AppHardware.RtmCryoDet._rtmCryoDet import *
 from DspCoreLib.SysgenMicrowaveMux import *
 
 class AppCore(pr.Device):
@@ -31,15 +32,22 @@ class AppCore(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
+        #########
+        # Devices
+        #########        
         for i in range(2):
             if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
-                self.add(MicrowaveMuxCore(
+                self.add(AmcMicrowaveMuxCore(
                     name    = "MicrowaveMuxCore[%i]" % (i),
                     offset  = (i*0x00100000),
                     expand  = True,
                 ))        
-        self.add(SysgenMicrowaveMux(offset=0x01000000))
+        self.add(SysgenMicrowaveMux(offset=0x01000000, expand=True))    
+        self.add(RtmCryoDet(        offset=0x02000000, expand=False))    
         
+        ###########
+        # Registers
+        ###########        
         self.add(pr.RemoteVariable(    
             name         = "DacSigTrigDelay",
             description  = "DacSig TrigDelay",

@@ -9,7 +9,7 @@ setenv AMCC_DIR     ${PWD}/../../firmware/submodules/amc-carrier-core/
 setenv TIMING_DIR   ${PWD}/../../firmware/submodules/lcls-timing-core
 setenv APPCORE_DIR  ${PWD}/../..//firmware/common/MicrowaveMuxApp/AppCore
 setenv DSP_DIR      ${PWD}/../../firmware/common/DspCoreLib/MicrowaveMux
-setenv TOP_DIR      ${PWD}/../../firmware/targets/MicrowaveMuxRtmEth
+setenv TOP_DIR      ${PWD}/../../firmware/targets/MicrowaveMuxBpEth
 
 # Setup python path
 setenv PYTHONPATH ${PWD}/python:${SURF_DIR}/python:${AMCC_DIR}/python:${TIMING_DIR}/python:${APPCORE_DIR}/python:${DSP_DIR}/python:${TOP_DIR}/python:${PYTHONPATH}
