@@ -431,13 +431,13 @@ AMCc:
         #####################################################
         #####################################################
         #####################################################
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/multitones_500_baseband.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_2Tones_4096pts.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/example_csv_1Tones_10MHzoffset.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_ones_Qs_ones.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_Ones_Qs_zeros.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_zeros_Qs_ones.csv
-        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/Is_zeros_Qs_zeros.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/multitones_500_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/example_csv_2Tones_4096pts.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/example_csv_1Tones_10MHzoffset.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/Is_ones_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/Is_Ones_Qs_zeros.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/Is_zeros_Qs_ones.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbBpEth/config/Is_zeros_Qs_zeros.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/IsandQsVary.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitones_499_baseband_16k.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/broad_noise_trig2.csv
