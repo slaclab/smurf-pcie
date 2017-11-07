@@ -173,8 +173,11 @@ architecture mapping of AppCore is
    signal dacSigTrigArm   : sl;
    signal dacSigTrigDelay : slv(23 downto 0);
 
-   signal rtmDin  : slv(15 downto 0) := x"0000";
-   signal rtmDout : slv(15 downto 0) := x"0000";
+   signal kRelay     : slv(1 downto 0);
+   signal startRamp  : sl;
+   signal selectRamp : sl;
+   signal lemo1      : sl;
+   signal lemo2      : sl;
 
 begin
 
@@ -279,8 +282,11 @@ begin
          dacSigValids    => dacSigValids,
          dacSigValues    => dacSigValues,
          -- Digital I/O Interface
-         rtmDout         => rtmDout,
-         rtmDin          => rtmDin,
+         kRelay          => kRelay,
+         startRamp       => startRamp,
+         selectRamp      => selectRamp,
+         lemo1           => lemo1,
+         lemo2           => lemo2,
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -292,14 +298,21 @@ begin
    --------------------
    -- Digital Debug RTM
    --------------------
-   U_RTM : entity work.RtmDigitalDebugV1
+   U_RTM : entity work.RtmCryoDet
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(RTM_INDEX_C).baseAddr)
       port map (
+         -- JESD Clocks and resets   
+         jesdClk         => jesdClk(0),
+         jesdRst         => jesdRst(0),
          -- Digital I/O Interface
-         dout            => rtmDout(15 downto 0),
-         din             => rtmDin(15 downto 0),
+         kRelay          => kRelay,
+         startRamp       => startRamp,
+         selectRamp      => selectRamp,
+         lemo1           => lemo1,
+         lemo2           => lemo2,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,

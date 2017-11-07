@@ -20,6 +20,7 @@
 import pyrogue as pr
 
 from AppHardware.AmcCryo._amcCryoCore import *
+from AppHardware.RtmCryoDet._rtmCryoDet import *
 from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
@@ -38,7 +39,8 @@ class AppCore(pr.Device):
                     offset  = (i*0x00100000),
                     expand  = True,
                 ))        
-        self.add(SysgenCryo(    offset=0x01000000))
+        self.add(SysgenCryo(offset=0x01000000, expand=False)) 
+        self.add(RtmCryoDet(offset=0x02000000, expand=False))           
         
         self.add(pr.RemoteVariable(    
             name         = "DacSigTrigDelay",

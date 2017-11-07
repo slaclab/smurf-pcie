@@ -46,8 +46,8 @@ export AMC_TYPE_BAY1 = AmcCryo
 export AMC_INTF_BAY1 = 
 
 # RTM_TYPE & RTM_INTF are defined by application
-export RTM_TYPE = RtmDigitalDebug
-export RTM_INTF = Version1
+export RTM_TYPE = RtmCryoDet
+export RTM_INTF = Version2
 
 ##########################################################################################
 # Applications must define the application common path where AppCore.vhd exists
