@@ -295,9 +295,9 @@ begin
          axilWriteMaster => axilWriteMasters(DSP_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
 
-   --------------------
-   -- Digital Debug RTM
-   --------------------
+   ---------------
+   -- CRYO-DET RTM
+   ---------------
    U_RTM : entity work.RtmCryoDet
       generic map (
          TPD_G            => TPD_G,
