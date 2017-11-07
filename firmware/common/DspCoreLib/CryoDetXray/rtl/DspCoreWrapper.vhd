@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-09-21
+-- Last update: 2017-10-24
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -83,6 +83,7 @@ architecture mapping of DspCoreWrapper is
          rst                   : in  std_logic_vector(1-1 downto 0);
          siggen0               : in  std_logic_vector(32-1 downto 0);
          siggen1               : in  std_logic_vector(32-1 downto 0);
+         ramDout               : in  std_logic_vector(2048-1 downto 0);
          clk                   : in  std_logic;
          dspcore_aresetn       : in  std_logic;
          dspcore_s_axi_awaddr  : in  std_logic_vector(12-1 downto 0);
@@ -119,6 +120,9 @@ architecture mapping of DspCoreWrapper is
          debug6                : out std_logic_vector(32-1 downto 0);
          debug7                : out std_logic_vector(32-1 downto 0);
          siggenstart           : out std_logic_vector(1-1 downto 0);
+         ramDin                : out std_logic_vector(2048-1 downto 0);
+         ramAddr               : out std_logic_vector(512-1 downto 0);
+         ramWe                 : out std_logic_vector(64-1 downto 0);
          dspcore_s_axi_awready : out std_logic;
          dspcore_s_axi_wready  : out std_logic;
          dspcore_s_axi_bresp   : out std_logic_vector(2-1 downto 0);
@@ -129,6 +133,15 @@ architecture mapping of DspCoreWrapper is
          dspcore_s_axi_rvalid  : out std_logic
          );
    end component;
+
+   constant NUM_AXI_MASTERS_C : natural := 2;
+
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
+
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    signal readMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
    signal readSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
@@ -142,6 +155,11 @@ architecture mapping of DspCoreWrapper is
    signal dac    : Slv32Array(15 downto 0);
    signal debug  : Slv32Array(7 downto 0);
    signal sigGen : Slv32Array(1 downto 0);
+
+   signal ramWe   : slv(63 downto 0);
+   signal ramAddr : slv((8*64)-1 downto 0);
+   signal ramDin  : slv((32*64)-1 downto 0);
+   signal ramDout : slv((32*64)-1 downto 0);
 
 begin
 
@@ -226,6 +244,28 @@ begin
    -----------------------------------
    dacSigCtrl(1) <= DAC_SIG_CTRL_INIT_C;
 
+   ---------------------
+   -- AXI-Lite Crossbar
+   ---------------------
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+
    ----------------------
    -- ASYNC AXI-Lite Jump
    ----------------------
@@ -237,10 +277,10 @@ begin
          -- Slave Port
          sAxiClk         => axilClk,
          sAxiClkRst      => axilRst,
-         sAxiReadMaster  => axilReadMaster,
-         sAxiReadSlave   => axilReadSlave,
-         sAxiWriteMaster => axilWriteMaster,
-         sAxiWriteSlave  => axilWriteSlave,
+         sAxiReadMaster  => axilReadMasters(0),
+         sAxiReadSlave   => axilReadSlaves(0),
+         sAxiWriteMaster => axilWriteMasters(0),
+         sAxiWriteSlave  => axilWriteSlaves(0),
          -- Master Port
          mAxiClk         => jesdClk(0),
          mAxiClkRst      => jesdRst(0),
@@ -249,6 +289,30 @@ begin
          mAxiWriteMaster => writeMaster,
          mAxiWriteSlave  => writeSlave);
 
+   --------------------------------          
+   -- AXI-Lite Shared Memory Module
+   --------------------------------
+   U_Mem : entity work.DspCore64xBram
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(1).baseAddr)
+      port map (
+         -- Clock and Reset
+         jesdClk         => jesdClk(0),
+         jesdRst         => jesdRst(0),
+         ramWe           => ramWe,
+         ramAddr         => ramAddr,
+         ramDin          => ramDin,
+         ramDout         => ramDout,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(1),
+         axilReadSlave   => axilReadSlaves(1),
+         axilWriteMaster => axilWriteMasters(1),
+         axilWriteSlave  => axilWriteSlaves(1));
+         
    -------------------
    -- System Generator
    -------------------
@@ -308,6 +372,11 @@ begin
          -- Digital I/O Interface
          rtmDin                => rtmDin,
          rtmDout               => rtmDout,
+         -- BRAM Interface
+         ramWe                 => ramWe,
+         ramAddr               => ramAddr,
+         ramDin                => ramDin,
+         ramDout               => ramDout,
          -- AXI-Lite Interface
          dspcore_s_axi_awaddr  => writeMaster.awaddr(11 downto 0),
          dspcore_s_axi_awvalid => writeMaster.awvalid,
