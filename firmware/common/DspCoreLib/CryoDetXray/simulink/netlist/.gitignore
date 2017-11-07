@@ -5,3 +5,4 @@
 *.vhd
 sysgen/
 hdl_netlist/
+Synthesized\ Checkpoint/
