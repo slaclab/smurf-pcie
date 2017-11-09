@@ -37,7 +37,12 @@ hold on, plot(S21(idx) ,'xr'), hold off
 
 %Highlight S21 every 100 kHz
 df = mean(diff(freq)); %frequency spacing of points
-delta = 100e3
+<<<<<<< HEAD
+%delta = 10e6
+delta = 10e6
+=======
+delta = 0.1e6
+>>>>>>> CMB: latest mods, freq lock OK, fixes after timing tweaks
 n0 = round(delta/df)
 n1 = floor(idx/n0);
 ticks = idx + n0*(-n1:n1);
@@ -50,7 +55,7 @@ hold on, plot(freq(idx)/1e6, Sig(idx,3) ,'xr'), hold off
 
 
 % fit to S21 over narrow frequency range
-dF = 0.1e6;
+dF = 0.250e6;
 ixLo = idx - round(dF/df)
 ixHi = idx + round(dF/df)
 dS21 = S21(ixHi) - S21(ixLo);

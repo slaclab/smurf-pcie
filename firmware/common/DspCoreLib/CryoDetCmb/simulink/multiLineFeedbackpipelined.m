@@ -1,4 +1,5 @@
-function [freq, chanOut] = lineTrackingFeedback( channelNo, deltaF, FBen, Finitial, dFmax)
+function [freq, chanOut] = lineTrackingFeedback( channelNo, deltaF, FBen, Finitial, dFmax, FBclr, Dvalid)
+%function [freq, chanOut, debug] = lineTrackingFeedback( channelNo, deltaF, FBen, Finitial, dFmax)
 % Mcode function lineTrackingFeedback(channelNo, deltaF, FBen,  Finitial, dFmax)
 % updates the transmission frequency for a resonant line
 
@@ -115,13 +116,51 @@ if channelNo == 0  %diagnostic
 end
 
 %if  ~FBen | ~en | channelNo >=16  % feedback disabled or invalid cahnnel number
-if  ~FBen | ~en | channelNo >= maxNumChans  % feedback disabled or invalid cahnnel number
+if  (~FBen | ~en | channelNo >= maxNumChans | ~Dvalid)  % feedback disabled or invalid cahnnel number
     Df1 = xfix(dfType, 0);   % in case of reset or FB not enabled output initial frequency
 else
     %compute new freq offset
 %                                                disp('deltaF'), disp(deltaF)
     Df1 = xfix(dfType, int1 + deltaF);
 end
+
+%---reset operation
+if FBclr
+    intdf0 = 0;
+    intdf1 = 0;
+    intdf2 = 0;
+    intdf3 = 0;
+    intdf4 = 0;
+    intdf5 = 0;
+    intdf6 = 0;
+    intdf7 = 0;
+    intdf8 = 0;
+    intdf9 = 0;
+    intdf10 = 0;
+    intdf11 = 0;
+    intdf12 = 0;
+    intdf13 = 0;
+    intdf14 = 0;
+    intdf15 = 0;
+else
+    intdf0 = intdf0;
+    intdf1 = intdf1;
+    intdf2 = intdf2;
+    intdf3 = intdf3;
+    intdf4 = intdf4;
+    intdf5 = intdf5;
+    intdf6 = intdf6;
+    intdf7 = intdf7;
+    intdf8 = intdf8;
+    intdf9 = intdf9;
+    intdf10 = intdf10;
+    intdf11 = intdf11;
+    intdf12 = intdf12;
+    intdf13 = intdf13;
+    intdf14 = intdf14;
+    intdf15 = intdf15;
+end
+
 
 %pipeline stage 2 _________________________________________________________
 if df1 >  dFmax  %test for out-of-bounds
@@ -172,9 +211,11 @@ if c2 < maxNumChans
         otherwise  % unused channel number
     end  % end punting
 
-    freq = xfix({xlUnsigned, 24, 24, xlTruncate, xlSaturate}, df2 + fp2);  
+    freq = xfix({xlUnsigned, 24, 24, xlTruncate, xlSaturate}, df2 + fp2);
+    %debug = xfix(dfType, int2);
 else
     freq = xfix({xlUnsigned, 24, 24, xlTruncate, xlSaturate}, 0); % invalid cannel number
+    %debug = xfix(dfType, 0);
 end
 
 % update function outputs and state variables
