@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-09-21
+-- Last update: 2017-11-09
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -65,82 +65,79 @@ architecture mapping of DspCoreWrapper is
 
    component dspcore
       port (
-         kRelay                : in  std_logic_vector(2-1 downto 0);
-         startRamp             : out std_logic_vector(1-1 downto 0);
-         selectRamp            : out std_logic_vector(1-1 downto 0);
-         lemo1                 : in  std_logic_vector(1-1 downto 0);
-         lemo2                 : out std_logic_vector(1-1 downto 0);
-         adc0                  : in  std_logic_vector(32-1 downto 0);
-         adc1                  : in  std_logic_vector(32-1 downto 0);
-         adc10                 : in  std_logic_vector(32-1 downto 0);
-         adc11                 : in  std_logic_vector(32-1 downto 0);
-         adc12                 : in  std_logic_vector(32-1 downto 0);
-         adc13                 : in  std_logic_vector(32-1 downto 0);
-         adc14                 : in  std_logic_vector(32-1 downto 0);
-         adc15                 : in  std_logic_vector(32-1 downto 0);
-         adc2                  : in  std_logic_vector(32-1 downto 0);
-         adc3                  : in  std_logic_vector(32-1 downto 0);
-         adc4                  : in  std_logic_vector(32-1 downto 0);
-         adc5                  : in  std_logic_vector(32-1 downto 0);
-         adc6                  : in  std_logic_vector(32-1 downto 0);
-         adc7                  : in  std_logic_vector(32-1 downto 0);
-         adc8                  : in  std_logic_vector(32-1 downto 0);
-         adc9                  : in  std_logic_vector(32-1 downto 0);
-         rst                   : in  std_logic_vector(1-1 downto 0);
-         siggen0               : in  std_logic_vector(32-1 downto 0);
-         siggen1               : in  std_logic_vector(32-1 downto 0);
-         clk                   : in  std_logic;
-         dspcore_aresetn       : in  std_logic;
-         dspcore_s_axi_awaddr  : in  std_logic_vector(12-1 downto 0);
-         dspcore_s_axi_awvalid : in  std_logic;
-         dspcore_s_axi_wdata   : in  std_logic_vector(32-1 downto 0);
-         dspcore_s_axi_wstrb   : in  std_logic_vector(4-1 downto 0);
-         dspcore_s_axi_wvalid  : in  std_logic;
-         dspcore_s_axi_bready  : in  std_logic;
-         dspcore_s_axi_araddr  : in  std_logic_vector(12-1 downto 0);
-         dspcore_s_axi_arvalid : in  std_logic;
-         dspcore_s_axi_rready  : in  std_logic;
-         dac0                  : out std_logic_vector(32-1 downto 0);
-         dac1                  : out std_logic_vector(32-1 downto 0);
-         dac10                 : out std_logic_vector(32-1 downto 0);
-         dac11                 : out std_logic_vector(32-1 downto 0);
-         dac12                 : out std_logic_vector(32-1 downto 0);
-         dac13                 : out std_logic_vector(32-1 downto 0);
-         dac14                 : out std_logic_vector(32-1 downto 0);
-         dac15                 : out std_logic_vector(32-1 downto 0);
-         dac2                  : out std_logic_vector(32-1 downto 0);
-         dac3                  : out std_logic_vector(32-1 downto 0);
-         dac4                  : out std_logic_vector(32-1 downto 0);
-         dac5                  : out std_logic_vector(32-1 downto 0);
-         dac6                  : out std_logic_vector(32-1 downto 0);
-         dac7                  : out std_logic_vector(32-1 downto 0);
-         dac8                  : out std_logic_vector(32-1 downto 0);
-         dac9                  : out std_logic_vector(32-1 downto 0);
-         debug3                : out std_logic_vector(32-1 downto 0);
-         debug0                : out std_logic_vector(32-1 downto 0);
-         debug1                : out std_logic_vector(32-1 downto 0);
-         debug2                : out std_logic_vector(32-1 downto 0);
-         debug4                : out std_logic_vector(32-1 downto 0);
-         debug5                : out std_logic_vector(32-1 downto 0);
-         debug6                : out std_logic_vector(32-1 downto 0);
-         debug7                : out std_logic_vector(32-1 downto 0);
-         siggenstart           : out std_logic_vector(1-1 downto 0);
-         dspcore_s_axi_awready : out std_logic;
-         dspcore_s_axi_wready  : out std_logic;
-         dspcore_s_axi_bresp   : out std_logic_vector(2-1 downto 0);
-         dspcore_s_axi_bvalid  : out std_logic;
-         dspcore_s_axi_arready : out std_logic;
-         dspcore_s_axi_rdata   : out std_logic_vector(32-1 downto 0);
-         dspcore_s_axi_rresp   : out std_logic_vector(2-1 downto 0);
-         dspcore_s_axi_rvalid  : out std_logic
+         adc0                       : in  std_logic_vector (31 downto 0);
+         adc1                       : in  std_logic_vector (31 downto 0);
+         adc10                      : in  std_logic_vector (31 downto 0);
+         adc11                      : in  std_logic_vector (31 downto 0);
+         adc12                      : in  std_logic_vector (31 downto 0);
+         adc13                      : in  std_logic_vector (31 downto 0);
+         adc14                      : in  std_logic_vector (31 downto 0);
+         adc15                      : in  std_logic_vector (31 downto 0);
+         adc2                       : in  std_logic_vector (31 downto 0);
+         adc3                       : in  std_logic_vector (31 downto 0);
+         adc4                       : in  std_logic_vector (31 downto 0);
+         adc5                       : in  std_logic_vector (31 downto 0);
+         adc6                       : in  std_logic_vector (31 downto 0);
+         adc7                       : in  std_logic_vector (31 downto 0);
+         adc8                       : in  std_logic_vector (31 downto 0);
+         adc9                       : in  std_logic_vector (31 downto 0);
+         krelay                     : in  std_logic_vector (1 downto 0);
+         lemo1                      : in  std_logic_vector (0 to 0);
+         rst                        : in  std_logic_vector (0 to 0);
+         siggen0                    : in  std_logic_vector (31 downto 0);
+         siggen1                    : in  std_logic_vector (31 downto 0);
+         dsp_axi_lite_clk           : in  std_logic;
+         dsp_clk                    : in  std_logic;
+         dsp_axi_lite_aresetn       : in  std_logic;
+         dsp_axi_lite_s_axi_awaddr  : in  std_logic_vector (11 downto 0);
+         dsp_axi_lite_s_axi_awvalid : in  std_logic;
+         dsp_axi_lite_s_axi_wdata   : in  std_logic_vector (31 downto 0);
+         dsp_axi_lite_s_axi_wstrb   : in  std_logic_vector (3 downto 0);
+         dsp_axi_lite_s_axi_wvalid  : in  std_logic;
+         dsp_axi_lite_s_axi_bready  : in  std_logic;
+         dsp_axi_lite_s_axi_araddr  : in  std_logic_vector (11 downto 0);
+         dsp_axi_lite_s_axi_arvalid : in  std_logic;
+         dsp_axi_lite_s_axi_rready  : in  std_logic;
+         dac0                       : out std_logic_vector (31 downto 0);
+         dac1                       : out std_logic_vector (31 downto 0);
+         dac10                      : out std_logic_vector (31 downto 0);
+         dac11                      : out std_logic_vector (31 downto 0);
+         dac12                      : out std_logic_vector (31 downto 0);
+         dac13                      : out std_logic_vector (31 downto 0);
+         dac14                      : out std_logic_vector (31 downto 0);
+         dac15                      : out std_logic_vector (31 downto 0);
+         dac2                       : out std_logic_vector (31 downto 0);
+         dac3                       : out std_logic_vector (31 downto 0);
+         dac4                       : out std_logic_vector (31 downto 0);
+         dac5                       : out std_logic_vector (31 downto 0);
+         dac6                       : out std_logic_vector (31 downto 0);
+         dac7                       : out std_logic_vector (31 downto 0);
+         dac8                       : out std_logic_vector (31 downto 0);
+         dac9                       : out std_logic_vector (31 downto 0);
+         debug0                     : out std_logic_vector (31 downto 0);
+         debug1                     : out std_logic_vector (31 downto 0);
+         debug2                     : out std_logic_vector (31 downto 0);
+         debug3                     : out std_logic_vector (31 downto 0);
+         debug4                     : out std_logic_vector (31 downto 0);
+         debug5                     : out std_logic_vector (31 downto 0);
+         debug6                     : out std_logic_vector (31 downto 0);
+         debug7                     : out std_logic_vector (31 downto 0);
+         lemo2                      : out std_logic_vector (0 to 0);
+         selectramp                 : out std_logic_vector (0 to 0);
+         siggenstart                : out std_logic_vector (0 to 0);
+         startramp                  : out std_logic_vector (0 to 0);
+         dsp_axi_lite_s_axi_awready : out std_logic;
+         dsp_axi_lite_s_axi_wready  : out std_logic;
+         dsp_axi_lite_s_axi_bresp   : out std_logic_vector (1 downto 0);
+         dsp_axi_lite_s_axi_bvalid  : out std_logic;
+         dsp_axi_lite_s_axi_arready : out std_logic;
+         dsp_axi_lite_s_axi_rdata   : out std_logic_vector (31 downto 0);
+         dsp_axi_lite_s_axi_rresp   : out std_logic_vector (1 downto 0);
+         dsp_axi_lite_s_axi_rvalid  : out std_logic
          );
    end component;
 
-   signal readMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-   signal readSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
-   signal writeMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-   signal writeSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
-
+   signal axilRstL    : sl;
    signal rstL        : sl;
    signal sigGenStart : sl;
 
@@ -151,6 +148,7 @@ architecture mapping of DspCoreWrapper is
 
 begin
 
+   axilRstL        <= not(axilRst);
    rstL            <= not(jesdRst(0));
    dacValids       <= (others => (others => '1'));
    dacValues(0, 8) <= (others => '0');
@@ -232,108 +230,86 @@ begin
    -----------------------------------
    dacSigCtrl(1) <= DAC_SIG_CTRL_INIT_C;
 
-   ----------------------
-   -- ASYNC AXI-Lite Jump
-   ----------------------
-   U_AxiLiteAsync : entity work.AxiLiteAsync
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_RESP_OK_C)
-      port map (
-         -- Slave Port
-         sAxiClk         => axilClk,
-         sAxiClkRst      => axilRst,
-         sAxiReadMaster  => axilReadMaster,
-         sAxiReadSlave   => axilReadSlave,
-         sAxiWriteMaster => axilWriteMaster,
-         sAxiWriteSlave  => axilWriteSlave,
-         -- Master Port
-         mAxiClk         => jesdClk(0),
-         mAxiClkRst      => jesdRst(0),
-         mAxiReadMaster  => readMaster,
-         mAxiReadSlave   => readSlave,
-         mAxiWriteMaster => writeMaster,
-         mAxiWriteSlave  => writeSlave);
-
    -------------------
    -- System Generator
    -------------------
    U_SysGen : dspcore
       port map (
          -- Clock and Reset
-         clk                   => jesdClk(0),
-         rst(0)                => jesdRst(0),
-         dspcore_aresetn       => rstL,
-         -- ADCs Ports
-         adc0                  => adc(0),
-         adc1                  => adc(1),
-         adc2                  => adc(2),
-         adc3                  => adc(3),
-         adc4                  => adc(4),
-         adc5                  => adc(5),
-         adc6                  => adc(6),
-         adc7                  => adc(7),
-         adc8                  => adc(8),
-         adc9                  => adc(9),
-         adc10                 => adc(10),
-         adc11                 => adc(11),
-         adc12                 => adc(12),
-         adc13                 => adc(13),
-         adc14                 => adc(14),
-         adc15                 => adc(15),
-         -- DAC Ports
-         dac0                  => dac(0),
-         dac1                  => dac(1),
-         dac2                  => dac(2),
-         dac3                  => dac(3),
-         dac4                  => dac(4),
-         dac5                  => dac(5),
-         dac6                  => dac(6),
-         dac7                  => dac(7),
-         dac8                  => dac(8),
-         dac9                  => dac(9),
-         dac10                 => dac(10),
-         dac11                 => dac(11),
-         dac12                 => dac(12),
-         dac13                 => dac(13),
-         dac14                 => dac(14),
-         dac15                 => dac(15),
-         -- DAQ Mux Debug Ports
-         debug0                => debug(0),
-         debug1                => debug(1),
-         debug2                => debug(2),
-         debug3                => debug(3),
-         debug4                => debug(4),
-         debug5                => debug(5),
-         debug6                => debug(6),
-         debug7                => debug(7),
-         -- Signal Generator Ports
-         sigGenStart(0)        => sigGenStart,
-         sigGen0               => sigGen(0),
-         sigGen1               => sigGen(1),
-         -- Digital I/O Interface         
-         kRelay                => kRelay,
-         startRamp(0)          => startRamp,
-         selectRamp(0)         => selectRamp,
-         lemo1(0)              => lemo1,
-         lemo2(0)              => lemo2,
-         -- AXI-Lite Interface
-         dspcore_s_axi_awaddr  => writeMaster.awaddr(11 downto 0),
-         dspcore_s_axi_awvalid => writeMaster.awvalid,
-         dspcore_s_axi_wdata   => writeMaster.wdata,
-         dspcore_s_axi_wstrb   => writeMaster.wstrb,
-         dspcore_s_axi_wvalid  => writeMaster.wvalid,
-         dspcore_s_axi_bready  => writeMaster.bready,
-         dspcore_s_axi_araddr  => readMaster.araddr(11 downto 0),
-         dspcore_s_axi_arvalid => readMaster.arvalid,
-         dspcore_s_axi_rready  => readMaster.rready,
-         dspcore_s_axi_awready => writeSlave.awready,
-         dspcore_s_axi_wready  => writeSlave.wready,
-         dspcore_s_axi_bresp   => writeSlave.bresp,
-         dspcore_s_axi_bvalid  => writeSlave.bvalid,
-         dspcore_s_axi_arready => readSlave.arready,
-         dspcore_s_axi_rdata   => readSlave.rdata,
-         dspcore_s_axi_rresp   => readSlave.rresp,
-         dspcore_s_axi_rvalid  => readSlave.rvalid);
+         dsp_clk                    => jesdClk(0),
+         rst(0)                     => jesdRst(0),
+         -- ADCs Ports (dsp_clk domain)
+         adc0                       => adc(0),
+         adc1                       => adc(1),
+         adc2                       => adc(2),
+         adc3                       => adc(3),
+         adc4                       => adc(4),
+         adc5                       => adc(5),
+         adc6                       => adc(6),
+         adc7                       => adc(7),
+         adc8                       => adc(8),
+         adc9                       => adc(9),
+         adc10                      => adc(10),
+         adc11                      => adc(11),
+         adc12                      => adc(12),
+         adc13                      => adc(13),
+         adc14                      => adc(14),
+         adc15                      => adc(15),
+         -- DAC Ports (dsp_clk domain)
+         dac0                       => dac(0),
+         dac1                       => dac(1),
+         dac2                       => dac(2),
+         dac3                       => dac(3),
+         dac4                       => dac(4),
+         dac5                       => dac(5),
+         dac6                       => dac(6),
+         dac7                       => dac(7),
+         dac8                       => dac(8),
+         dac9                       => dac(9),
+         dac10                      => dac(10),
+         dac11                      => dac(11),
+         dac12                      => dac(12),
+         dac13                      => dac(13),
+         dac14                      => dac(14),
+         dac15                      => dac(15),
+         -- DAQ Mux Debug Ports (dsp_clk domain)
+         debug0                     => debug(0),
+         debug1                     => debug(1),
+         debug2                     => debug(2),
+         debug3                     => debug(3),
+         debug4                     => debug(4),
+         debug5                     => debug(5),
+         debug6                     => debug(6),
+         debug7                     => debug(7),
+         -- Signal Generator Ports (dsp_clk domain)
+         sigGenStart(0)             => sigGenStart,
+         sigGen0                    => sigGen(0),
+         sigGen1                    => sigGen(1),
+         -- Digital I/O Interface (dsp_clk domain)         
+         kRelay                     => kRelay,
+         startRamp(0)               => startRamp,
+         selectRamp(0)              => selectRamp,
+         lemo1(0)                   => lemo1,
+         lemo2(0)                   => lemo2,
+         -- AXI-Lite Interface (dsp_axi_lite_clk domain)
+         dsp_axi_lite_clk           => axilClk,
+         dsp_axi_lite_aresetn       => axilRstL,
+         dsp_axi_lite_s_axi_awaddr  => axilWriteMaster.awaddr(11 downto 0),
+         dsp_axi_lite_s_axi_awvalid => axilWriteMaster.awvalid,
+         dsp_axi_lite_s_axi_wdata   => axilWriteMaster.wdata,
+         dsp_axi_lite_s_axi_wstrb   => axilWriteMaster.wstrb,
+         dsp_axi_lite_s_axi_wvalid  => axilWriteMaster.wvalid,
+         dsp_axi_lite_s_axi_bready  => axilWriteMaster.bready,
+         dsp_axi_lite_s_axi_araddr  => axilReadMaster.araddr(11 downto 0),
+         dsp_axi_lite_s_axi_arvalid => axilReadMaster.arvalid,
+         dsp_axi_lite_s_axi_rready  => axilReadMaster.rready,
+         dsp_axi_lite_s_axi_awready => axilWriteSlave.awready,
+         dsp_axi_lite_s_axi_wready  => axilWriteSlave.wready,
+         dsp_axi_lite_s_axi_bresp   => axilWriteSlave.bresp,
+         dsp_axi_lite_s_axi_bvalid  => axilWriteSlave.bvalid,
+         dsp_axi_lite_s_axi_arready => axilReadSlave.arready,
+         dsp_axi_lite_s_axi_rdata   => axilReadSlave.rdata,
+         dsp_axi_lite_s_axi_rresp   => axilReadSlave.rresp,
+         dsp_axi_lite_s_axi_rvalid  => axilReadSlave.rvalid);
 
 end mapping;
