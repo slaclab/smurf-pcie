@@ -1,3 +1,5 @@
+Fadc = 614.4e6;  % MHz
+
 taps_per_chan   = 16;
 number_channels = 32;
 number_subband  = number_channels/2; % really will generate 2 overlapping PFB
