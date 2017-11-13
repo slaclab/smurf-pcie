@@ -1,4 +1,6 @@
-Fadc = 614.4e6;  % MHz
+Fadc = 614e6;  % MHz
+axi_clk = 156.25e6;
+Tclk = 2/Fadc; Ts = Tclk;
 
 taps_per_chan   = 16;
 number_channels = 32;
