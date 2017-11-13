@@ -19,13 +19,95 @@
 
 import pyrogue as pr
 
-class SysgenCryo(pr.Device):
+class SysgenCryoBramReadWrite(pr.Device):
     def __init__(   self, 
-            name        = "SysgenCryo", 
+            name        = "SysgenCryoBramReadWrite", 
+            description = "Note: This module is read-only with respect to sysgen", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
+
+        ##############################
+        # Registers
+        ##############################          
+        self.addRemoteVariables(   
+            name         = "Reg",
+            description  = "",
+            offset       =  0x0,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+            number       =  128,
+            stride       =  4,
+            hidden       = True, # Set hidden by default to prevent GUI from starting up slowly
+        )
+        
+class SysgenCryoBramReadOnly(pr.Device):
+    def __init__(   self, 
+            name        = "SysgenCryoBramReadOnly", 
+            description = "Note: This module is Write-only with respect to sysgen", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
+
+        ##############################
+        # Registers
+        ##############################          
+        self.addRemoteVariables(   
+            name         = "Reg",
+            description  = "",
+            offset       =  0x0,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            number       =  128,
+            stride       =  4,
+            hidden       = True, # Set hidden by default to prevent GUI from starting up slowly
+        )        
+
+class SysgenCryoBram(pr.Device):
+    def __init__(   self, 
+            name        = "SysgenCryoBram", 
+            description = "Cryo SYSGEN Module", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
+        
+        ##############################
+        # Devices
+        ##############################          
+        for i in range(8):
+            self.add(SysgenCryoBramReadWrite(
+                name   = ('ReadWrite[%d]'%i), 
+                offset = (i*0x1000), 
+                expand = False,
+            ))              
+        
+        for i in range(8):
+            self.add(SysgenCryoBramReadOnly(
+                name   = ('ReadOnly[%d]'%i), 
+                offset = (i*0x1000 + 0x8000), 
+                expand = False,
+            )) 
+            
+class SysgenCryoBase(pr.Device):
+    def __init__(   self, 
+            name        = "SysgenCryoBase", 
             description = "Cryo SYSGEN Module", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
+        ##############################
+        # Devices
+        ##############################        
+        self.add(SysgenCryoBram(
+            name   = 'Bram', 
+            offset = 0x00010000, 
+            expand = False,
+        ))
+        
+        ##############################
+        # Registers
+        ##############################  
         self.add(pr.RemoteVariable(    
             name         = "VersionNumber",
             description  = "Version Number",
@@ -35,122 +117,7 @@ class SysgenCryo(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
         ))
-        
-        self.add(pr.RemoteVariable(   
-            name         = "muxSelect",
-            description  = "Sets the DAC outputs",
-            offset       =  0x080,
-            bitSize      =  1,
-            bitOffset    =  0,
-            mode         = "RW",
-            enum         = {
-                0 : "Adc",
-                1 : "SigGen",
-            },
-        ))        
-        
-        self.add(pr.RemoteVariable(    
-            name         = "StartSigGenReg",
-            description  = "Triggers signal generator when the signal generator is in trigger mode (not ppe",
-            offset       =  0x080,
-            bitSize      =  1,
-            bitOffset    =  1,
-            base         = pr.UInt,
-            mode         = "RW",
-            hidden       =  True,
-        ))        
-        
-        self.add(pr.RemoteVariable(    
-            name         = "Ch0MuxSel",
-            description  = "Mux Selects for Ch0 ADC & DAC Only",
-            offset       =  0x080,
-            bitSize      =  2,
-            bitOffset    =  2,
-            mode         = "RW",
-            enum         = {
-                0 : "AtoDThru",
-                1 : "DACMem",
-                2 : "DUC",
-                3 : "SineGen",
-            },
-        ))        
-        
-        self.add(pr.RemoteVariable(   
-            name         = "Ch0B1CjEn",
-            description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
-            offset       =  0x084,
-            bitSize      =  1,
-            bitOffset    =  0,
-            mode         = "RW",
-            enum         = {
-                0 : "CH0_B1_Norm",
-                1 : "CH0_B1_Conj",
-            },
-        ))        
-
-        self.add(pr.RemoteVariable(   
-            name         = "Ch0B2CjEn",
-            description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
-            offset       =  0x084,
-            bitSize      =  1,
-            bitOffset    =  1,
-            mode         = "RW",
-            enum         = {
-                0 : "CH0_B2_Norm",
-                1 : "CH0_B2_Conj",
-            },
-        ))        
-
-        self.add(pr.RemoteVariable(    
-            name         = "Ch0FLO1",
-            description  = "Sets DDS frequency for LO1",
-            offset       =  0x088,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "Ch0FLO2",
-            description  = "Sets DDS frequency for LO2",
-            offset       =  0x08C,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "SineGenPhsInc",
-            description  = "Sets DDS frequency (via phase increment value)for Prog IQ Sinewave Generator",
-            offset       =  0x090,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "LO1_Poff",
-            description  = "LO1 Phase offset setting",
-            offset       =  0x094,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "LO2_Poff",
-            description  = "LO2 Phase offset setting",
-            offset       =  0x098,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
+                
         self.add(pr.RemoteVariable(    
             name         = "ScratchPad",
             description  = "Scratch Pad Register",
@@ -161,11 +128,30 @@ class SysgenCryo(pr.Device):
             mode         = "RW",
         ))
         
+        # ##############################
+        # # Commands
+        # ##############################
+        # @self.command(description="Starts the signal generator pattern",)
+        # def CmdClearErrors():    
+            # self.StartSigGenReg.set(1)
+            # self.StartSigGenReg.set(0)
+
+class SysgenCryo(pr.Device):
+    def __init__(   self, 
+            name        = "SysgenCryo", 
+            numberPairs = 1, 
+            description = "Cryo SYSGEN Module", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)        
+        
         ##############################
-        # Commands
-        ##############################
-        @self.command(description="Starts the signal generator pattern",)
-        def CmdClearErrors():    
-            self.StartSigGenReg.set(1)
-            self.StartSigGenReg.set(0)        
+        # Devices
+        ##############################        
+        for i in range(numberPairs):
+            if ( i<8 ) and ( i>=0) : 
+                self.add(SysgenCryoBase(
+                    name   = ('Base[%d]'%i), 
+                    offset = (i*0x00100000), 
+                    expand = False,
+                )) 
         
