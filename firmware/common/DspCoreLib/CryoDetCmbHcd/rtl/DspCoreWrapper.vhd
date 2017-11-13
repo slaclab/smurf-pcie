@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-09
+-- Last update: 2017-11-13
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -28,6 +28,7 @@ use work.AppTopPkg.all;
 entity DspCoreWrapper is
    generic (
       TPD_G            : time             := 1 ns;
+      BUILD_DSP_G      : slv(7 downto 0)  := x"01";
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
@@ -63,253 +64,210 @@ end DspCoreWrapper;
 
 architecture mapping of DspCoreWrapper is
 
-   component dspcore
-      port (
-         adc0                       : in  std_logic_vector (31 downto 0);
-         adc1                       : in  std_logic_vector (31 downto 0);
-         adc10                      : in  std_logic_vector (31 downto 0);
-         adc11                      : in  std_logic_vector (31 downto 0);
-         adc12                      : in  std_logic_vector (31 downto 0);
-         adc13                      : in  std_logic_vector (31 downto 0);
-         adc14                      : in  std_logic_vector (31 downto 0);
-         adc15                      : in  std_logic_vector (31 downto 0);
-         adc2                       : in  std_logic_vector (31 downto 0);
-         adc3                       : in  std_logic_vector (31 downto 0);
-         adc4                       : in  std_logic_vector (31 downto 0);
-         adc5                       : in  std_logic_vector (31 downto 0);
-         adc6                       : in  std_logic_vector (31 downto 0);
-         adc7                       : in  std_logic_vector (31 downto 0);
-         adc8                       : in  std_logic_vector (31 downto 0);
-         adc9                       : in  std_logic_vector (31 downto 0);
-         krelay                     : in  std_logic_vector (1 downto 0);
-         lemo1                      : in  std_logic_vector (0 to 0);
-         rst                        : in  std_logic_vector (0 to 0);
-         siggen0                    : in  std_logic_vector (31 downto 0);
-         siggen1                    : in  std_logic_vector (31 downto 0);
-         dsp_axi_lite_clk           : in  std_logic;
-         dsp_clk                    : in  std_logic;
-         dsp_axi_lite_aresetn       : in  std_logic;
-         dsp_axi_lite_s_axi_awaddr  : in  std_logic_vector (11 downto 0);
-         dsp_axi_lite_s_axi_awvalid : in  std_logic;
-         dsp_axi_lite_s_axi_wdata   : in  std_logic_vector (31 downto 0);
-         dsp_axi_lite_s_axi_wstrb   : in  std_logic_vector (3 downto 0);
-         dsp_axi_lite_s_axi_wvalid  : in  std_logic;
-         dsp_axi_lite_s_axi_bready  : in  std_logic;
-         dsp_axi_lite_s_axi_araddr  : in  std_logic_vector (11 downto 0);
-         dsp_axi_lite_s_axi_arvalid : in  std_logic;
-         dsp_axi_lite_s_axi_rready  : in  std_logic;
-         dac0                       : out std_logic_vector (31 downto 0);
-         dac1                       : out std_logic_vector (31 downto 0);
-         dac10                      : out std_logic_vector (31 downto 0);
-         dac11                      : out std_logic_vector (31 downto 0);
-         dac12                      : out std_logic_vector (31 downto 0);
-         dac13                      : out std_logic_vector (31 downto 0);
-         dac14                      : out std_logic_vector (31 downto 0);
-         dac15                      : out std_logic_vector (31 downto 0);
-         dac2                       : out std_logic_vector (31 downto 0);
-         dac3                       : out std_logic_vector (31 downto 0);
-         dac4                       : out std_logic_vector (31 downto 0);
-         dac5                       : out std_logic_vector (31 downto 0);
-         dac6                       : out std_logic_vector (31 downto 0);
-         dac7                       : out std_logic_vector (31 downto 0);
-         dac8                       : out std_logic_vector (31 downto 0);
-         dac9                       : out std_logic_vector (31 downto 0);
-         debug0                     : out std_logic_vector (31 downto 0);
-         debug1                     : out std_logic_vector (31 downto 0);
-         debug2                     : out std_logic_vector (31 downto 0);
-         debug3                     : out std_logic_vector (31 downto 0);
-         debug4                     : out std_logic_vector (31 downto 0);
-         debug5                     : out std_logic_vector (31 downto 0);
-         debug6                     : out std_logic_vector (31 downto 0);
-         debug7                     : out std_logic_vector (31 downto 0);
-         lemo2                      : out std_logic_vector (0 to 0);
-         selectramp                 : out std_logic_vector (0 to 0);
-         siggenstart                : out std_logic_vector (0 to 0);
-         startramp                  : out std_logic_vector (0 to 0);
-         dsp_axi_lite_s_axi_awready : out std_logic;
-         dsp_axi_lite_s_axi_wready  : out std_logic;
-         dsp_axi_lite_s_axi_bresp   : out std_logic_vector (1 downto 0);
-         dsp_axi_lite_s_axi_bvalid  : out std_logic;
-         dsp_axi_lite_s_axi_arready : out std_logic;
-         dsp_axi_lite_s_axi_rdata   : out std_logic_vector (31 downto 0);
-         dsp_axi_lite_s_axi_rresp   : out std_logic_vector (1 downto 0);
-         dsp_axi_lite_s_axi_rvalid  : out std_logic
-         );
-   end component;
+   constant NUM_AXI_MASTERS_C : natural := 8;
 
-   signal axilRstL    : sl;
-   signal rstL        : sl;
-   signal sigGenStart : sl;
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
-   signal adc    : Slv32Array(15 downto 0);
-   signal dac    : Slv32Array(15 downto 0);
-   signal debug  : Slv32Array(7 downto 0);
-   signal sigGen : Slv32Array(1 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
+   signal adc        : Slv32Array(15 downto 0);
+   signal dac        : Slv32Array(15 downto 0);
+   signal debug      : Slv32Array(15 downto 0);
+   signal sigGen     : Slv32Array(15 downto 0);
+   signal sigGenSync : Slv32Array(1 downto 0);
+
+   signal jesdClkVec      : slv(7 downto 0) := (others => '0');
+   signal jesdRstVec      : slv(7 downto 0) := (others => '0');
+   signal sigGenStart     : slv(7 downto 0) := (others => '0');
+   signal sigGenStartSync : slv(7 downto 0) := (others => '0');
+   signal startRampVec    : slv(7 downto 0) := (others => '0');
+   signal selectRampVec   : slv(7 downto 0) := (others => '0');
+   signal lemo2Vec        : slv(7 downto 0) := (others => '0');
 
 begin
 
-   axilRstL        <= not(axilRst);
-   rstL            <= not(jesdRst(0));
+   ---------------------------------
+   -- Mapping/Terminating Interfaces
+   ---------------------------------
    dacValids       <= (others => (others => '1'));
    dacValues(0, 8) <= (others => '0');
    dacValues(0, 9) <= (others => '0');
    dacValues(1, 8) <= (others => '0');
    dacValues(1, 9) <= (others => '0');
-   debugValids     <= (others => (others => '1'));
 
-   JESD_MAP :
+   debugValids <= (others => (others => '1'));
+
+   debugValues(0, 0) <= debug(0);
+   debugValues(0, 1) <= debug(1);
+   debugValues(0, 2) <= debug(2);
+   debugValues(0, 3) <= debug(3);
+
+   debugValues(1, 0) <= debug(8);
+   debugValues(1, 1) <= debug(9);
+   debugValues(1, 2) <= debug(10);
+   debugValues(1, 3) <= debug(11);
+
+   startRamp  <= uOr(startRampVec);
+   selectRamp <= uOr(selectRampVec);
+   lemo2      <= uOr(lemo2Vec);
+
+   dacSigCtrl(0).start <= (others => uOr(sigGenStartSync));
+   dacSigCtrl(1)       <= DAC_SIG_CTRL_INIT_C;
+
+   MORE_MAPPING :
+   for i in 3 downto 0 generate
+
+      jesdClkVec(i) <= jesdClk(0);
+      jesdRstVec(i) <= jesdRst(0);
+
+      jesdClkVec(i+4) <= jesdClk(1);
+      jesdRstVec(i+4) <= jesdRst(1);
+
+      sigGen(0+(2*i)) <= dacSigValues(0, 0);
+      sigGen(1+(2*i)) <= dacSigValues(0, 1);
+
+      sigGen(8+(2*i)) <= sigGenSync(0);
+      sigGen(9+(2*i)) <= sigGenSync(1);
+
+      sigGenStartSync(i) <= sigGenStart(i);
+
+      U_sigGenStart : entity work.SynchronizerOneShot
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => jesdClk(0),
+            dataIn  => sigGenStart(i+4),
+            dataOut => sigGenStartSync(i+4));
+
+   end generate MORE_MAPPING;
+
+   SYNC_SIGGEN :
+   for i in 1 downto 0 generate
+      U_sigGen : entity work.SynchronizerFifo
+         generic map (
+            TPD_G        => TPD_G,
+            DATA_WIDTH_G => 32)
+         port map (
+            rst    => jesdRst(0),
+            -- Write Ports (wr_clk domain)
+            wr_clk => jesdClk(0),
+            din    => sigGen(i),
+            -- Read Ports (rd_clk domain)
+            rd_clk => jesdClk(1),
+            dout   => sigGenSync(i));
+   end generate SYNC_SIGGEN;
+
+   GEN_CH :
    for i in 7 downto 0 generate
+
       --------------
       -- JESD BAY[0]
       --------------
       adc(i)          <= adcValues(0, i);
       dacValues(0, i) <= dac(i);
+
       --------------
       -- JESD BAY[1]
-      --------------
-      U_SyncAdc : entity work.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => 32)
-         port map (
-            rst    => jesdRst(1),
-            -- Write Ports (wr_clk domain)
-            wr_clk => jesdClk(1),
-            wr_en  => adcValids(1)(i),
-            din    => adcValues(1, i),
-            -- Read Ports (rd_clk domain)
-            rd_clk => jesdClk(0),
-            dout   => adc(8+i));
+      --------------   
+      adc(i+8)        <= adcValues(1, i);
+      dacValues(1, i) <= dac(i+8);
 
-      U_SyncDac : entity work.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => 32)
-         port map (
-            rst    => jesdRst(0),
-            -- Write Ports (wr_clk domain)
-            wr_clk => jesdClk(0),
-            din    => dac(8+i),
-            -- Read Ports (rd_clk domain)
-            rd_clk => jesdClk(1),
-            dout   => dacValues(1, i));
-   end generate JESD_MAP;
+   end generate GEN_CH;
 
-   DEBUG_MAP :
-   for i in 3 downto 0 generate
-      --------------
-      -- JESD BAY[0]
-      --------------
-      debugValues(0, i) <= debug(i);
-      --------------
-      -- JESD BAY[1]
-      --------------
-      U_SyncDebug : entity work.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => 32)
-         port map (
-            rst    => jesdRst(0),
-            -- Write Ports (wr_clk domain)
-            wr_clk => jesdClk(0),
-            din    => debug(4+i),
-            -- Read Ports (rd_clk domain)
-            rd_clk => jesdClk(1),
-            dout   => debugValues(1, i));
-   end generate DEBUG_MAP;
-
-   --------------------------
-   -- Signal Generator BAY[0]
-   --------------------------
-   sigGen(0)           <= dacSigValues(0, 0);
-   sigGen(1)           <= dacSigValues(0, 1);
-   dacSigCtrl(0).start <= (others => sigGenStart);
-
-   -----------------------------------
-   -- Signal Generator BAY[1] not used
-   -----------------------------------
-   dacSigCtrl(1) <= DAC_SIG_CTRL_INIT_C;
-
-   -------------------
-   -- System Generator
-   -------------------
-   U_SysGen : dspcore
+   ---------------------
+   -- AXI-Lite Crossbar
+   ---------------------
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
       port map (
-         -- Clock and Reset
-         dsp_clk                    => jesdClk(0),
-         rst(0)                     => jesdRst(0),
-         -- ADCs Ports (dsp_clk domain)
-         adc0                       => adc(0),
-         adc1                       => adc(1),
-         adc2                       => adc(2),
-         adc3                       => adc(3),
-         adc4                       => adc(4),
-         adc5                       => adc(5),
-         adc6                       => adc(6),
-         adc7                       => adc(7),
-         adc8                       => adc(8),
-         adc9                       => adc(9),
-         adc10                      => adc(10),
-         adc11                      => adc(11),
-         adc12                      => adc(12),
-         adc13                      => adc(13),
-         adc14                      => adc(14),
-         adc15                      => adc(15),
-         -- DAC Ports (dsp_clk domain)
-         dac0                       => dac(0),
-         dac1                       => dac(1),
-         dac2                       => dac(2),
-         dac3                       => dac(3),
-         dac4                       => dac(4),
-         dac5                       => dac(5),
-         dac6                       => dac(6),
-         dac7                       => dac(7),
-         dac8                       => dac(8),
-         dac9                       => dac(9),
-         dac10                      => dac(10),
-         dac11                      => dac(11),
-         dac12                      => dac(12),
-         dac13                      => dac(13),
-         dac14                      => dac(14),
-         dac15                      => dac(15),
-         -- DAQ Mux Debug Ports (dsp_clk domain)
-         debug0                     => debug(0),
-         debug1                     => debug(1),
-         debug2                     => debug(2),
-         debug3                     => debug(3),
-         debug4                     => debug(4),
-         debug5                     => debug(5),
-         debug6                     => debug(6),
-         debug7                     => debug(7),
-         -- Signal Generator Ports (dsp_clk domain)
-         sigGenStart(0)             => sigGenStart,
-         sigGen0                    => sigGen(0),
-         sigGen1                    => sigGen(1),
-         -- Digital I/O Interface (dsp_clk domain)         
-         kRelay                     => kRelay,
-         startRamp(0)               => startRamp,
-         selectRamp(0)              => selectRamp,
-         lemo1(0)                   => lemo1,
-         lemo2(0)                   => lemo2,
-         -- AXI-Lite Interface (dsp_axi_lite_clk domain)
-         dsp_axi_lite_clk           => axilClk,
-         dsp_axi_lite_aresetn       => axilRstL,
-         dsp_axi_lite_s_axi_awaddr  => axilWriteMaster.awaddr(11 downto 0),
-         dsp_axi_lite_s_axi_awvalid => axilWriteMaster.awvalid,
-         dsp_axi_lite_s_axi_wdata   => axilWriteMaster.wdata,
-         dsp_axi_lite_s_axi_wstrb   => axilWriteMaster.wstrb,
-         dsp_axi_lite_s_axi_wvalid  => axilWriteMaster.wvalid,
-         dsp_axi_lite_s_axi_bready  => axilWriteMaster.bready,
-         dsp_axi_lite_s_axi_araddr  => axilReadMaster.araddr(11 downto 0),
-         dsp_axi_lite_s_axi_arvalid => axilReadMaster.arvalid,
-         dsp_axi_lite_s_axi_rready  => axilReadMaster.rready,
-         dsp_axi_lite_s_axi_awready => axilWriteSlave.awready,
-         dsp_axi_lite_s_axi_wready  => axilWriteSlave.wready,
-         dsp_axi_lite_s_axi_bresp   => axilWriteSlave.bresp,
-         dsp_axi_lite_s_axi_bvalid  => axilWriteSlave.bvalid,
-         dsp_axi_lite_s_axi_arready => axilReadSlave.arready,
-         dsp_axi_lite_s_axi_rdata   => axilReadSlave.rdata,
-         dsp_axi_lite_s_axi_rresp   => axilReadSlave.rresp,
-         dsp_axi_lite_s_axi_rvalid  => axilReadSlave.rvalid);
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+
+   ----------------
+   -- SYSGEN Module
+   ----------------
+   GEN_VEC :
+   for i in 7 downto 0 generate
+
+      GEN_DSP : if (BUILD_DSP_G(i) = '1') generate
+
+         U_DSP : entity work.DspCoreWrapperBase
+            generic map (
+               TPD_G            => TPD_G,
+               AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+               AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
+            port map (
+               -- JESD Clocks and resets   
+               jesdClk         => jesdClkVec(i),
+               jesdRst         => jesdRstVec(i),
+               -- ADC/DAC/Debug Interface (jesdClk domain)
+               adc(0)          => adc((2*i)+0),
+               adc(1)          => adc((2*i)+1),
+               dac(0)          => dac((2*i)+0),
+               dac(1)          => dac((2*i)+1),
+               debug(0)        => debug((2*i)+0),
+               debug(1)        => debug((2*i)+1),
+               -- DAC Signal Generator Interface (jesdClk domain)
+               sigGenStart     => sigGenStart(i),
+               sigGen(0)       => sigGen((2*i)+0),
+               sigGen(1)       => sigGen((2*i)+1),
+               -- Digital I/O Interface
+               kRelay          => kRelay,
+               startRamp       => startRampVec(i),
+               selectRamp      => selectRampVec(i),
+               lemo1           => lemo1,
+               lemo2           => lemo2Vec(i),
+               -- AXI-Lite Interface
+               axilClk         => axilClk,
+               axilRst         => axilRst,
+               axilReadMaster  => axilReadMasters(i),
+               axilReadSlave   => axilReadSlaves(i),
+               axilWriteMaster => axilWriteMasters(i),
+               axilWriteSlave  => axilWriteSlaves(i));
+
+      end generate;
+
+      BYP_DSP : if (BUILD_DSP_G(i) = '0') generate
+
+         dac(((2*i)+0))   <= (others => '0');
+         dac(((2*i)+1))   <= (others => '0');
+         debug(((2*i)+0)) <= (others => '0');
+         debug(((2*i)+1)) <= (others => '0');
+         sigGenStart(i)   <= '0';
+         startRampVec(i)  <= '0';
+         selectRampVec(i) <= '0';
+         lemo2Vec(i)      <= '0';
+
+         U_AxiLiteEmpty : entity work.AxiLiteEmpty
+            generic map (
+               TPD_G            => TPD_G,
+               AXI_ERROR_RESP_G => AXI_RESP_OK_C)
+            port map (
+               axiClk         => axilClk,
+               axiClkRst      => axilRst,
+               axiReadMaster  => axilReadMasters(i),
+               axiReadSlave   => axilReadSlaves(i),
+               axiWriteMaster => axilWriteMasters(i),
+               axiWriteSlave  => axilWriteSlaves(i));
+
+      end generate;
+
+   end generate GEN_VEC;
 
 end mapping;
