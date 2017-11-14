@@ -89,7 +89,7 @@ begin
          generic map (
             TPD_G            => TPD_G,
             BRAM_EN_G        => true,
-            REG_EN_G         => false,  -- false = 1 cycle read access latency
+            REG_EN_G         => true,  -- true = 2 cycle read access latency
             AXI_WR_EN_G      => true,
             SYS_WR_EN_G      => true,
             COMMON_CLK_G     => false,

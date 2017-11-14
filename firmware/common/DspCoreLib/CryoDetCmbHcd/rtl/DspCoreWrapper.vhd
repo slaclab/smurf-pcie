@@ -28,7 +28,7 @@ use work.AppTopPkg.all;
 entity DspCoreWrapper is
    generic (
       TPD_G            : time             := 1 ns;
-      BUILD_DSP_G      : slv(7 downto 0)  := x"01";
+      BUILD_DSP_G      : slv(7 downto 0)  := x"03";
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
