@@ -19,75 +19,105 @@
 
 import pyrogue as pr
 
-class SysgenCryoBramReadWrite(pr.Device):
+        
+class CryoChannel:
     def __init__(   self, 
-            name        = "SysgenCryoBramReadWrite", 
+            name        = "Cryo frequency cord", 
             description = "Note: This module is read-only with respect to sysgen", 
+            hidden      = False,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
         ##############################
-        # Registers
+        # Configuration registers (RO from Sysgen)
         ##############################          
+        # Cryo channel frequency word
         self.addRemoteVariables(   
-            name         = "Reg",
-            description  = "",
+            name         = "feedbackEnable",
+            description  = "Enable feedback on this channel",
+            offset       =  0x1000,
+            bitSize      =  1,
+            bitOffset    =  32,
+            base         = pr.UInt,
+            mode         = "RW",
+        )
+
+        self.addRemoteVariables(   
+            name         = "amplitdueScale",
+            description  = "Amplitdue scale",
             offset       =  0x0,
+            bitSize      =  4,
+            bitOffset    =  24,
+            base         = pr.UInt,
+            mode         = "RW",
+        )
+
+        self.addRemoteVariables(   
+            name         = "centerFrequency",
+            description  = "Center frequency",
+            offset       =  0x0,
+            bitSize      =  24,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        )
+	
+        # Cryo channel ETA
+        self.addRemoteVariables(   
+            name         = "ETA",
+            description  = "ETA",
+            offset       =  0x800,
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RW",
-            number       =  128,
-            stride       =  4,
-            hidden       = True, # Set hidden by default to prevent GUI from starting up slowly
         )
-        
-class SysgenCryoBramReadOnly(pr.Device):
-    def __init__(   self, 
-            name        = "SysgenCryoBramReadOnly", 
-            description = "Note: This module is Write-only with respect to sysgen", 
-            **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
-        # Registers
+        # Readback register (WO from Sysgen)
         ##############################          
+        # Cryo channel readback frequency error
         self.addRemoteVariables(   
-            name         = "Reg",
-            description  = "",
-            offset       =  0x0,
+            name         = "frequencyError",
+            description  = "Frequency error",
+            #offset       =  0x0000,
+            offset       =  0x1000,
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-            number       =  128,
-            stride       =  4,
-            hidden       = True, # Set hidden by default to prevent GUI from starting up slowly
-        )        
+        )
 
-class SysgenCryoBram(pr.Device):
+        # Cryo channel readback loop filter output
+        self.addRemoteVariables(   
+            name         = "loopFilterOutput",
+            description  = "Loop filter output",
+            #offset       =  0x0800,
+            offset       =  0x1800,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+        )
+
+
+class CryoFrequencyBand(pr.Device):
     def __init__(   self, 
-            name        = "SysgenCryoBram", 
-            description = "Cryo SYSGEN Module", 
+            name        = "CryoFrequencyBand", 
+            description = "Note: This module is read-only with respect to sysgen", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
+
         
-        ##############################
-        # Devices
-        ##############################          
-        for i in range(8):
-            self.add(SysgenCryoBramReadWrite(
-                name   = ('ReadWrite[%d]'%i), 
-                offset = (i*0x1000), 
+#        ##############################
+#        # Devices
+#        ##############################          
+        for i in range(512):
+            self.add(CryoChannel(
+                name   = ('CryoChannel[%d]'%i), 
+                offset = (i*0x4), 
                 expand = False,
             ))              
-        
-        for i in range(8):
-            self.add(SysgenCryoBramReadOnly(
-                name   = ('ReadOnly[%d]'%i), 
-                offset = (i*0x1000 + 0x8000), 
-                expand = False,
-            )) 
             
 class SysgenCryoBase(pr.Device):
     def __init__(   self, 
@@ -99,8 +129,8 @@ class SysgenCryoBase(pr.Device):
         ##############################
         # Devices
         ##############################        
-        self.add(SysgenCryoBram(
-            name   = 'Bram', 
+        self.add(CryoFrequencyBand(
+            name   = 'CryoFrequencyBand', 
             offset = 0x00010000, 
             expand = False,
         ))
