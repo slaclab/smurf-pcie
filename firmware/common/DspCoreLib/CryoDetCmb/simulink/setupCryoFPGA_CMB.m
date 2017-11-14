@@ -19,6 +19,12 @@ Ts = 1/Fadc  % ADC sample rate
 %Fclk = Fadc/2  % data to FPGA is brought out in 2 parallel channels at half the ADC rate
 Fclk = Fadc  % same rate for new HW (non-Demo HW)
 Tclk = 1/Fclk
+
+%--AXI lite Ifc clock / JED 11-07-2017
+AXI_ifc_clk = 156.25e6;
+Aic_div = 2^8; %--AIX ifc clock division ratio
+AXF_icdr = 2^8; %--same as above, not sure if still used in simulink/sysgen model
+
 %--added simulink_period var in order to make clock probe work / JED 07-31-2017
 simulink_period = Ts;
 
