@@ -35,7 +35,7 @@ class CryoChannel:
         self.addRemoteVariables(   
             name         = "feedbackEnable",
             description  = "Enable feedback on this channel",
-            offset       =  0x1000,
+            offset       =  0x0000,
             bitSize      =  1,
             bitOffset    =  32,
             base         = pr.UInt,
@@ -45,7 +45,7 @@ class CryoChannel:
         self.addRemoteVariables(   
             name         = "amplitdueScale",
             description  = "Amplitdue scale",
-            offset       =  0x0,
+            offset       =  0x0000,
             bitSize      =  4,
             bitOffset    =  24,
             base         = pr.UInt,
@@ -55,7 +55,7 @@ class CryoChannel:
         self.addRemoteVariables(   
             name         = "centerFrequency",
             description  = "Center frequency",
-            offset       =  0x0,
+            offset       =  0x0000,
             bitSize      =  24,
             bitOffset    =  0,
             base         = pr.UInt,
@@ -66,7 +66,7 @@ class CryoChannel:
         self.addRemoteVariables(   
             name         = "ETA",
             description  = "ETA",
-            offset       =  0x800,
+            offset       =  0x0800,
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
@@ -80,7 +80,6 @@ class CryoChannel:
         self.addRemoteVariables(   
             name         = "frequencyError",
             description  = "Frequency error",
-            #offset       =  0x0000,
             offset       =  0x1000,
             bitSize      =  32,
             bitOffset    =  0,
@@ -92,7 +91,6 @@ class CryoChannel:
         self.addRemoteVariables(   
             name         = "loopFilterOutput",
             description  = "Loop filter output",
-            #offset       =  0x0800,
             offset       =  0x1800,
             bitSize      =  32,
             bitOffset    =  0,
