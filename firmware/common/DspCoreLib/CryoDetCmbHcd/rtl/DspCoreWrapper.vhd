@@ -79,14 +79,14 @@ architecture mapping of DspCoreWrapper is
    signal sigGen     : Slv32Array(15 downto 0);
    signal sigGenSync : Slv32Array(1 downto 0);
 
-   signal jesdClkVec      : slv(7 downto 0) := (others => '0');
-   signal jesdRstVec      : slv(7 downto 0) := (others => '0');
-   signal sigGenStart     : slv(7 downto 0) := (others => '0');
-   signal sigGenStartSync : slv(7 downto 0) := (others => '0');
-   signal startRampVec    : slv(7 downto 0) := (others => '0');
-   signal selectRampVec   : slv(7 downto 0) := (others => '0');
-   signal lemo2Vec        : slv(7 downto 0) := (others => '0');
-   signal debugvalid      : Slv2Array(7 downto 0);
+   signal jesdClkVec      : slv(7 downto 0)       := (others => '0');
+   signal jesdRstVec      : slv(7 downto 0)       := (others => '0');
+   signal sigGenStart     : slv(7 downto 0)       := (others => '0');
+   signal sigGenStartSync : slv(7 downto 0)       := (others => '0');
+   signal startRampVec    : slv(7 downto 0)       := (others => '0');
+   signal selectRampVec   : slv(7 downto 0)       := (others => '0');
+   signal lemo2Vec        : slv(7 downto 0)       := (others => '0');
+   signal debugvalid      : Slv2Array(7 downto 0) := (others => "00");
 
 begin
 
