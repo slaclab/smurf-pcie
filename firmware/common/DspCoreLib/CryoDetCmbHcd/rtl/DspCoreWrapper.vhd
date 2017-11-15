@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-13
+-- Last update: 2017-11-15
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -86,6 +86,7 @@ architecture mapping of DspCoreWrapper is
    signal startRampVec    : slv(7 downto 0) := (others => '0');
    signal selectRampVec   : slv(7 downto 0) := (others => '0');
    signal lemo2Vec        : slv(7 downto 0) := (others => '0');
+   signal debugvalid      : Slv2Array(7 downto 0);
 
 begin
 
@@ -98,12 +99,20 @@ begin
    dacValues(1, 8) <= (others => '0');
    dacValues(1, 9) <= (others => '0');
 
-   debugValids <= (others => (others => '1'));
+   debugValids(0)(0) <= debugvalid(0)(0);
+   debugValids(0)(1) <= debugvalid(0)(1);
+   debugValids(0)(2) <= debugvalid(1)(0);
+   debugValids(0)(3) <= debugvalid(1)(0);
 
    debugValues(0, 0) <= debug(0);
    debugValues(0, 1) <= debug(1);
    debugValues(0, 2) <= debug(2);
    debugValues(0, 3) <= debug(3);
+
+   debugValids(1)(0) <= debugvalid(4)(0);
+   debugValids(1)(1) <= debugvalid(4)(1);
+   debugValids(1)(2) <= debugvalid(5)(0);
+   debugValids(1)(3) <= debugvalid(5)(0);
 
    debugValues(1, 0) <= debug(8);
    debugValues(1, 1) <= debug(9);
@@ -221,6 +230,7 @@ begin
                adc(1)          => adc((2*i)+1),
                dac(0)          => dac((2*i)+0),
                dac(1)          => dac((2*i)+1),
+               debugvalid      => debugvalid(i),
                debug(0)        => debug((2*i)+0),
                debug(1)        => debug((2*i)+1),
                -- DAC Signal Generator Interface (jesdClk domain)

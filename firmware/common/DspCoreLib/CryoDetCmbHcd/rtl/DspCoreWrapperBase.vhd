@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapperBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-13
+-- Last update: 2017-11-15
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -37,9 +37,10 @@ entity DspCoreWrapperBase is
       -- ADC/DAC/Debug Interface (jesdClk domain)
       adc             : in  Slv32Array(1 downto 0);
       dac             : out Slv32Array(1 downto 0);
+      debugvalid      : out slv(1 downto 0);
       debug           : out Slv32Array(1 downto 0);
       -- DAC Signal Generator Interface (jesdClk domain)
-      sigGenStart     : out  sl;
+      sigGenStart     : out sl;
       sigGen          : in  Slv32Array(1 downto 0);
       -- Digital I/O Interface
       kRelay          : in  slv(1 downto 0);
@@ -62,21 +63,21 @@ architecture mapping of DspCoreWrapperBase is
       port (
          adc0                       : in  std_logic_vector (31 downto 0);
          adc1                       : in  std_logic_vector (31 downto 0);
-         rddata6                    : in  std_logic_vector (31 downto 0);
-         rddata2                    : in  std_logic_vector (31 downto 0);
-         rddata3                    : in  std_logic_vector (31 downto 0);
-         rddata1                    : in  std_logic_vector (31 downto 0);
-         rddata4                    : in  std_logic_vector (31 downto 0);
-         rddata5                    : in  std_logic_vector (31 downto 0);
-         rddata7                    : in  std_logic_vector (31 downto 0);
          krelay                     : in  std_logic_vector (1 downto 0);
          lemo1                      : in  std_logic_vector (0 to 0);
+         rddata0                    : in  std_logic_vector (31 downto 0);
+         rddata1                    : in  std_logic_vector (31 downto 0);
+         rddata2                    : in  std_logic_vector (31 downto 0);
+         rddata3                    : in  std_logic_vector (31 downto 0);
+         rddata4                    : in  std_logic_vector (31 downto 0);
+         rddata5                    : in  std_logic_vector (31 downto 0);
+         rddata6                    : in  std_logic_vector (31 downto 0);
+         rddata7                    : in  std_logic_vector (31 downto 0);
          rst                        : in  std_logic_vector (0 to 0);
          siggen0                    : in  std_logic_vector (31 downto 0);
          siggen1                    : in  std_logic_vector (31 downto 0);
-         rddata0                    : in  std_logic_vector (31 downto 0);
-         dsp_clk                    : in  std_logic;
          dsp_axi_lite_clk           : in  std_logic;
+         dsp_clk                    : in  std_logic;
          dsp_axi_lite_aresetn       : in  std_logic;
          dsp_axi_lite_s_axi_awaddr  : in  std_logic_vector (11 downto 0);
          dsp_axi_lite_s_axi_awvalid : in  std_logic;
@@ -87,38 +88,39 @@ architecture mapping of DspCoreWrapperBase is
          dsp_axi_lite_s_axi_araddr  : in  std_logic_vector (11 downto 0);
          dsp_axi_lite_s_axi_arvalid : in  std_logic;
          dsp_axi_lite_s_axi_rready  : in  std_logic;
-         wrdata4                    : out std_logic_vector (31 downto 0);
-         wrdata5                    : out std_logic_vector (31 downto 0);
-         wrdata6                    : out std_logic_vector (31 downto 0);
-         wrdata7                    : out std_logic_vector (31 downto 0);
-         wraddr4                    : out std_logic_vector (6 downto 0);
-         wraddr5                    : out std_logic_vector (6 downto 0);
-         wraddr6                    : out std_logic_vector (6 downto 0);
-         wraddr7                    : out std_logic_vector (6 downto 0);
          dac0                       : out std_logic_vector (31 downto 0);
          dac1                       : out std_logic_vector (31 downto 0);
-         rdaddr4                    : out std_logic_vector (6 downto 0);
-         rdaddr5                    : out std_logic_vector (6 downto 0);
-         rdaddr6                    : out std_logic_vector (6 downto 0);
-         rdaddr7                    : out std_logic_vector (6 downto 0);
          debug0                     : out std_logic_vector (31 downto 0);
          debug1                     : out std_logic_vector (31 downto 0);
          lemo2                      : out std_logic_vector (0 to 0);
-         selectramp                 : out std_logic_vector (0 to 0);
-         siggenstart                : out std_logic_vector (0 to 0);
-         startramp                  : out std_logic_vector (0 to 0);
          rdaddr0                    : out std_logic_vector (6 downto 0);
          rdaddr1                    : out std_logic_vector (6 downto 0);
          rdaddr2                    : out std_logic_vector (6 downto 0);
          rdaddr3                    : out std_logic_vector (6 downto 0);
+         rdaddr4                    : out std_logic_vector (6 downto 0);
+         rdaddr5                    : out std_logic_vector (6 downto 0);
+         rdaddr6                    : out std_logic_vector (6 downto 0);
+         rdaddr7                    : out std_logic_vector (6 downto 0);
+         selectramp                 : out std_logic_vector (0 to 0);
+         siggenstart                : out std_logic_vector (0 to 0);
+         startramp                  : out std_logic_vector (0 to 0);
          wraddr0                    : out std_logic_vector (6 downto 0);
          wraddr1                    : out std_logic_vector (6 downto 0);
          wraddr2                    : out std_logic_vector (6 downto 0);
          wraddr3                    : out std_logic_vector (6 downto 0);
+         wraddr4                    : out std_logic_vector (6 downto 0);
+         wraddr5                    : out std_logic_vector (6 downto 0);
+         wraddr6                    : out std_logic_vector (6 downto 0);
+         wraddr7                    : out std_logic_vector (6 downto 0);
          wrdata0                    : out std_logic_vector (31 downto 0);
          wrdata1                    : out std_logic_vector (31 downto 0);
          wrdata2                    : out std_logic_vector (31 downto 0);
          wrdata3                    : out std_logic_vector (31 downto 0);
+         wrdata4                    : out std_logic_vector (31 downto 0);
+         wrdata5                    : out std_logic_vector (31 downto 0);
+         wrdata6                    : out std_logic_vector (31 downto 0);
+         wrdata7                    : out std_logic_vector (31 downto 0);
+         debugvalids                : out std_logic_vector (1 downto 0);
          dsp_axi_lite_s_axi_awready : out std_logic;
          dsp_axi_lite_s_axi_wready  : out std_logic;
          dsp_axi_lite_s_axi_bresp   : out std_logic_vector (1 downto 0);
@@ -129,7 +131,7 @@ architecture mapping of DspCoreWrapperBase is
          dsp_axi_lite_s_axi_rvalid  : out std_logic
          );
    end component;
-   
+
    constant NUM_AXI_MASTERS_C : natural := 2;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 16);
@@ -137,18 +139,18 @@ architecture mapping of DspCoreWrapperBase is
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);   
-   
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
    signal axilRstL : sl;
-   
-   signal ramAddr : Slv7Array(15 downto 0) := (others=>(others=>'0'));
-   signal ramDin  : Slv32Array(15 downto 0) := (others=>(others=>'0'));
-   signal ramDout : Slv32Array(15 downto 0) := (others=>(others=>'0'));
+
+   signal ramAddr : Slv7Array(15 downto 0)  := (others => (others => '0'));
+   signal ramDin  : Slv32Array(15 downto 0) := (others => (others => '0'));
+   signal ramDout : Slv32Array(15 downto 0) := (others => (others => '0'));
 
 begin
 
-   axilRstL    <= not(axilRst);
-   
+   axilRstL <= not(axilRst);
+
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
@@ -170,7 +172,7 @@ begin
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
-         
+
    -------------------
    -- System Generator
    -------------------
@@ -220,6 +222,7 @@ begin
          wraddr6                    => ramAddr(14),
          wraddr7                    => ramAddr(15),
          -- DAQ Mux Debug Ports (dsp_clk domain)
+         debugvalids                => debugvalid,
          debug0                     => debug(0),
          debug1                     => debug(1),
          -- Signal Generator Ports (dsp_clk domain)
@@ -265,7 +268,7 @@ begin
          -- Clock and Reset
          jesdClk         => jesdClk,
          jesdRst         => jesdRst,
-         ramWe           => x"FF00",-- RAM[15:8] = write only , RAM[7:0] = Read only
+         ramWe           => x"FF00",  -- RAM[15:8] = write only , RAM[7:0] = Read only
          ramAddr         => ramAddr,
          ramDin          => ramDin,
          ramDout         => ramDout,
