@@ -129,7 +129,7 @@ class CryoChannels(pr.Device):
             description = "Note: This module is read-only with respect to sysgen", 
             hidden      = True,
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, hidden=hidden, **kwargs)
 
         
 #        ##############################
