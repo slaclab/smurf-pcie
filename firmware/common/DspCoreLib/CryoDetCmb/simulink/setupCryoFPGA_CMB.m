@@ -24,6 +24,9 @@ Tclk = 1/Fclk
 AXI_ifc_clk = 156.25e6;
 Aic_div = 2^8; %--AIX ifc clock division ratio
 AXF_icdr = 2^8; %--same as above, not sure if still used in simulink/sysgen model
+%Aic_div = 2^0; %--AIX ifc clock division ratio
+%AXF_icdr = 2^0; %--same as above, not sure if still used in simulink/sysgen model / change to zero for sim purposes only
+
 
 %--added simulink_period var in order to make clock probe work / JED 07-31-2017
 simulink_period = Ts;

@@ -9,7 +9,7 @@ freq =ScopeData2.signals(3).values; %vector of frequency set for channel 0
 time = ScopeData2.time;
 
 %choose a start time to eliminate initial transient
-start = 0.5e-6
+start = 0.8e-6
 first = find(time>=start,1);
 last = length(time);
 range = first:last;

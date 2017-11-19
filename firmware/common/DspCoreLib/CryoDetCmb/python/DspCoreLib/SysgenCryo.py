@@ -21,8 +21,8 @@ import pyrogue as pr
 
 class SysgenCryo(pr.Device):
     def __init__(   self, 
-            name        = "FTA DspCore Version", 
-            description = "Version of FTA DSP Core module",
+            name        = "CMB Frequency Tracking Algorithm 16ch version", 
+            description = "Alg for tracking 16ch of resonators",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -69,6 +69,19 @@ class SysgenCryo(pr.Device):
         # Control Registers
         ##############################        
         
+        
+        # #--signal generator start / not used, comment out for now...
+        # self.add(pr.RemoteVariable(    
+            # name         = "StartSigGenReg",
+            # description  = "Triggers signal generator when the signal generator is in trigger mode (not ppe",
+            # offset       =  0x080,
+            # bitSize      =  1,
+            # bitOffset    =  1,
+            # base         = pr.UInt,
+            # mode         = "RW",
+            # hidden       =  True,
+        # ))        
+
         #--Ctrl Reg0_[0]
         self.add(pr.RemoteVariable(   
             name         = "RF_out_ena",
@@ -255,7 +268,7 @@ class SysgenCryo(pr.Device):
         ))
         
           #--Ctrl Reg63_[0]
-          self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(    
             name         = "RstLoopFiltBit",
             description  = "Resets the accumulators inside the FB Loop Filter",
             offset       =  0x8FC,
@@ -1471,158 +1484,12 @@ class SysgenCryo(pr.Device):
         # Commands
         ##############################
         
+        # @self.command(description="Starts the signal generator pattern",)
+        # def CmdClearErrors():    
+            # self.StartSigGenReg.set(1)
+            # self.StartSigGenReg.set(0)        
+
         @self.command(description="Resets the FB Loop Filter Accumulators",)
-        def CmdClearErrors():    
+        def ResetLoopFilter():    
             self.RstLoopFiltBit.set(1)
             self.RstLoopFiltBit.set(0)        
-
-
-        
-        
-#--OLD stuff is below: / will need to delete eventually
-#
-#---------------------------------------------------------
-
-        self.add(pr.RemoteVariable(    
-            name         = "VersionNumber",
-            description  = "Version Number",
-            offset       =  0x000,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "RO",
-        ))
-        
-        self.add(pr.RemoteVariable(   
-            name         = "muxSelect",
-            description  = "Sets the DAC outputs",
-            offset       =  0x080,
-            bitSize      =  1,
-            bitOffset    =  0,
-            mode         = "RW",
-            enum         = {
-                0 : "Ch_0",
-                1 : "Ch_1",
-
-            },
-        ))        
-        
-        self.add(pr.RemoteVariable(    
-            name         = "StartSigGenReg",
-            description  = "Triggers signal generator when the signal generator is in trigger mode (not ppe",
-            offset       =  0x080,
-            bitSize      =  1,
-            bitOffset    =  1,
-            base         = pr.UInt,
-            mode         = "RW",
-            hidden       =  True,
-        ))        
-        
-        self.add(pr.RemoteVariable(    
-            name         = "Ch0MuxSel",
-            description  = "Mux Selects for Ch0 ADC & DAC Only",
-            offset       =  0x080,
-            bitSize      =  2,
-            bitOffset    =  2,
-            mode         = "RW",
-            enum         = {
-                0 : "AtoDThru",
-                1 : "DACMem",
-                2 : "DUC",
-                3 : "SineGen",
-            },
-        ))        
-        
-        self.add(pr.RemoteVariable(   
-            name         = "Ch0B1CjEn",
-            description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
-            offset       =  0x084,
-            bitSize      =  1,
-            bitOffset    =  0,
-            mode         = "RW",
-            enum         = {
-                0 : "CH0_B1_Norm",
-                1 : "CH0_B1_Conj",
-            },
-        ))        
-
-        self.add(pr.RemoteVariable(   
-            name         = "Ch0B2CjEn",
-            description  = "Selects whether or not to conjugate the NCO Sine term for complex multiply",
-            offset       =  0x084,
-            bitSize      =  1,
-            bitOffset    =  1,
-            mode         = "RW",
-            enum         = {
-                0 : "CH0_B2_Norm",
-                1 : "CH0_B2_Conj",
-            },
-        ))        
-
-        self.add(pr.RemoteVariable(    
-            name         = "Ch0FLO1",
-            description  = "Sets DDS frequency for LO1",
-            offset       =  0x088,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "Ch0FLO2",
-            description  = "Sets DDS frequency for LO2",
-            offset       =  0x08C,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "SineGenPhsInc",
-            description  = "Sets DDS frequency (via phase increment value)for Prog IQ Sinewave Generator",
-            offset       =  0x090,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "LO1_Poff",
-            description  = "LO1 Phase offset setting",
-            offset       =  0x094,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "LO2_Poff",
-            description  = "LO2 Phase offset setting",
-            offset       =  0x098,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "ScratchPad",
-            description  = "Scratch Pad Register",
-            offset       =  0xFFC,
-            bitSize      =  32,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "RW",
-        ))
-        
-        ##############################
-        # Commands
-        ##############################
-        @self.command(description="Starts the signal generator pattern",)
-        def CmdClearErrors():    
-            self.StartSigGenReg.set(1)
-            self.StartSigGenReg.set(0)        
