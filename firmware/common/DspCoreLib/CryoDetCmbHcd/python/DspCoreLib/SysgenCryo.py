@@ -65,7 +65,7 @@ class CryoChannel(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(   
-            name         = "amplitdueScale",
+            name         = "amplitudeScale",
             description  = "Amplitdue scale UFix_4_0",
             offset       =  0x0800,
             bitSize      =  4,
@@ -127,7 +127,7 @@ class CryoChannels(pr.Device):
     def __init__(   self, 
             name        = "CryoFrequencyBand", 
             description = "Note: This module is read-only with respect to sysgen", 
-            hidden      = True,
+            hidden      = False,
             **kwargs):
         super().__init__(name=name, description=description, hidden=hidden, **kwargs)
 
@@ -135,7 +135,7 @@ class CryoChannels(pr.Device):
 #        ##############################
 #        # Devices
 #        ##############################          
-        for i in range(512):
+        for i in range(16):
             self.add(CryoChannel(
                 name   = ('CryoChannel[%d]'%i), 
                 offset = (i*0x4), 

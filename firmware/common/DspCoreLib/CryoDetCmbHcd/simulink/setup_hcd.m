@@ -66,3 +66,9 @@ for i = 1:number_subband/2
     analysis_coefficients2 = [analysis_coefficients2, fliplr(filts(i*2,:))];
 end
 
+freqRomData = zeros(1,128);
+freqRomData(1) = floor((1/38.8)*2^24) + 15*2^24;
+
+etaRomData = zeros(1,128);
+etaRomData(1) = 2^10 + (2^10)*(2^16);
+
