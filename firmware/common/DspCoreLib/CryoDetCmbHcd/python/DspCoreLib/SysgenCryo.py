@@ -26,7 +26,7 @@ class CryoChannel(pr.Device):
             description = "Note: This module is read-only with respect to sysgen", 
             hidden      = True,
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, hidden=hidden, **kwargs)
 
         ##############################
         # Configuration registers (RO from Sysgen)
@@ -39,7 +39,7 @@ class CryoChannel(pr.Device):
             offset       =  0x0000,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RW",
         ))
 
@@ -49,7 +49,7 @@ class CryoChannel(pr.Device):
             offset       =  0x0002,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RW",
         ))
 
@@ -59,7 +59,7 @@ class CryoChannel(pr.Device):
             description  = "Enable feedback on this channel UFix_1_0",
             offset       =  0x0800,
             bitSize      =  1,
-            bitOffset    =  32,
+            bitOffset    =  31,
             base         = pr.UInt,
             mode         = "RW",
         ))
@@ -135,12 +135,25 @@ class CryoChannels(pr.Device):
 #        ##############################
 #        # Devices
 #        ##############################          
-        for i in range(16):
-            self.add(CryoChannel(
-                name   = ('CryoChannel[%d]'%i), 
-                offset = (i*0x4), 
-                expand = False,
-            ))              
+#        for i in range(512):
+        for i in range(128):
+            if (i % 16 == 0) :
+                self.add(CryoChannel(
+                    name   = ('CryoChannel[%d]'%i), 
+                    offset = (i*0x4), 
+                    hidden = False,
+                    expand = False,
+                ))             
+            else:
+                self.add(CryoChannel(
+                    name   = ('CryoChannel[%d]'%i), 
+                    offset = (i*0x4), 
+                    hidden = True,
+                    expand = False,
+                ))             
+          
+            
+          
             
 class CryoFreqBand(pr.Device):
     def __init__(   self, 
@@ -248,7 +261,7 @@ class CryoFreqBand(pr.Device):
             name         = "toneScale",
             description  = "Scale the sum of 16 tones before synthesizer",
             offset       =  0x88,
-            bitSize      =  1,
+            bitSize      =  2,
             bitOffset    =  3,
             base         = pr.UInt,
             mode         = "RW",
@@ -316,6 +329,16 @@ class CryoFreqBand(pr.Device):
         ))
 ## config3  end
        
+        self.add(pr.RemoteVariable(    
+            name         = "loopFilterOutputSel",
+            description  = "Global loop filter out reg.  Select with ",
+            offset       =  0x94,
+            bitSize      =  7,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
 
 ## status1
         self.add(pr.RemoteVariable(    
@@ -324,8 +347,9 @@ class CryoFreqBand(pr.Device):
             offset       =  0x08,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RO",
+            pollInterval = 1,
         ))
         self.add(pr.RemoteVariable(    
             name         = "I",
@@ -333,8 +357,9 @@ class CryoFreqBand(pr.Device):
             offset       =  0x08,
             bitSize      =  16,
             bitOffset    =  16,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RO",
+            pollInterval = 1,
         ))
 ## status1 end 
 
@@ -349,6 +374,15 @@ class CryoFreqBand(pr.Device):
             mode         = "RO",
         ))
 ## status2 end 
+        self.add(pr.RemoteVariable(    
+            name         = "loopFilterOutput",
+            description  = "Loop filter output UFix_32_0",
+            offset       =  0x10,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))
         
         # ##############################
         # # Commands
