@@ -122,7 +122,6 @@ class CryoChannel(pr.Device):
         ))
 
 
-
 class CryoChannels(pr.Device):
     def __init__(   self, 
             name        = "CryoFrequencyBand", 
@@ -383,7 +382,9 @@ class CryoFreqBand(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
         ))
-        
+       
+        for i in range(128):
+            self.CryoChannels.CryoChannel[i].centerFrequency.addListener(self.UpdateIQ) 
         # ##############################
         # # Commands
         # ##############################
@@ -391,6 +392,12 @@ class CryoFreqBand(pr.Device):
         # def CmdClearErrors():    
             # self.StartSigGenReg.set(1)
             # self.StartSigGenReg.set(0)
+
+        # Update I and Q values
+    def UpdateIQ(self,dev,value,disp):
+        self.I.get()
+        self.Q.get()
+
 
 class SysgenCryo(pr.Device):
     def __init__(   self, 
