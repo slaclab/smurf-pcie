@@ -1,3 +1,5 @@
+addpath('../../common')
+
 Fadc = 614e6;  % MHz
 axi_clk = 156.25e6;
 
@@ -71,4 +73,10 @@ freqRomData(1) = floor((1/38.8)*2^24) + 15*2^24;
 
 etaRomData = zeros(1,128);
 etaRomData(1) = 2^10 + (2^10)*(2^16);
+
+freqRomData1 = zeros(1,128);
+freqRomData1(1) = floor((1/38.8)*2^24) + 15*2^24;
+
+
+
 
