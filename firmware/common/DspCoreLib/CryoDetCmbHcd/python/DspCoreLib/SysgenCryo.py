@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-
+##import time
         
 class CryoChannel(pr.Device):
     def __init__(   self, 
@@ -39,7 +39,7 @@ class CryoChannel(pr.Device):
             offset       =  0x0000,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.Int,
+            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -49,7 +49,7 @@ class CryoChannel(pr.Device):
             offset       =  0x0002,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.Int,
+            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -98,6 +98,7 @@ class CryoChannel(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
+#            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(   
@@ -119,7 +120,9 @@ class CryoChannel(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
+#            pollInterval = 1,
         ))
+
 
 
 class CryoChannels(pr.Device):
@@ -134,8 +137,8 @@ class CryoChannels(pr.Device):
 #        ##############################
 #        # Devices
 #        ##############################          
-#        for i in range(512):
-        for i in range(128):
+        for i in range(512):
+#        for i in range(128):
             if (i % 16 == 0) :
                 self.add(CryoChannel(
                     name   = ('CryoChannel[%d]'%i), 
@@ -348,7 +351,7 @@ class CryoFreqBand(pr.Device):
             bitOffset    =  0,
             base         = pr.Int,
             mode         = "RO",
-            pollInterval = 1,
+##            pollInterval = 1,
         ))
         self.add(pr.RemoteVariable(    
             name         = "I",
@@ -358,7 +361,7 @@ class CryoFreqBand(pr.Device):
             bitOffset    =  16,
             base         = pr.Int,
             mode         = "RO",
-            pollInterval = 1,
+##            pollInterval = 1,
         ))
 ## status1 end 
 
@@ -383,8 +386,11 @@ class CryoFreqBand(pr.Device):
             mode         = "RO",
         ))
        
-        for i in range(128):
-            self.CryoChannels.CryoChannel[i].centerFrequency.addListener(self.UpdateIQ) 
+
+#        for i in range(512):
+#            if (i % 16 == 0) :
+#                self.CryoChannels.CryoChannel[i].centerFrequency.addListener(self.UpdateIQ)
+ 
         # ##############################
         # # Commands
         # ##############################
@@ -393,8 +399,8 @@ class CryoFreqBand(pr.Device):
             # self.StartSigGenReg.set(1)
             # self.StartSigGenReg.set(0)
 
-        # Update I and Q values
-    def UpdateIQ(self,dev,value,disp):
+    def UpdateIQ(self, dev, value, disp):
+##        time.sleep(0.001)
         self.I.get()
         self.Q.get()
 
