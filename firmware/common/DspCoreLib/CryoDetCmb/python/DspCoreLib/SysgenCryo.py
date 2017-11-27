@@ -26,7 +26,28 @@ class SysgenCryo(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
-        
+        #####################################
+        # Register with convertion template
+        #####################################
+        def addPair(name,offset,bitSize,units,bitOffset,description,function,):
+            self.add(pr.RemoteVariable(
+                name         = (name+"Raw"),
+                offset       = offset,
+                bitSize      = bitSize,
+                bitOffset    = bitOffset,
+                base         = pr.UInt,
+                mode         = 'RW',
+                description  = (description+" (raw value)"),
+                hidden       = True,
+            ))
+            self.add(pr.LinkVariable(
+                name         = name,
+                mode         = 'RW',
+                units        = units,
+                linkedSet    = function,
+                dependencies = [self.variables[name+"Raw"]],
+            ))
+
         ##############################
         # Initial/Basic Registers
         ##############################
@@ -224,15 +245,15 @@ class SysgenCryo(pr.Device):
 
         
         #--Ctrl Reg3_[7:0]
-        self.add(pr.RemoteVariable(    
+        self.addPair(
             name         = "Ref Dly",
             description  = "Sets Delay of Ref relative to system FB delay",
             offset       =  0x80C,
             bitSize      =  8,
             bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "RW",
-        ))
+            units        = "ns",
+            function     =  self.setNs,
+        )
 
         #--Ctrl Reg4_[31:16]
         self.add(pr.RemoteVariable(    
@@ -246,26 +267,26 @@ class SysgenCryo(pr.Device):
         ))
 
         #--Ctrl Reg5_[31:16]
-        self.add(pr.RemoteVariable(    
+        self.addPair(
             name         = "Feedback Band Limit",
             description  = "Sets Limit of Loop Filter BW",
             offset       =  0x814,
             bitSize      =  16,
             bitOffset    =  16,
-            base         = pr.UInt,
-            mode         = "RW",
-        ))
+            units        = "Hz",
+            function     =  self.setHz,
+        )
 
         #--Ctrl Reg6_[15:0]
-        self.add(pr.RemoteVariable(    
+        self.addPair(   
             name         = "Notch Bandwidth",
             description  = "Sets BW of the resonators",
             offset       =  0x818,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "RW",
-        ))
+            units        = "Hz",
+            function     =  self.setHz,
+        )
         
           #--Ctrl Reg63_[0]
         self.add(pr.RemoteVariable(    
@@ -299,15 +320,15 @@ class SysgenCryo(pr.Device):
             },
         ))        
         #--Ctrl Reg64_[23:0]
-        self.add(pr.RemoteVariable(   
+        self.addPair(
             name         = "Ch0 Initial Frequency",
             description  = "Ch0 Initial/Center Frequency",
             offset       =  0x900,
             bitSize      =  24,
             bitOffset    =  0, #--offset from LSB
-            base         = pr.UInt,
-            mode         = "RW",
-        ))        
+            units        = "Hz",
+            function     =  self.setHz,
+        ) 
         #
         #----
         
@@ -1083,15 +1104,15 @@ class SysgenCryo(pr.Device):
         
         
         #--Ctrl Reg128_[15:0]
-        self.add(pr.RemoteVariable(    
+        self.addPair(
             name         = "ADC0 Band_A DAC IF Band Mixer LO Freq",
             description  = "Sets the LO frequency of ADC0 Ch0 Band A mixer for DAC",
             offset       =  0xB00,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "RW",
-        ))
+            units        = "Hz",
+            function     =  self.setHz,
+        )
         
         
         ##############################
@@ -1478,8 +1499,21 @@ class SysgenCryo(pr.Device):
         #--END F(n) & dF(n) Readback Block for all channels
         #--------------------------------------------------------
         
-        
-        
+        ##########################
+        # Convertion functions
+        ##########################
+        @staticmethod
+        def setNs(dev, var, value):
+            num_bits=var.dependencies[0].bitSize[-1]
+            ns_reg=round(float(value)*(2**num_bits-1)/830.08)
+            var.dependencies[0].set(ns_reg)
+
+        @staticmethod
+        def setHz(dev, var, value):
+            num_bits=var.dependencies[0].bitSize[-1]
+            hz_reg=round(float(value)*(2**num_bits-1)/370.2E6)
+            var.dependencies[0].set(hz_reg)
+
         ##############################
         # Commands
         ##############################
