@@ -8,30 +8,31 @@ number_channels = 32;
 number_subband  = number_channels/2; % really will generate 2 overlapping PFB
 filt_len        = taps_per_chan*number_subband;
 pass_band       =  1;
-stop_band       = 80;
+stop_band       = 20;
 
 
-pass_band_freq  = (1/2)/(number_channels);
-stop_band_freq  = (3/2)/(number_channels);
+pass_band_freq  = (0.6)/(number_subband);
+stop_band_freq  = (1)/(number_subband);
 
-% filt = cfirpm(filt_len-1,[0,pass_band_freq,stop_band_freq,1],@lowpass,[pass_band,stop_band]);
-
-
-F= (0:(taps_per_chan*number_subband-1))/(taps_per_chan*number_subband);
+filt = cfirpm(filt_len-1,[0,pass_band_freq,stop_band_freq,1],@lowpass,[pass_band,stop_band]);
 
 
-x = 5.856*(2*number_subband*F-0.5);
-A = sqrt(0.5*erfc(x));
-
-N = length(A);
-
-n = 0:(N/2-1);
-A(N-n)   = conj(A(2+n));
-A(1+N/2) = 0;
-
-filt = ifft(A);
-filt = fftshift(filt);
-filt = filt/sum(filt);
+% 
+% F= (0:(taps_per_chan*number_subband-1))/(taps_per_chan*number_subband);
+% 
+% 
+% x = 5.856*(2*number_subband*F-0.5);
+% A = sqrt(0.5*erfc(x));
+% 
+% N = length(A);
+% 
+% n = 0:(N/2-1);
+% A(N-n)   = conj(A(2+n));
+% A(1+N/2) = 0;
+% 
+% filt = ifft(A);
+% filt = fftshift(filt);
+% filt = filt/sum(filt);
 
 
 filts = reshape(filt,number_subband,taps_per_chan);
