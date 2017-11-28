@@ -49,7 +49,7 @@ class CryoChannel(pr.Device):
             offset       =  0x0002,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RW",
         ))
 
@@ -118,7 +118,7 @@ class CryoChannel(pr.Device):
             offset       =  0x1800,
             bitSize      =  24,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RO",
 #            pollInterval = 1,
         ))
