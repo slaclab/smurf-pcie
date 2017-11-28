@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapperBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-15
+-- Last update: 2017-11-27
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -43,11 +43,8 @@ entity DspCoreWrapperBase is
       sigGenStart     : out sl;
       sigGen          : in  Slv32Array(1 downto 0);
       -- Digital I/O Interface
-      kRelay          : in  slv(1 downto 0);
-      startRamp       : out sl;
-      selectRamp      : out sl;
-      lemo1           : in  sl;
-      lemo2           : out sl;
+      startRamp       : in  sl;
+      selectRamp      : in  sl;
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -63,8 +60,6 @@ architecture mapping of DspCoreWrapperBase is
       port (
          adc0                       : in  std_logic_vector (31 downto 0);
          adc1                       : in  std_logic_vector (31 downto 0);
-         krelay                     : in  std_logic_vector (1 downto 0);
-         lemo1                      : in  std_logic_vector (0 to 0);
          rddata0                    : in  std_logic_vector (31 downto 0);
          rddata1                    : in  std_logic_vector (31 downto 0);
          rddata2                    : in  std_logic_vector (31 downto 0);
@@ -92,7 +87,6 @@ architecture mapping of DspCoreWrapperBase is
          dac1                       : out std_logic_vector (31 downto 0);
          debug0                     : out std_logic_vector (31 downto 0);
          debug1                     : out std_logic_vector (31 downto 0);
-         lemo2                      : out std_logic_vector (0 to 0);
          rdaddr0                    : out std_logic_vector (6 downto 0);
          rdaddr1                    : out std_logic_vector (6 downto 0);
          rdaddr2                    : out std_logic_vector (6 downto 0);
@@ -101,9 +95,9 @@ architecture mapping of DspCoreWrapperBase is
          rdaddr5                    : out std_logic_vector (6 downto 0);
          rdaddr6                    : out std_logic_vector (6 downto 0);
          rdaddr7                    : out std_logic_vector (6 downto 0);
-         selectramp                 : out std_logic_vector (0 to 0);
+         selectramp                 : in  std_logic_vector (0 to 0);
          siggenstart                : out std_logic_vector (0 to 0);
-         startramp                  : out std_logic_vector (0 to 0);
+         startramp                  : in  std_logic_vector (0 to 0);
          wraddr0                    : out std_logic_vector (6 downto 0);
          wraddr1                    : out std_logic_vector (6 downto 0);
          wraddr2                    : out std_logic_vector (6 downto 0);
@@ -229,12 +223,9 @@ begin
          sigGenStart(0)             => sigGenStart,
          sigGen0                    => sigGen(0),
          sigGen1                    => sigGen(1),
-         -- Digital I/O Interface (dsp_clk domain)         
-         kRelay                     => kRelay,
+         -- Digital I/O Interface (dsp_clk domain)  
          startRamp(0)               => startRamp,
          selectRamp(0)              => selectRamp,
-         lemo1(0)                   => lemo1,
-         lemo2(0)                   => lemo2,
          -- AXI-Lite Interface (dsp_axi_lite_clk domain)
          dsp_axi_lite_clk           => axilClk,
          dsp_axi_lite_aresetn       => axilRstL,

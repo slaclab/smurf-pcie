@@ -174,11 +174,8 @@ architecture mapping of AppCore is
    signal dacSigTrigArm   : sl;
    signal dacSigTrigDelay : slv(23 downto 0);
 
-   signal kRelay     : slv(1 downto 0);
    signal startRamp  : sl;
    signal selectRamp : sl;
-   signal lemo1      : sl;
-   signal lemo2      : sl;
 
 begin
 
@@ -283,11 +280,8 @@ begin
          dacSigValids    => dacSigValids,
          dacSigValues    => dacSigValues,
          -- Digital I/O Interface
-         kRelay          => kRelay,
          startRamp       => startRamp,
          selectRamp      => selectRamp,
-         lemo1           => lemo1,
-         lemo2           => lemo2,
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -309,11 +303,8 @@ begin
          jesdClk         => jesdClk(0),
          jesdRst         => jesdRst(0),
          -- Digital I/O Interface
-         kRelay          => kRelay,
          startRamp       => startRamp,
          selectRamp      => selectRamp,
-         lemo1           => lemo1,
-         lemo2           => lemo2,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
