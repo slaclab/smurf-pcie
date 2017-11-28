@@ -2,7 +2,7 @@
 -- File       : CryoCmbBpEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-09
--- Last update: 2017-07-20
+-- Last update: 2017-11-28
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -- 
@@ -226,6 +226,7 @@ begin
    U_AppTop : entity work.AppTop
       generic map (
          TPD_G                  => TPD_G,
+         DAQMUX_DECIMATOR_EN_G  => false,  -- Configured by application
          MR_LCLS_APP_G          => false,  -- Configured by application
          WAVEFORM_TDATA_BYTES_G => 8,
          -- JESD Generics
