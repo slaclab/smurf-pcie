@@ -331,6 +331,18 @@ class CryoFreqBand(pr.Device):
         ))
 ## config3  end
        
+## config4
+        self.add(pr.RemoteVariable(    
+            name         = "filterAlpha",
+            description  = "IIR filter alpha UFix16_15",
+            offset       =  0x90,
+            bitSize      =  16,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+## config4 end
         self.add(pr.RemoteVariable(    
             name         = "loopFilterOutputSel",
             description  = "Global loop filter out reg.  Select with ",
