@@ -353,6 +353,30 @@ class CryoFreqBand(pr.Device):
             mode         = "RW",
         ))
 
+        self.add(pr.RemoteVariable(    
+            name         = "analysisScale",
+            description  = "analysis filter bank scale, nominal value is 1",
+            offset       =  0x98,
+            bitSize      =  2,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+            hidden       = True,
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "synthesisScale",
+            description  = "synthesis filter bank scale, nominal value is 2",
+            offset       =  0x98,
+            bitSize      =  2,
+            bitOffset    =  2,
+            base         = pr.UInt,
+            mode         = "RW",
+            hidden       = True,
+        ))
+
+
+
 
 ## status1
         self.add(pr.RemoteVariable(    
