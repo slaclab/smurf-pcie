@@ -21,7 +21,7 @@ import pyrogue as pr
 
 from AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCore import *
 from AppHardware.RtmCryoDet._rtmCryoDet import *
-from DspCoreLib.SysgenMicrowaveMux import *
+from DspCoreLib.SysgenCryo import *
 
 class AppCore(pr.Device):
     def __init__(   self, 
@@ -42,7 +42,7 @@ class AppCore(pr.Device):
                     offset  = (i*0x00100000),
                     expand  = True,
                 ))        
-        self.add(SysgenMicrowaveMux(offset=0x01000000, expand=True))    
+        self.add(SysgenCryo(offset=0x01000000, expand=True))    
         self.add(RtmCryoDet(        offset=0x02000000, expand=False))    
         
         ###########
