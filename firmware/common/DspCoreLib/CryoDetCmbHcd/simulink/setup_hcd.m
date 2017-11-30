@@ -18,26 +18,26 @@ filt = cfirpm(filt_len-1,[0,pass_band_freq,stop_band_freq,1],@lowpass,[pass_band
 
 
 % 
-% F= (0:(taps_per_chan*number_subband-1))/(taps_per_chan*number_subband);
-% 
-% 
-% x = 5.856*(2*number_subband*F-0.5);
-% A = sqrt(0.5*erfc(x));
-% 
-% N = length(A);
-% 
-% n = 0:(N/2-1);
-% A(N-n)   = conj(A(2+n));
-% A(1+N/2) = 0;
-% 
-% filt = ifft(A);
-% filt = fftshift(filt);
-% filt = filt/sum(filt);
+F= (0:(taps_per_chan*number_subband-1))/(taps_per_chan*number_subband);
+
+
+x = 5.856*(2*number_subband*F-0.5);
+A = sqrt(0.5*erfc(x));
+
+N = length(A);
+
+n = 0:(N/2-1);
+A(N-n)   = conj(A(2+n));
+A(1+N/2) = 0;
+
+filt = ifft(A);
+filt = fftshift(filt);
+filt = filt/sum(filt);
 
 
 filts = reshape(filt,number_subband,taps_per_chan);
 
-% fvtool(filt)
+fvtool(filt)
 
 samples_per_channel = 4096*10;
 % generate complex chrip

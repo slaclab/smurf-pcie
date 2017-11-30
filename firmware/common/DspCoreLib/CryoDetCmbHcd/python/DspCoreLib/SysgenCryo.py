@@ -375,6 +375,15 @@ class CryoFreqBand(pr.Device):
             hidden       = True,
         ))
 
+        self.add(pr.RemoteVariable(    
+            name         = "decimation",
+            description  = "debug decimation rate 0...7",
+            offset       =  0x98,
+            bitSize      =  3,
+            bitOffset    =  4,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
 
 
 
