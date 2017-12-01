@@ -47,11 +47,13 @@ entity DspCoreWrapper is
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      kRelay          : in  slv(1 downto 0);
-      startRamp       : out sl;
-      selectRamp      : out sl;
-      lemo1           : in  sl;
-      lemo2           : out sl;
+      startRamp       : in sl;
+      selectRamp      : in sl;      
+      -- kRelay          : in  slv(1 downto 0);
+      -- startRamp       : out sl;
+      -- selectRamp      : out sl;
+      -- lemo1           : in  sl;
+      -- lemo2           : out sl;
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -376,11 +378,11 @@ begin
          sigGen0               => sigGen(0),
          sigGen1               => sigGen(1),
          -- Digital I/O Interface         
-         kRelay                => kRelay,
-         startRamp(0)          => startRamp,
-         selectRamp(0)         => selectRamp,
-         lemo1(0)              => lemo1,
-         lemo2(0)              => lemo2,
+         kRelay                => "00",
+         startRamp(0)          => open,
+         selectRamp(0)         => open,
+         lemo1(0)              => '0',
+         lemo2(0)              => open,
          -- BRAM Interface
          ramWe                 => ramWe,
          ramAddr               => ramAddr,
