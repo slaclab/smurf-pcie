@@ -176,6 +176,7 @@ architecture mapping of AppCore is
 
    signal startRamp  : sl;
    signal selectRamp : sl;
+   signal rampCnt    : slv(31 downto 0);
 
 begin
 
@@ -282,6 +283,7 @@ begin
          -- Digital I/O Interface
          startRamp       => startRamp,
          selectRamp      => selectRamp,
+         rampCnt         => rampCnt,
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -305,6 +307,7 @@ begin
          -- Digital I/O Interface
          startRamp       => startRamp,
          selectRamp      => selectRamp,
+         rampCnt         => rampCnt,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,

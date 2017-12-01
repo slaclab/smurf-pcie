@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-15
+-- Last update: 2017-12-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -48,8 +48,9 @@ entity DspCoreWrapper is
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      startRamp       : in sl;
-      selectRamp      : in sl;
+      startRamp       : in  sl;
+      selectRamp      : in  sl;
+      rampCnt         : in  slv(31 downto 0);
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -76,12 +77,12 @@ architecture mapping of DspCoreWrapper is
    signal sigGen     : Slv32Array(15 downto 0);
    signal sigGenSync : Slv32Array(1 downto 0);
 
-   signal jesdClkVec      : slv(7 downto 0)       := (others => '0');
-   signal jesdRstVec      : slv(7 downto 0)       := (others => '0');
-   signal sigGenStart     : slv(7 downto 0)       := (others => '0');
-   signal sigGenStartSync : slv(7 downto 0)       := (others => '0');
-   
-   signal debugvalid      : Slv2Array(7 downto 0) := (others => "00");
+   signal jesdClkVec      : slv(7 downto 0) := (others => '0');
+   signal jesdRstVec      : slv(7 downto 0) := (others => '0');
+   signal sigGenStart     : slv(7 downto 0) := (others => '0');
+   signal sigGenStartSync : slv(7 downto 0) := (others => '0');
+
+   signal debugvalid : Slv2Array(7 downto 0) := (others => "00");
 
 begin
 
@@ -231,6 +232,7 @@ begin
                -- Digital I/O Interface
                startRamp       => startRamp,
                selectRamp      => selectRamp,
+               rampCnt         => rampCnt,
                -- AXI-Lite Interface
                axilClk         => axilClk,
                axilRst         => axilRst,

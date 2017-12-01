@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-09-21
+-- Last update: 2017-12-01
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -175,6 +175,7 @@ architecture mapping of AppCore is
 
    signal startRamp  : sl;
    signal selectRamp : sl;
+   signal rampCnt    : slv(31 downto 0);
 
 begin
 
@@ -281,6 +282,7 @@ begin
          -- Digital I/O Interface
          startRamp       => startRamp,
          selectRamp      => selectRamp,
+         rampCnt         => rampCnt,
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -304,6 +306,7 @@ begin
          -- Digital I/O Interface
          startRamp       => startRamp,
          selectRamp      => selectRamp,
+         rampCnt         => rampCnt,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,

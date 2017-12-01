@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapperBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-27
+-- Last update: 2017-12-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -45,6 +45,7 @@ entity DspCoreWrapperBase is
       -- Digital I/O Interface
       startRamp       : in  sl;
       selectRamp      : in  sl;
+      rampCnt         : in  slv(31 downto 0);
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -71,6 +72,7 @@ architecture mapping of DspCoreWrapperBase is
          rst                        : in  std_logic_vector (0 to 0);
          siggen0                    : in  std_logic_vector (31 downto 0);
          siggen1                    : in  std_logic_vector (31 downto 0);
+         rampCnt                    : in  std_logic_vector (31 downto 0);
          dsp_axi_lite_clk           : in  std_logic;
          dsp_clk                    : in  std_logic;
          dsp_axi_lite_aresetn       : in  std_logic;
@@ -226,6 +228,7 @@ begin
          -- Digital I/O Interface (dsp_clk domain)  
          startRamp(0)               => startRamp,
          selectRamp(0)              => selectRamp,
+         rampCnt                    => rampCnt,
          -- AXI-Lite Interface (dsp_axi_lite_clk domain)
          dsp_axi_lite_clk           => axilClk,
          dsp_axi_lite_aresetn       => axilRstL,
