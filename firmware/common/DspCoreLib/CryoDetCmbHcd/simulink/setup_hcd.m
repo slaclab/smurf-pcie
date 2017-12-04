@@ -21,7 +21,8 @@ filt = cfirpm(filt_len-1,[0,pass_band_freq,stop_band_freq,1],@lowpass,[pass_band
 F= (0:(taps_per_chan*number_subband-1))/(taps_per_chan*number_subband);
 
 
-x = 5.856*(2*number_subband*F-0.5);
+% x = 5.856*(2*number_subband*F-0.5);
+x = 6*(2*number_subband*F-0.6);
 A = sqrt(0.5*erfc(x));
 
 N = length(A);
@@ -69,14 +70,22 @@ for i = 1:number_subband/2
     analysis_coefficients2 = [analysis_coefficients2, fliplr(filts(i*2,:))];
 end
 
-freqRomData = zeros(1,128);
-freqRomData(1) = floor((1/38.8)*2^24) + 15*2^24;
+
 
 etaRomData = zeros(1,128);
 etaRomData(1) = 2^10 + (2^10)*(2^16);
 
+freqRomData = zeros(1,128);
+freqRomData(1) = floor((1/38.8)*2^24) + 15*2^24;
+
 freqRomData1 = zeros(1,128);
 freqRomData1(1) = floor((1/38.8)*2^24) + 15*2^24;
+
+freqRomData2 = zeros(1,128);
+% freqRomData2(1) = floor((1/38.8)*2^24) + 15*2^24;
+
+freqRomData3 = zeros(1,128);
+% freqRomData3(1) = floor((1/38.8)*2^24) + 15*2^24;
 
 
 
