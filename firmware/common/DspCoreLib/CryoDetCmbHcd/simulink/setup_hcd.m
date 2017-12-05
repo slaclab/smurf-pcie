@@ -35,6 +35,12 @@ filt = ifft(A);
 filt = fftshift(filt);
 filt = filt/sum(filt);
 
+% new filter, alias 0.75 - 1.25 of channel bin
+lpFilt = designfilt('lowpassfir','FilterOrder', filt_len-1, ...
+    'PassbandFrequency', 0.65/number_subband, 'StopbandFrequency', 1.35/number_subband, ...
+    'StopbandWeight', 10, 'DesignMethod', 'equiripple');
+filt = lpFilt.Coefficients;
+
 
 filts = reshape(filt,number_subband,taps_per_chan);
 
