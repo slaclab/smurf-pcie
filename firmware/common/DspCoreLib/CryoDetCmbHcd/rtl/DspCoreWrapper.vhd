@@ -98,7 +98,7 @@ begin
    debugValids(0)(0) <= debugvalid(0)(0);
    debugValids(0)(1) <= debugvalid(0)(1);
    debugValids(0)(2) <= debugvalid(1)(0);
-   debugValids(0)(3) <= debugvalid(1)(0);
+   debugValids(0)(3) <= debugvalid(1)(1);
 
    debugValues(0, 0) <= debug(0);
    debugValues(0, 1) <= debug(1);
@@ -108,7 +108,7 @@ begin
    debugValids(1)(0) <= debugvalid(4)(0);
    debugValids(1)(1) <= debugvalid(4)(1);
    debugValids(1)(2) <= debugvalid(5)(0);
-   debugValids(1)(3) <= debugvalid(5)(0);
+   debugValids(1)(3) <= debugvalid(5)(1);
 
    debugValues(1, 0) <= debug(8);
    debugValues(1, 1) <= debug(9);
