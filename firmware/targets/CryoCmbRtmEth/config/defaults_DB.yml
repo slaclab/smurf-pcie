@@ -340,16 +340,22 @@ AMCc:
         ## System Generator Configuration Registers
         ###########################################
         SysgenCryo:      
-          ScratchPad: 0xDEADBEEF
-          muxSelect: SigGen
-          Ch0MuxSel: SineGen
-          Ch0B1CjEn: CH0_B1_Norm
-          Ch0B2CjEn: CH0_B2_Conj
-          Ch0FLO1: 0x0000682B # set to 125M
-          Ch0FLO2: 0x0000682B # set to 125M but want -125M so conj
-          SineGenPhsInc: 0x000010AB
-          LO1_Poff: 0x00682AAB
-          LO2_Poff: 0x00682AAB
+          ScratchPad Write: 0x1234ABCD
+          RF_out_ena: RF Off
+          Ref_Src: INT Ref
+          FB Polarity: Inverted
+          Status Mux Select: Ch_0
+          Debug Mux Select: Ch_0
+          ADC Ch0_A I/Q Swap: HiWd=Q / LoWd=I
+          FB Enable: FB DISabled
+          FB Gain: 0x4000 #--gain = 4
+          Ref Dly: 0x1E #--dly = 100ns
+          Output Amplitude: 0xFFF0 #--ampl=0.1
+          Feedback Band Limit: 0x0140 #--freq lim=1.5MHz
+          Notch Bandwidth: 0xD5 #--1MHz
+          Ch0 Enable: Ch0 DISabled
+          Ch0 Initial Frequency: 0x3A6AAB #--70MHz for test
+          ADC0 BndA upmix LO Freq: 0x0000
         ###########################################
       AppTopJesd[:]:
         JesdRx:
@@ -419,7 +425,7 @@ AMCc:
         #####################################################
         #####################################################
         #####################################################
-        CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/multitones_500_baseband.csv
+        # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/multitones_500_baseband.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_2Tones_4096pts.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/example_csv_1Tones_10MHzoffset.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/Is_ones_Qs_ones.csv
