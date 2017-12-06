@@ -448,8 +448,26 @@ class CryoFreqBand(pr.Device):
 ##        time.sleep(0.001)
         self.I.get()
         self.Q.get()
-
-
+        
+class CryoAdcMux(pr.Device):
+    def __init__(   self, 
+            name        = "CryoAdcMux", 
+            description = "", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
+        
+        self.addRemoteVariables(   
+            name         = "ChRemap",
+            description  = "",
+            offset       =  0x0,
+            bitSize      =  4,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+            number       =  10,
+            stride       =  4,
+        )
+        
 class SysgenCryo(pr.Device):
     def __init__(   self, 
             name        = "SysgenCryo", 
@@ -468,4 +486,16 @@ class SysgenCryo(pr.Device):
                     offset = (i*0x00100000), 
                     expand = False,
                 )) 
+                
+        self.add(CryoAdcMux(
+            name   = 'CryoAdcMux[0]', 
+            offset = 0x00800000, 
+            expand = False,
+        ))  
+        
+        self.add(CryoAdcMux(
+            name   = 'CryoAdcMux[1]', 
+            offset = 0x00800100, 
+            expand = False,
+        ))
         
