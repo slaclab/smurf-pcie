@@ -361,7 +361,6 @@ class CryoFreqBand(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RW",
-            hidden       = True,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -372,7 +371,6 @@ class CryoFreqBand(pr.Device):
             bitOffset    =  2,
             base         = pr.UInt,
             mode         = "RW",
-            hidden       = True,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -384,6 +382,39 @@ class CryoFreqBand(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
         ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "singleChannelReadout",
+            description  = "select for single channel readout",
+            offset       =  0x9C,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "singleChannelReadoutOpt2",
+            description  = "non-decimated single channel readout - rate 307.2e6/128",
+            offset       =  0x9C,
+            bitSize      =  1,
+            bitOffset    =  10,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+
+        self.add(pr.RemoteVariable(    
+            name         = "readoutChannelSelect",
+            description  = "select for single channel readout",
+            offset       =  0x9C,
+            bitSize      =  9,
+            bitOffset    =  1,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+
 
 
 
