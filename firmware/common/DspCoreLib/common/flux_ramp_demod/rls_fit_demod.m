@@ -33,7 +33,7 @@ alpha = 0.1*ones(7,1);
 delta = 0.005;
 u = 0.999;
 R     = (1/delta)*eye(7);
-phase = [];
+phase = zeros(frameSize,1);
 
 % Frame processing resets at flux ramp strobe
 for i = 1:frameSize
