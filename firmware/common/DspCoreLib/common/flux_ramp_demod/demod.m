@@ -1,7 +1,6 @@
 close all
 
 
-
 % Readout setup
 Fs = 600e3;               % downsampled rate
 resetRate = 1e3;          % flux ramp reset rate
@@ -28,11 +27,12 @@ disp_n = 130;  % display the 130 degree phase offset case
 for d = 1:360    
     % flux ramp
     lambda = 0.33;
-    noise = 0.01;
+    noise = 0.1;
     poff = 2*pi*(d/360);
     sig = sin(2*pi*freqNorm*[0:1:frameSize-1] + poff);  % ideal sin
     obs = (lambda*sig')./(1+lambda*sig');               % flux ramp mod
     obs_n = obs + noise*randn(size(obs));               % noisy measurement
+
     
     if d == disp_n
         figure;
@@ -75,10 +75,11 @@ for d = 1:360
         hold on
         plot(sig_est1)
         plot(obs)
+        plot(obs_n)
         
         legend([num2str(modelOrder) ' order, estimate error: ',num2str(err(d)), ' deg'],...
             ['1 order, estimate error: ',num2str(err1(d)), ' deg'],...
-            'original signal')
+            'original signal','noisy measurement')
     end
 
 

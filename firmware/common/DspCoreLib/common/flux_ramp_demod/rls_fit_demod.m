@@ -53,7 +53,7 @@ for i = 1:frameSize
 end
 
 figure;
-subplot(3,1,1)
+subplot(2,1,1)
 plot(obs)
 hold on
 plot(obs_n)
@@ -61,7 +61,7 @@ title('Measurement')
 xlabel('sample')
 legend('Flux ramp signal','noise corrupted measurement')
 xlim([0 frameSize])
-subplot(3,1,2)
+subplot(2,1,2)
 plot(phase*180/pi)
 hold on
 plot([0 frameSize],[poff*180/pi poff*180/pi],'-r')
@@ -70,11 +70,11 @@ xlabel('sample')
 ylabel('Phase (degree)')
 legend('Phase estimate','Phase')
 xlim([0 frameSize])
-subplot(3,1,3)
-plot((phase-poff)*180/pi)
-title('Phase error')
-xlabel('sample')
-ylabel('Phase (degree)')
-xlim([0 frameSize])
-ylim([-1 1])
+% subplot(3,1,3)
+% plot((phase-poff)*180/pi)
+% title('Phase error')
+% xlabel('sample')
+% ylabel('Phase (degree)')
+% xlim([0 frameSize])
+% ylim([-1 1])
 
