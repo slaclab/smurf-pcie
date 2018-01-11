@@ -117,7 +117,7 @@ crlb_rms = sqrt(crlb_var);
 
 disp([' ' ])
 disp([' ' ])
-disp(['Pure sine wave results:'])
+disp(['Flux ramp demod results:'])
 disp(['    Measurement noise: ', num2str(noiseSigma), ' RMS'])
 disp(['    amplitude: ', num2str(A)])
 disp(['    SNR: ' num2str(snr), ' dB'])
