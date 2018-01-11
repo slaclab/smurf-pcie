@@ -31,9 +31,9 @@ H = [cos(2*pi*i*Fc./Fs), sin(2*pi*i*Fc./Fs)];
 
 % frame processing
 theta = zeros(numberFrames, 1);
-for i = 0:numberFrames-1
-    alpha = H\y( (i*frameSize+1):((i+1)*frameSize) );
-    theta(i+1) = atan2(alpha(2), alpha(1));
+for k = 0:numberFrames-1
+    alpha = H\y( (k*frameSize+1):((k+1)*frameSize) );
+    theta(k+1) = atan2(alpha(2), alpha(1));
 end
 
 snr = (A.^2)./(2*noiseSigma.^2);
@@ -51,7 +51,7 @@ disp(['    Measurement noise: ', num2str(noiseSigma), ' RMS'])
 disp(['    amplitude: ', num2str(A)])
 disp(['    SNR: ' num2str(snr), ' dB'])
 disp(['    CRLB: ' num2str(crlb_rms), ' radians RMS'])
-disp(['    acheived: ', num2str(rms), ' radians RMS'])
+disp(['    achieved: ', num2str(rms), ' radians RMS'])
 disp([' ' ])
 disp([' ' ])
 
@@ -62,15 +62,6 @@ noiseSigma = 200;  % Hz RMS
 modDepth = 150e3; % Hz
 lambda    = 0.3;
 
-
-Fs = 2.4e6;              % processing rate
-Fc = 30e3;               % flux ramp carrier rate
-Fr = 10e3;               % flux ramp reset rate
-frameSize = Fs/Fr;  
-numberFrames = 10000;
-
-i = 0:(frameSize-1);
-i = i(:);
 
 
 A = modDepth;
@@ -100,6 +91,7 @@ H = [cos(2*pi*i*Fc./Fs), sin(2*pi*i*Fc./Fs),...
     cos(3*2*pi*i*Fc./Fs), sin(3*2*pi*i*Fc./Fs),...
     ones(frameSize,1)];
 
+
 % frame processing
 theta = zeros(numberFrames, 1);
 for i = 0:numberFrames-1
@@ -115,14 +107,12 @@ crlb_var = (2*noiseSigma.^2)/(frameSize*A.^2);
 crlb_rms = sqrt(crlb_var);
 
 
-disp([' ' ])
-disp([' ' ])
 disp(['Flux ramp demod results:'])
-disp(['    Measurement noise: ', num2str(noiseSigma), ' RMS'])
-disp(['    amplitude: ', num2str(A)])
+disp(['    Measurement noise: ', num2str(noiseSigma), ' Hz RMS'])
+disp(['    amplitude: ', num2str(A), ' Hz'])
 disp(['    SNR: ' num2str(snr), ' dB'])
 disp(['    CRLB: ' num2str(crlb_rms), ' radians RMS'])
-disp(['    acheived: ', num2str(rms), ' radians RMS'])
+disp(['    achieved: ', num2str(rms), ' radians RMS'])
 disp([' ' ])
 disp([' ' ])
 
