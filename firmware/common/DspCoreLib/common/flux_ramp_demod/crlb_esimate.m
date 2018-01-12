@@ -128,14 +128,32 @@ H = [cos(2*pi*i*Fc./Fs), sin(2*pi*i*Fc./Fs),...
 
 
 % frame processing
-theta = zeros(numberFrames, 1);
+theta1 = zeros(numberFrames, 1);
+theta2 = zeros(numberFrames, 1);
+theta3 = zeros(numberFrames, 1);
+
+amp1 = zeros(numberFrames, 1);
+amp2 = zeros(numberFrames, 1);
+amp3 = zeros(numberFrames, 1);
+
 for k = 0:numberFrames-1
     alpha = H\y( (k*frameSize+1):((k+1)*frameSize) );
-    theta(k+1) = atan2(alpha(2), alpha(1));
+    theta1(k+1) = atan2(alpha(2),     alpha(1));
+    amp1(k+1)   = sqrt( alpha(2).^2 + alpha(1).^2);
+    theta2(k+1) = atan2(alpha(4),     alpha(3));
+    amp2(k+1)   = sqrt( alpha(4).^2 + alpha(3).^2);
+    theta3(k+1) = atan2(alpha(6),     alpha(5));
+    amp3(k+1)   = sqrt( alpha(6).^2 + alpha(5).^2);
 end
 
+% We need to look at amplitude of 1st harmonic for CRLB
+A = mean(amp1);
 snr = (A.^2)./(2*noiseSigma.^2);
-rms = std(theta);
+
+rms = std(theta1);
+
+% Note this is bound on variance of phase estimate for 1st harmonic
+%   not necessarily bound on variance of demodulated SQUID response
 
 % CRLB estimate var(theta_hat) >= (2*sigma^2)/(N*A^2)
 crlb_var = (2*noiseSigma.^2)/(frameSize*A.^2);
@@ -168,7 +186,7 @@ title('Measurement noise spectrum')
 xlabel('Frequency (Hz)')
 
 figure
-[pxx, f] = pwelch(theta-mean(theta), [], [], [], 2.4e6);
+[pxx, f] = pwelch(theta1-mean(theta1), [], [], [], 2.4e6);
 semilogx(f,10*log10(pxx))
 ylabel('Power/frequency (rad/Hz)')
 title('Demodulated noise spectrum')
