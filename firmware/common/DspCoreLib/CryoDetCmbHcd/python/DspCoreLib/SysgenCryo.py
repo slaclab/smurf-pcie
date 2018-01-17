@@ -416,6 +416,18 @@ class CryoFreqBand(pr.Device):
 
 
 
+        self.add(pr.RemoteVariable(    
+            name         = "dspReset",
+            description  = "reset DSP core",
+            offset       =  0x100,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+
+
 
 
 ## status1
