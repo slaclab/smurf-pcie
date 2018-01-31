@@ -9,32 +9,24 @@
 % 
 % u       = [x_re, x_im]';
 
-function [notchMimo] = generateNotch(Qc, Qr, fNotch, fAdc)
-
-% Represent sytem as MIMO I/Q in I/Q out
-%
-% Notch   = 1 - H(s)
-% H(s)    = H_re(s) + 1i*H_im(s)
-% Notch   = 1 - H_re(s) - 1i*H_im(s) 
-
-% G(s)    = [1-H_re(s), -(0-H_im(s));...
-%            (0-H_im(s)), 1-H_re(s)];
-% u       = [x_re, x_im]';
-
+% function [notchMimo] = generateNotch(Qc, Qr, fNotchRf, fNotchBaseband, fAdc)
+function [notchMimo] = generateNotch(Qc, Qr, fNotchRf, varargin)
 
 % Fill in unset optional values.
-switch nargin
-    case 3
-        fAdc = [];  % will return contnuous time model
-end
+numvarargs             = length(varargin);
+optargs                = {fNotchRf, []};  % default continuous system with fNotchBaseband = fNotchRf
+optargs(1:numvarargs)  = varargin;
+
+[fNotchBaseband, fAdc] = optargs{:};
 
 
-wNotch = 2*pi*fNotch;
+wNotchRf       = 2*pi*fNotchRf;
+wNotchBaseband = 2*pi*fNotchBaseband;
 
-H_den  = [(2*Qr/wNotch)^2, (4*Qr/wNotch), 1+(2*Qr)^2];
+H_den  = [(2*Qr/wNotchRf)^2, (4*Qr/wNotchRf), 1+(2*Qr*fNotchBaseband./fNotchRf)^2];
 
-H_re_num = (Qr/Qc)*[(2*Qr/wNotch), (1)];
-H_im_num = (Qr/Qc)*[2*Qr];
+H_re_num = (Qr/Qc)*[(2*Qr/wNotchRf), (1)];
+H_im_num = (Qr/Qc)*[2*Qr*fNotchBaseband./fNotchRf];
 
 H_re = tf(H_re_num, H_den);
 H_im = tf(H_im_num, H_den);
@@ -46,7 +38,7 @@ if isempty(fAdc)
     notchMimo = G;
 else
     % discrete representation 
-    discopts = c2dOptions('Method','tustin','PrewarpFrequency',wNotch);
+    discopts = c2dOptions('Method','tustin','PrewarpFrequency',wNotchBaseband);
     notchMimo = c2d(G, 1/fAdc, discopts);
 end
 notchMimo.InputName{1}  = 'I';
@@ -54,8 +46,11 @@ notchMimo.InputName{2}  = 'Q';
 notchMimo.OutputName{1} = 'I';
 notchMimo.OutputName{2} = 'Q';
 
+% with not output arguments plot complex and mimo response
 if nargout == 0
+   complexNotch = 1 - H_re -1i*H_im;
    figure; bode(notchMimo); 
+   figure; bode(complexNotch);
 end
 
 
