@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-
+##import time
         
 class CryoChannel(pr.Device):
     def __init__(   self, 
@@ -26,7 +26,7 @@ class CryoChannel(pr.Device):
             description = "Note: This module is read-only with respect to sysgen", 
             hidden      = True,
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, hidden=hidden, **kwargs)
 
         ##############################
         # Configuration registers (RO from Sysgen)
@@ -49,7 +49,7 @@ class CryoChannel(pr.Device):
             offset       =  0x0002,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RW",
         ))
 
@@ -59,13 +59,13 @@ class CryoChannel(pr.Device):
             description  = "Enable feedback on this channel UFix_1_0",
             offset       =  0x0800,
             bitSize      =  1,
-            bitOffset    =  32,
+            bitOffset    =  31,
             base         = pr.UInt,
             mode         = "RW",
         ))
 
         self.add(pr.RemoteVariable(   
-            name         = "amplitdueScale",
+            name         = "amplitudeScale",
             description  = "Amplitdue scale UFix_4_0",
             offset       =  0x0800,
             bitSize      =  4,
@@ -98,6 +98,7 @@ class CryoChannel(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
+#            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(   
@@ -117,8 +118,9 @@ class CryoChannel(pr.Device):
             offset       =  0x1800,
             bitSize      =  24,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RO",
+#            pollInterval = 1,
         ))
 
 
@@ -127,7 +129,7 @@ class CryoChannels(pr.Device):
     def __init__(   self, 
             name        = "CryoFrequencyBand", 
             description = "Note: This module is read-only with respect to sysgen", 
-            hidden      = True,
+            hidden      = False,
             **kwargs):
         super().__init__(name=name, description=description, hidden=hidden, **kwargs)
 
@@ -136,11 +138,24 @@ class CryoChannels(pr.Device):
 #        # Devices
 #        ##############################          
         for i in range(512):
-            self.add(CryoChannel(
-                name   = ('CryoChannel[%d]'%i), 
-                offset = (i*0x4), 
-                expand = False,
-            ))              
+#        for i in range(128):
+            if (i % 16 == 0) :
+                self.add(CryoChannel(
+                    name   = ('CryoChannel[%d]'%i), 
+                    offset = (i*0x4), 
+                    hidden = False,
+                    expand = False,
+                ))             
+            else:
+                self.add(CryoChannel(
+                    name   = ('CryoChannel[%d]'%i), 
+                    offset = (i*0x4), 
+                    hidden = True,
+                    expand = False,
+                ))             
+          
+            
+          
             
 class CryoFreqBand(pr.Device):
     def __init__(   self, 
@@ -248,7 +263,7 @@ class CryoFreqBand(pr.Device):
             name         = "toneScale",
             description  = "Scale the sum of 16 tones before synthesizer",
             offset       =  0x88,
-            bitSize      =  1,
+            bitSize      =  2,
             bitOffset    =  3,
             base         = pr.UInt,
             mode         = "RW",
@@ -316,6 +331,104 @@ class CryoFreqBand(pr.Device):
         ))
 ## config3  end
        
+## config4
+        self.add(pr.RemoteVariable(    
+            name         = "filterAlpha",
+            description  = "IIR filter alpha UFix16_15",
+            offset       =  0x90,
+            bitSize      =  16,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+## config4 end
+        self.add(pr.RemoteVariable(    
+            name         = "loopFilterOutputSel",
+            description  = "Global loop filter out reg.  Select with ",
+            offset       =  0x94,
+            bitSize      =  7,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "analysisScale",
+            description  = "analysis filter bank scale, nominal value is 1",
+            offset       =  0x98,
+            bitSize      =  2,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "synthesisScale",
+            description  = "synthesis filter bank scale, nominal value is 2",
+            offset       =  0x98,
+            bitSize      =  2,
+            bitOffset    =  2,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "decimation",
+            description  = "debug decimation rate 0...7",
+            offset       =  0x98,
+            bitSize      =  3,
+            bitOffset    =  4,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "singleChannelReadout",
+            description  = "select for single channel readout",
+            offset       =  0x9C,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "singleChannelReadoutOpt2",
+            description  = "non-decimated single channel readout - rate 307.2e6/128",
+            offset       =  0x9C,
+            bitSize      =  1,
+            bitOffset    =  10,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+
+        self.add(pr.RemoteVariable(    
+            name         = "readoutChannelSelect",
+            description  = "select for single channel readout",
+            offset       =  0x9C,
+            bitSize      =  9,
+            bitOffset    =  1,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+
+
+        self.add(pr.RemoteVariable(    
+            name         = "dspReset",
+            description  = "reset DSP core",
+            offset       =  0x100,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+
+
+
 
 ## status1
         self.add(pr.RemoteVariable(    
@@ -324,8 +437,9 @@ class CryoFreqBand(pr.Device):
             offset       =  0x08,
             bitSize      =  16,
             bitOffset    =  0,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RO",
+##            pollInterval = 1,
         ))
         self.add(pr.RemoteVariable(    
             name         = "I",
@@ -333,8 +447,9 @@ class CryoFreqBand(pr.Device):
             offset       =  0x08,
             bitSize      =  16,
             bitOffset    =  16,
-            base         = pr.UInt,
+            base         = pr.Int,
             mode         = "RO",
+##            pollInterval = 1,
         ))
 ## status1 end 
 
@@ -349,7 +464,21 @@ class CryoFreqBand(pr.Device):
             mode         = "RO",
         ))
 ## status2 end 
-        
+        self.add(pr.RemoteVariable(    
+            name         = "loopFilterOutput",
+            description  = "Loop filter output UFix_32_0",
+            offset       =  0x10,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))
+       
+
+#        for i in range(512):
+#            if (i % 16 == 0) :
+#                self.CryoChannels.CryoChannel[i].centerFrequency.addListener(self.UpdateIQ)
+ 
         # ##############################
         # # Commands
         # ##############################
@@ -358,6 +487,30 @@ class CryoFreqBand(pr.Device):
             # self.StartSigGenReg.set(1)
             # self.StartSigGenReg.set(0)
 
+    def UpdateIQ(self, dev, value, disp):
+##        time.sleep(0.001)
+        self.I.get()
+        self.Q.get()
+        
+class CryoAdcMux(pr.Device):
+    def __init__(   self, 
+            name        = "CryoAdcMux", 
+            description = "", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
+        
+        self.addRemoteVariables(   
+            name         = "ChRemap",
+            description  = "",
+            offset       =  0x0,
+            bitSize      =  4,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+            number       =  10,
+            stride       =  4,
+        )
+        
 class SysgenCryo(pr.Device):
     def __init__(   self, 
             name        = "SysgenCryo", 
@@ -376,4 +529,16 @@ class SysgenCryo(pr.Device):
                     offset = (i*0x00100000), 
                     expand = False,
                 )) 
+                
+        self.add(CryoAdcMux(
+            name   = 'CryoAdcMux[0]', 
+            offset = 0x00800000, 
+            expand = False,
+        ))  
+        
+        self.add(CryoAdcMux(
+            name   = 'CryoAdcMux[1]', 
+            offset = 0x00800100, 
+            expand = False,
+        ))
         

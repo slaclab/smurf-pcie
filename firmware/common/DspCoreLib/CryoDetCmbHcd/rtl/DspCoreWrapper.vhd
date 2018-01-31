@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-15
+-- Last update: 2017-12-06
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ use work.AppTopPkg.all;
 entity DspCoreWrapper is
    generic (
       TPD_G            : time             := 1 ns;
-      BUILD_DSP_G      : slv(7 downto 0)  := x"03";
+      BUILD_DSP_G      : slv(7 downto 0)  := x"01";
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
@@ -48,11 +48,9 @@ entity DspCoreWrapper is
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      kRelay          : in  slv(1 downto 0);
-      startRamp       : out sl;
-      selectRamp      : out sl;
-      lemo1           : in  sl;
-      lemo2           : out sl;
+      startRamp       : in  sl;
+      selectRamp      : in  sl;
+      rampCnt         : in  slv(31 downto 0);
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -64,7 +62,7 @@ end DspCoreWrapper;
 
 architecture mapping of DspCoreWrapper is
 
-   constant NUM_AXI_MASTERS_C : natural := 8;
+   constant NUM_AXI_MASTERS_C : natural := 9;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
@@ -73,20 +71,22 @@ architecture mapping of DspCoreWrapper is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
+
+   signal adcValidsRemap : Slv10Array(1 downto 0);
+   signal adcValuesRemap : sampleDataVectorArray(1 downto 0, 9 downto 0);
+
    signal adc        : Slv32Array(15 downto 0);
    signal dac        : Slv32Array(15 downto 0);
    signal debug      : Slv32Array(15 downto 0);
    signal sigGen     : Slv32Array(15 downto 0);
    signal sigGenSync : Slv32Array(1 downto 0);
 
-   signal jesdClkVec      : slv(7 downto 0)       := (others => '0');
-   signal jesdRstVec      : slv(7 downto 0)       := (others => '0');
-   signal sigGenStart     : slv(7 downto 0)       := (others => '0');
-   signal sigGenStartSync : slv(7 downto 0)       := (others => '0');
-   signal startRampVec    : slv(7 downto 0)       := (others => '0');
-   signal selectRampVec   : slv(7 downto 0)       := (others => '0');
-   signal lemo2Vec        : slv(7 downto 0)       := (others => '0');
-   signal debugvalid      : Slv2Array(7 downto 0) := (others => "00");
+   signal jesdClkVec      : slv(7 downto 0) := (others => '0');
+   signal jesdRstVec      : slv(7 downto 0) := (others => '0');
+   signal sigGenStart     : slv(7 downto 0) := (others => '0');
+   signal sigGenStartSync : slv(7 downto 0) := (others => '0');
+
+   signal debugvalid : Slv2Array(7 downto 0) := (others => "00");
 
 begin
 
@@ -102,7 +102,7 @@ begin
    debugValids(0)(0) <= debugvalid(0)(0);
    debugValids(0)(1) <= debugvalid(0)(1);
    debugValids(0)(2) <= debugvalid(1)(0);
-   debugValids(0)(3) <= debugvalid(1)(0);
+   debugValids(0)(3) <= debugvalid(1)(1);
 
    debugValues(0, 0) <= debug(0);
    debugValues(0, 1) <= debug(1);
@@ -112,16 +112,12 @@ begin
    debugValids(1)(0) <= debugvalid(4)(0);
    debugValids(1)(1) <= debugvalid(4)(1);
    debugValids(1)(2) <= debugvalid(5)(0);
-   debugValids(1)(3) <= debugvalid(5)(0);
+   debugValids(1)(3) <= debugvalid(5)(1);
 
    debugValues(1, 0) <= debug(8);
    debugValues(1, 1) <= debug(9);
    debugValues(1, 2) <= debug(10);
    debugValues(1, 3) <= debug(11);
-
-   startRamp  <= uOr(startRampVec);
-   selectRamp <= uOr(selectRampVec);
-   lemo2      <= uOr(lemo2Vec);
 
    dacSigCtrl(0).start <= (others => uOr(sigGenStartSync));
    dacSigCtrl(1)       <= DAC_SIG_CTRL_INIT_C;
@@ -169,19 +165,39 @@ begin
             dout   => sigGenSync(i));
    end generate SYNC_SIGGEN;
 
+   U_AdcMux : entity work.DspCoreWrapperAdcMux
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+      port map (
+         -- ADC Interface
+         jesdClk         => jesdClk,
+         jesdRst         => jesdRst,
+         adcValidIn      => adcValids,
+         adcValueIn      => adcValues,
+         adcValidOut     => adcValidsRemap,
+         adcValueOut     => adcValuesRemap,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(8),
+         axilReadSlave   => axilReadSlaves(8),
+         axilWriteMaster => axilWriteMasters(8),
+         axilWriteSlave  => axilWriteSlaves(8));
+
    GEN_CH :
    for i in 7 downto 0 generate
 
       --------------
       -- JESD BAY[0]
       --------------
-      adc(i)          <= adcValues(0, i);
+      adc(i)          <= adcValuesRemap(0, i);
       dacValues(0, i) <= dac(i);
 
       --------------
       -- JESD BAY[1]
       --------------   
-      adc(i+8)        <= adcValues(1, i);
+      adc(i+8)        <= adcValuesRemap(1, i);
       dacValues(1, i) <= dac(i+8);
 
    end generate GEN_CH;
@@ -238,11 +254,9 @@ begin
                sigGen(0)       => sigGen((2*i)+0),
                sigGen(1)       => sigGen((2*i)+1),
                -- Digital I/O Interface
-               kRelay          => kRelay,
-               startRamp       => startRampVec(i),
-               selectRamp      => selectRampVec(i),
-               lemo1           => lemo1,
-               lemo2           => lemo2Vec(i),
+               startRamp       => startRamp,
+               selectRamp      => selectRamp,
+               rampCnt         => rampCnt,
                -- AXI-Lite Interface
                axilClk         => axilClk,
                axilRst         => axilRst,
@@ -260,9 +274,6 @@ begin
          debug(((2*i)+0)) <= (others => '0');
          debug(((2*i)+1)) <= (others => '0');
          sigGenStart(i)   <= '0';
-         startRampVec(i)  <= '0';
-         selectRampVec(i) <= '0';
-         lemo2Vec(i)      <= '0';
 
          U_AxiLiteEmpty : entity work.AxiLiteEmpty
             generic map (

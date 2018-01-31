@@ -80,8 +80,12 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   GEN_VEC :
-   for i in (NUM_AXI_MASTERS_C-1) downto 0 generate
+-- Not sure why this works but pervious sysgen write only
+--   (vec 15:8) were not working
+-- TODO recombine to single GEN_VEC
+--   set AXI_WR_EN_G, SYS_WR_EN_G from higher level  
+   GEN_VEC_SYS_RO :
+   for i in (NUM_AXI_MASTERS_C/2-1) downto 0 generate
       --------------------------------          
       -- AXI-Lite Shared Memory Module
       --------------------------------          
@@ -91,7 +95,7 @@ begin
             BRAM_EN_G        => true,
             REG_EN_G         => true,  -- true = 2 cycle read access latency
             AXI_WR_EN_G      => true,
-            SYS_WR_EN_G      => true,
+            SYS_WR_EN_G      => false,
             COMMON_CLK_G     => false,
             ADDR_WIDTH_G     => 7,
             DATA_WIDTH_G     => 32,
@@ -111,6 +115,40 @@ begin
             axiReadSlave   => axilReadSlaves(i),
             axiWriteMaster => axilWriteMasters(i),
             axiWriteSlave  => axilWriteSlaves(i));
-   end generate GEN_VEC;
+   end generate GEN_VEC_SYS_RO;
+
+   GEN_VEC_AXI_RO :
+   for i in (NUM_AXI_MASTERS_C-1) downto (NUM_AXI_MASTERS_C/2) generate
+      --------------------------------          
+      -- AXI-Lite Shared Memory Module
+      --------------------------------          
+      U_Mem : entity work.AxiDualPortRam
+         generic map (
+            TPD_G            => TPD_G,
+            BRAM_EN_G        => true,
+            REG_EN_G         => true,  -- true = 2 cycle read access latency
+            AXI_WR_EN_G      => false,
+            SYS_WR_EN_G      => true,
+            COMMON_CLK_G     => false,
+            ADDR_WIDTH_G     => 7,
+            DATA_WIDTH_G     => 32,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            -- Clock and Reset
+            clk            => jesdClk,
+            rst            => jesdRst,
+            --we             => ramWe(i),
+            we             => '1',
+            addr           => ramAddr(i),
+            din            => ramDin(i),
+            dout           => ramDout(i),
+            -- AXI-Lite Interface
+            axiClk         => axilClk,
+            axiRst         => axilRst,
+            axiReadMaster  => axilReadMasters(i),
+            axiReadSlave   => axilReadSlaves(i),
+            axiWriteMaster => axilWriteMasters(i),
+            axiWriteSlave  => axilWriteSlaves(i));
+   end generate GEN_VEC_AXI_RO;
 
 end mapping;

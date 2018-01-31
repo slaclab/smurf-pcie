@@ -1,4 +1,4 @@
-export GIT_BYPASS = 1
+export GIT_BYPASS = 0
 ##########################################################################################
 # Applications must define the 32-bitFirmware Version Number
 ##########################################################################################
@@ -55,6 +55,7 @@ export RTM_INTF = Version2
 
 # COMMON_FILE is defined by application
 export COMMON_FILE = MicrowaveMuxApp
+export CRYO_DET_TYPE = CryoDetCmbHcd
 
 ##########################################################################################
 # Application have the option to remove unused source code from Vivado project
