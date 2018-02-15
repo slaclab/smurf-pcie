@@ -180,7 +180,7 @@ begin
       U_RssiClient : entity work.RssiCoreWrapper
          generic map (
             TPD_G               => TPD_G,
-            -- APP_ILEAVE_EN_G     => true,
+            APP_ILEAVE_EN_G     => true,
             APP_STREAMS_G       => RSSI_STREAMS_C,
             APP_STREAM_ROUTES_G => (
                0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
