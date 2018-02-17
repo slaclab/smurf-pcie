@@ -56,9 +56,9 @@ AMCc:
             REG[1]:  0x07BAAAA1
             REG[2]:  0x2000C002
             REG[3]:  0x00000003
-            REG[4]:  0x30008B84
+            REG[4]:  0x30008BC4
             REG[5]:  0x800025
-            REG[6]:  0x35046046
+            REG[6]:  0x35046446
             REG[7]:  0x12000007
             REG[8]:  0x102D0428
             REG[9]:  0x34337CC9
@@ -70,7 +70,7 @@ AMCc:
             REG[1]:  0x08D55551
             REG[2]:  0x1000C002
             REG[3]:  0x00000003
-            REG[4]:  0x30008B84
+            REG[4]:  0x30008BC4
             REG[5]:  0x800025
             REG[6]:  0x3503C046
             REG[7]:  0x12000007
@@ -98,7 +98,7 @@ AMCc:
             REG[1]:  0x0B0AAAA1
             REG[2]:  0x1FFCC002
             REG[3]:  0x00000003
-            REG[4]:  0x30008B84
+            REG[4]:  0x30008BC4
             REG[5]:  0x800025
             REG[6]:  0x35030056
             REG[7]:  0x12000007
@@ -521,7 +521,8 @@ AMCc:
         #####################################################
         # CsvFilePath: /afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoCmbRtmEth/config/multitones_500_baseband.csv
         ##CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/multitone_space1p8gauss0p6MHz_b_baseband16k.csv
-        CsvFilePath: /home/cryo/mdewart/multitone_space1p8gauss0p6MHz_b_baseband16k.csv
+        #CsvFilePath: /home/cryo/mdewart/multitone_space1p8gauss0p6MHz_b_baseband16k.csv
+        CsvFilePath: /home/cryo/ssmith/cryo-det/software/CryoDetCmbHcd/matlab/toneFiles/multitone_1tonehalfscale_baseband16k.csv
         #
         # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/Is_zeros_Qs_ones.csv
         # CsvFilePath: /afs/slac.stanford.edu/u/rl/dandvan/cryo_det/matlab/broad_noise4.csv
