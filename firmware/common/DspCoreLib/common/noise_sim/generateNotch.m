@@ -3,12 +3,11 @@
 % Notch   = 1 - H(s)
 % H(s)    = H_re(s) + 1i*H_im(s)
 % Notch   = 1 - H_re(s) - 1i*H_im(s) 
-
 % G(s)    = [1-H_re(s), -(0-H_im(s));...
 %            (0-H_im(s)), 1-H_re(s)];
 % 
 % u       = [x_re, x_im]';
-
+%
 % function [notchMimo] = generateNotch(Qc, Qr, fNotchRf, fNotchBaseband, fAdc)
 function [notchMimo] = generateNotch(Qc, Qr, fNotchRf, varargin)
 
@@ -48,9 +47,11 @@ notchMimo.OutputName{2} = 'Q';
 
 % with not output arguments plot complex and mimo response
 if nargout == 0
+   opts = bodeoptions;
+   opts.FreqUnits = 'Hz';
    complexNotch = 1 - H_re -1i*H_im;
-   figure; bode(notchMimo); 
-   figure; bode(complexNotch);
+   figure; bode(notchMimo, opts);
+   figure; bode(complexNotch, opts);
 end
 
 
