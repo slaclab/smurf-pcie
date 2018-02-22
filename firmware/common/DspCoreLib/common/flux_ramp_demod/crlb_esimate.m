@@ -5,7 +5,7 @@ Fc           = 30e3;     % flux ramp carrier rate
 Fr           = 10e3;     % flux ramp reset rate
 frameSize    = Fs/Fr;  
 numberFrames = 10000;
-filterNoise  = 1;        % filter noise spectrum?.
+filterNoise  = 0;        % filter noise spectrum?.
 a            = 0.01;     % noise filter rolloff
 
 i = 0:(frameSize-1);
@@ -43,8 +43,9 @@ for k = 0:numberFrames-1
     theta(k+1) = atan2(alpha(2), alpha(1));
 end
 
-snr = (A.^2)./(2*noiseSigma.^2);
-rms = std(theta);
+snrPower = (A.^2)./(2*noiseSigma.^2);
+snr      = 10*log10(snrPower);
+rms      = std(theta);
 
 % CRLB estimate var(theta_hat) >= (2*sigma^2)/(N*A^2)
 crlb_var = (2*noiseSigma.^2)/(frameSize*A.^2);
