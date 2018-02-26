@@ -53,7 +53,7 @@ if nargout == 0
    opts.FreqUnits = 'Hz';
    figure; bode(notchMimo, opts);
    figure; bode(complexNotch, opts);
-   figure; nyquist(complexNotch);
+   figure; nyquist(complexNotch); grid on; xlim([0 1]);
 end
 
 
