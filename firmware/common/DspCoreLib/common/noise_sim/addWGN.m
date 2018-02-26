@@ -18,7 +18,7 @@
 
 function [output, noise] = addWGN(input, SNR)
 
-    signalPower = (input*input')/(length(input));
+    signalPower = (input(:)'*input(:))/(length(input(:)));
     noisePower  = signalPower/(10^(SNR/10));
 
     if isreal(input)
