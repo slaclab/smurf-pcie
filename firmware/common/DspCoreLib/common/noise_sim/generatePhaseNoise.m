@@ -50,9 +50,9 @@ function [phaseNoise, rmsPhaseNoise, freqOut, PxxOut, h] = generatePhaseNoise(fr
     % integrate power in log log
     for i = 1:length(dBc)-1
         p        = 0.5*(dBc(i+1) + dBc(i)) + 10*log10(freq(i+1) - freq(i));
-        ssbPower = ssbPower + 10.^(p./10)
+        ssbPower = ssbPower + 10.^(p./10);
     end
-    rmsPhaseNoise = sqrt(2*ssbPower)
+    rmsPhaseNoise = sqrt(2*ssbPower);
     
     linearFreqVec = [freqStart            freq  freqEnd];
     logPowerVec   = [dBc(1)                dBc     -200];
