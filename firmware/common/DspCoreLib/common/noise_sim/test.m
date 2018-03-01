@@ -156,41 +156,35 @@ title('Frequency error PSD')
 
 %% Let's try IQ vs freq (complex plot)
 
-nSamples = 2e4;
-freqScanRange = -0.5e6:10e3:0.5e6;
-l = length(freqScanRange);
-I = zeros(1, l);
-Q = zeros(1, l);
-trim = 10000;
+freqScanRange = -1e6:10e3:1e6;
+freqScan      = fNotch + freqScanRange;
+[I, Q]        = nyquist( notchComplex, 2*pi*freqScan );
 
-for i = 1:l
-    probeTone  = exp(j*2*pi*(0:nSamples+timeDelaySamples-1)*(fNotch+freqScanRange(i))/fAdc);
-    txTone    = (probeTone + noise(1:nSamples+timeDelaySamples)).*phaseNoisePhasor(1:nSamples+timeDelaySamples);
-    txTone    = txTone(1:nSamples);
+response      = I(:) + 1i*Q(:);
 
-    simout = lsim(notch, [real(txTone); imag(txTone)]);
-    notchTone = simout(:,1)' + 1i*simout(:,2)';
+responseMag   = abs(response);
 
-    notchTone_d = addFracTimingDelay(notchTone, timeDelayFrac);
+responsePhase = angle( response - 0.5 ); % Phase wrt IQ circle center
+responsePhase = unwrap( responsePhase );
+responsePhase = responsePhase - mean( responsePhase );
 
-    % rxTone      = notchTone_d.*conj(phaseNoisePhasor(1+timeDelaySamples:end));
-    rxTone  = notchTone_d;
-
-    baseband    = rxTone.*conj(probeTone(1+timeDelaySamples:nSamples+timeDelaySamples))*exp(j*pi);
-
-%     baseband    = rxTone.*conj(probeTone(1+timeDelaySamples:nSamples+timeDelaySamples));
-    
-    baseband    = baseband(trim+1:end); % trim by FIR length
-    
-    
-    I(i) = mean(real(baseband));
-    Q(i) = mean(imag(baseband));
-    
-end
 
 figure;
-plot(I + j*Q,'.')
+subplot(2,1,1)
+plot(freqScan./1e6, 20*log10(responseMag))
+title('Notch response')
+xlabel('Frequency (MHz)')
+ylabel('Magnitude (dB)')
+subplot(2,1,2)
+plot(freqScan./1e6, responsePhase)
+xlabel('Frequency (MHz)')
+ylabel('Phase (rad)')
+
+figure;
+plot(response,'.')
 title('Complex response (IQ)')
+
+
 
 % from plot -0.02043 is -10kHz
 %            0.02043 is +10kHz
