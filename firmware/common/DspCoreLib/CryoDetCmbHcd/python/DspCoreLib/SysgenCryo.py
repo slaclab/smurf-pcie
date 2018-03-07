@@ -172,7 +172,6 @@ class CryoChannels(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, hidden=hidden, **kwargs)
 
-
 #        ##############################
 #        # Devices
 #        ##############################
@@ -195,21 +194,21 @@ class CryoChannels(pr.Device):
             name        = "etaScanFreqs",
             description = "etaScan frequencies",
             mode        = "RW",
-            value       = [0.0 for x in range(100)],
+            value       = [0.0 for x in range(1000)],
         ))
 
         self.add(pr.LocalVariable(
             name        = "etaScanResultsImag",
             description = "etaScan frequencies",
             mode        = "RW",
-            value       = [0.0 for x in range(100)],
+            value       = [0.0 for x in range(1000)],
         ))
 
         self.add(pr.LocalVariable(
             name        = "etaScanResultsReal",
             description = "etaScan frequencies",
             mode        = "RW",
-            value       = [0.0 for x in range(100)],
+            value       = [0.0 for x in range(1000)],
         ))
 
         self.add(pr.LocalVariable(
@@ -217,6 +216,13 @@ class CryoChannels(pr.Device):
             description = "etaScan frequencies",
             mode        = "RW",
             value       = 0.0,
+        ))
+
+        self.add(pr.LocalVariable(
+            name        = "etaScanNumElements",
+            description = "etaScan frequencies",
+            mode        = "RW",
+            value       = 1000,
         ))
 
         self.add(pr.LocalVariable(
@@ -230,9 +236,9 @@ class CryoChannels(pr.Device):
         def runEtaScan():
             band    = self.etaScanBand.get()
             subchan = 16*band
-            print( subchan )
             ampl    = self.etaScanAmplitude.get()
             freqs   = self.etaScanFreqs.get()
+            n       = self.etaScaNumElements.get()
             # workaround for rogue local variables
             # list objects get written as string, not list of float when set by GUI
             if isinstance(freqs, str):
@@ -247,10 +253,14 @@ class CryoChannels(pr.Device):
             # run scan in phase
             self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
             resultsReal = []
-
-            for freqMHz in freqs:
+            f           = []
+            for freqMHz in freqs[:n]:
                 # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
-                self.CryoChannel[subchan].centerFrequencyMHz.set( freqMHz )
+                # out list of freqs may do several measurements at a single freq
+                # dont' want to write the same value again
+                if f != freqMHz:
+                    f = freqMHz
+                    self.CryoChannel[subchan].centerFrequencyMHz.set( f )
                 # do we need a dwell?
                 freqError = self.CryoChannel[subchan].frequencyError.get()
                 resultsReal.append( freqError )
@@ -258,9 +268,11 @@ class CryoChannels(pr.Device):
             # run scan in quadrature
             self.CryoChannel[subchan].etaPhaseDegree.set( -90 )
             resultsImag = []
-
-            for freqMHz in freqs:
-                self.CryoChannel[subchan].centerFrequencyMHz.set( freqMHz )
+            f           = []
+            for freqMHz in freqs[:n]:
+                if f != freqMHz:
+                    f = freqMHz
+                    self.CryoChannel[subchan].centerFrequencyMHz.set( f )
                 # do we need a dwell?
                 freqError = self.CryoChannel[subchan].frequencyError.get()
                 resultsImag.append( freqError )
