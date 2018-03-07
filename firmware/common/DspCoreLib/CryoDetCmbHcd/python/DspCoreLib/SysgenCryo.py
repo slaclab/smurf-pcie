@@ -36,6 +36,7 @@ class CryoChannel(pr.Device):
         # Cryo channel ETA
         self.add(pr.RemoteVariable(
             name         = "etaMag",
+            hidden       = True,
             description  = "ETA mag Fix_16_10",
             offset       =  0x0000,
             bitSize      =  16,
@@ -54,6 +55,7 @@ class CryoChannel(pr.Device):
 
         self.add(pr.RemoteVariable(
             name         = "etaPhase",
+            hidden       = True,
             description  = "ETA phase Fix_16_15",
             offset       =  0x0002,
             bitSize      =  16,
@@ -93,6 +95,7 @@ class CryoChannel(pr.Device):
 
         self.add(pr.RemoteVariable(
             name         = "centerFrequency",
+            hidden       = True,
             description  = "Center frequency UFix_24_24",
             offset       =  0x0800,
             bitSize      =  24,
@@ -139,14 +142,25 @@ class CryoChannel(pr.Device):
         # Cryo channel readback frequency error
         self.add(pr.RemoteVariable(
             name         = "frequencyError",
-            description  = "Frequency error Fix_24_23",
+            description  = "Frequency error MHz",
+            hidden       = True,
             offset       =  0x1800,
             bitSize      =  24,
             bitOffset    =  0,
             base         = pr.Int,
             mode         = "RO",
-#            pollInterval = 1,
         ))
+
+        self.add(pr.LinkVariable(
+            name         = "frequencyErrorMHz",
+            description  = "Frequency error Fix_24_23",
+            mode         = "RO",
+            dependencies = [self.frequencyError],
+            linkedGet    = lambda: self.frequencyError.get(read=False)*2**-23*freqSpanMHz,
+        ))
+
+
+
 
 
 
@@ -163,21 +177,12 @@ class CryoChannels(pr.Device):
 #        # Devices
 #        ##############################
         for i in range(512):
-#        for i in range(128):
-            if (i % 16 == 0) :
-                self.add(CryoChannel(
-                    name   = ('CryoChannel[%d]'%i),
-                    offset = (i*0x4),
-                    hidden = False,
-                    expand = False,
-                ))
-            else:
-                self.add(CryoChannel(
-                    name   = ('CryoChannel[%d]'%i),
-                    offset = (i*0x4),
-                    hidden = True,
-                    expand = False,
-                ))
+            self.add(CryoChannel(
+                name   = ('CryoChannel[%d]'%i),
+                offset = (i*0x4),
+                hidden = (i % 16 != 0),
+                expand = False,
+            ))
 
         self.add(pr.LocalVariable(
             name        = "etaScanBand",
@@ -225,8 +230,15 @@ class CryoChannels(pr.Device):
         def runEtaScan():
             band    = self.etaScanBand.get()
             subchan = 16*band
+            print( subchan )
             ampl    = self.etaScanAmplitude.get()
             freqs   = self.etaScanFreqs.get()
+            # workaround for rogue local variables
+            # list objects get written as string, not list of float
+            # when set by GUI
+            if isinstance(freqs, str):
+                freqs = eval(freqs)
+
             dwell   = self.etaScanDwell.get()
 
             self.CryoChannel[subchan].amplitudeScale.set( ampl )
@@ -237,6 +249,9 @@ class CryoChannels(pr.Device):
             self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
             resultsReal = []
 
+            print( freqs )
+            for freqMHz in freqs:
+                print( freqMHz )
             for freqMHz in freqs:
                 # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
                 self.CryoChannel[subchan].centerFrequencyMHz.set( freqMHz )
@@ -256,6 +271,21 @@ class CryoChannels(pr.Device):
 
             self.etaScanResultsReal.set( resultsReal )
             self.etaScanResultsImag.set( resultsImag )
+
+
+        @self.command(description="Set all amplitudeScale values",value=0)
+        def setAmplitudeScales(arg):
+            for c in self.CryoChannel.values():
+                c.amplitudeScale.setDisp(arg, write=False)
+
+            # Commit blocks with bulk background writes
+            self.writeBlocks()
+
+            # Verify the blocks with background transactions
+            self.verifyBlocks()
+
+            # Check write and verify results
+            self.checkBlocks()
 
 
 class CryoFreqBand(pr.Device):
