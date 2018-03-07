@@ -219,13 +219,6 @@ class CryoChannels(pr.Device):
         ))
 
         self.add(pr.LocalVariable(
-            name        = "etaScanNumElements",
-            description = "etaScan frequencies",
-            mode        = "RW",
-            value       = 1000,
-        ))
-
-        self.add(pr.LocalVariable(
             name        = "etaScanAmplitude",
             description = "number of points to average for etaScan",
             mode        = "RW",
@@ -238,7 +231,6 @@ class CryoChannels(pr.Device):
             subchan = 16*band
             ampl    = self.etaScanAmplitude.get()
             freqs   = self.etaScanFreqs.get()
-            n       = self.etaScaNumElements.get()
             # workaround for rogue local variables
             # list objects get written as string, not list of float when set by GUI
             if isinstance(freqs, str):
@@ -254,7 +246,7 @@ class CryoChannels(pr.Device):
             self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
             resultsReal = []
             f           = []
-            for freqMHz in freqs[:n]:
+            for freqMHz in freqs:
                 # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
                 # out list of freqs may do several measurements at a single freq
                 # dont' want to write the same value again
@@ -269,7 +261,7 @@ class CryoChannels(pr.Device):
             self.CryoChannel[subchan].etaPhaseDegree.set( -90 )
             resultsImag = []
             f           = []
-            for freqMHz in freqs[:n]:
+            for freqMHz in freqs:
                 if f != freqMHz:
                     f = freqMHz
                     self.CryoChannel[subchan].centerFrequencyMHz.set( f )
