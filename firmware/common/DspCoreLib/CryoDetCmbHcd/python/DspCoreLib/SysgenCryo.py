@@ -49,8 +49,8 @@ class CryoChannel(pr.Device):
             name         = "etaMagScaled",
             description  = "ETA mag scaled",
             dependencies = [self.etaMag],
-            linkedGet    = lambda: self.etaMag.get(read=False)*2**-10,
-            linkedSet    = lambda value: self.etaMag.set(round(value*2**10)),
+            linkedGet    = lambda: self.etaMag.value()*2**-10,
+            linkedSet    = lambda value, write: self.etaMag.set(round(value*2**10), write=write),
         ))
 
         self.add(pr.RemoteVariable(
@@ -68,8 +68,8 @@ class CryoChannel(pr.Device):
             name         = "etaPhaseDegree",
             description  = "ETA phase degrees",
             dependencies = [self.etaPhase],
-            linkedGet    = lambda: self.etaPhase.get(read=False)*180*2**-15,
-            linkedSet    = lambda value: self.etaPhase.set(round(value*2**15./180)),
+            linkedGet    = lambda: self.etaPhase.value()*180*2**-15,
+            linkedSet    = lambda value, write: self.etaPhase.set(round(value*2**15./180), write=write),
         ))
 
         # Cryo channel frequency word
@@ -108,8 +108,8 @@ class CryoChannel(pr.Device):
             name         = "centerFrequencyMHz",
             description  = "Center frequency MHz",
             dependencies = [self.centerFrequency],
-            linkedGet    = lambda: self.centerFrequency.get(read=False)*2**-24*freqSpanMHz,
-            linkedSet    = lambda value: self.centerFrequency.set(round((value*2**24./freqSpanMHz))),
+            linkedGet    = lambda: self.centerFrequency.value()*2**-24*freqSpanMHz,
+            linkedSet    = lambda value, write: self.centerFrequency.set(round((value*2**24./freqSpanMHz)), write=write),
         ))
 
 
@@ -183,6 +183,16 @@ class CryoChannels(pr.Device):
                 expand = False,
             ))
 
+
+        # make waveform of etaPhase 
+        self.add(pr.LinkVariable(
+            name        = "etaPhaseArray",
+            description = "eta phase array (degree)",
+            dependencies = [chan.etaPhaseDegree for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
+
         self.add(pr.LocalVariable(
             name        = "etaScanBand",
             description = "etaScan frequency band",
@@ -190,6 +200,8 @@ class CryoChannels(pr.Device):
             value       = 0,
         ))
 
+        # make waveform for etaScanFreqs, 1000 will be our max number
+        # make sure to initialize with type we want in EPICS (float)
         self.add(pr.LocalVariable(
             name        = "etaScanFreqs",
             description = "etaScan frequencies",
@@ -224,6 +236,7 @@ class CryoChannels(pr.Device):
             mode        = "RW",
             value       = 0,
         ))
+
 
         @self.command(description="Run etaScan",)
         def runEtaScan():
@@ -286,6 +299,28 @@ class CryoChannels(pr.Device):
 
             # Check write and verify results
             self.checkBlocks()
+
+    @staticmethod
+    def setArray(dev, var, value):
+       # workaround for rogue local variables
+       # list objects get written as string, not list of float when set by GUI
+       if isinstance(value, str):
+           value = eval(value)
+       for variable, setpoint in zip( var.dependencies, value ):
+           variable.set( setpoint, write=False )
+       dev.writeBlocks()
+       dev.verifyBlocks()
+       dev.checkBlocks()
+
+
+
+    @staticmethod
+    def getArray(dev, var, read):
+       array = []
+       for variable in var.dependencies:
+           array.append( variable.value() )
+       return array
+
 
 
 class CryoFreqBand(pr.Device):
