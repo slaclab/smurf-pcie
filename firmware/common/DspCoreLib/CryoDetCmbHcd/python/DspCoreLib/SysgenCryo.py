@@ -316,10 +316,7 @@ class CryoChannels(pr.Device):
 
     @staticmethod
     def getArray(dev, var, read):
-       array = []
-       for variable in var.dependencies:
-           array.append( variable.value() )
-       return array
+       return [variable.value() for variable in var.dependencies]
 
 
 
