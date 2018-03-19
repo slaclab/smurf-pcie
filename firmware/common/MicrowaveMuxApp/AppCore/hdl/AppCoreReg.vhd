@@ -25,8 +25,7 @@ use work.AxiLitePkg.all;
 
 entity AppCoreReg is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns);
    port (
       -- Configuration/Status
       dacSigTrigArm   : out sl;
@@ -81,7 +80,7 @@ begin
       axiSlaveRegister(regCon, x"04", 0, v.dacSigTrigArm);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_OK_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then

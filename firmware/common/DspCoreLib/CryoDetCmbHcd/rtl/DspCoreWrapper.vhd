@@ -67,9 +67,9 @@ architecture mapping of DspCoreWrapper is
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
 
 
    signal adcValidsRemap : Slv10Array(1 downto 0);
@@ -274,18 +274,6 @@ begin
          debug(((2*i)+0)) <= (others => '0');
          debug(((2*i)+1)) <= (others => '0');
          sigGenStart(i)   <= '0';
-
-         U_AxiLiteEmpty : entity work.AxiLiteEmpty
-            generic map (
-               TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_RESP_OK_C)
-            port map (
-               axiClk         => axilClk,
-               axiClkRst      => axilRst,
-               axiReadMaster  => axilReadMasters(i),
-               axiReadSlave   => axilReadSlaves(i),
-               axiWriteMaster => axilWriteMasters(i),
-               axiWriteSlave  => axilWriteSlaves(i));
 
       end generate;
 

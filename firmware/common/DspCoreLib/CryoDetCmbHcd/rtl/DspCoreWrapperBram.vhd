@@ -98,8 +98,7 @@ begin
             SYS_WR_EN_G      => false,
             COMMON_CLK_G     => false,
             ADDR_WIDTH_G     => 7,
-            DATA_WIDTH_G     => 32,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            DATA_WIDTH_G     => 32)
          port map (
             -- Clock and Reset
             clk            => jesdClk,
@@ -131,8 +130,7 @@ begin
             SYS_WR_EN_G      => true,
             COMMON_CLK_G     => false,
             ADDR_WIDTH_G     => 7,
-            DATA_WIDTH_G     => 32,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            DATA_WIDTH_G     => 32)
          port map (
             -- Clock and Reset
             clk            => jesdClk,
