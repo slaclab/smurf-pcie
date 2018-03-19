@@ -2,7 +2,7 @@
 -- File       : EthConfig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-02-06
+-- Last update: 2018-03-16
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ entity EthConfig is
       phyReady        : in  sl;
       localIp         : out slv(31 downto 0);  -- big endianness
       localMac        : out slv(47 downto 0);  -- big endianness
+      bypRssi         : out slv(RSSI_PER_LINK_C-1 downto 0);
       -- AXI-Lite Register Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -46,6 +47,7 @@ architecture rtl of EthConfig is
    type RegType is record
       localIp        : slv(31 downto 0);
       localMac       : slv(47 downto 0);
+      bypRssi        : slv(RSSI_PER_LINK_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -53,6 +55,7 @@ architecture rtl of EthConfig is
    constant REG_INIT_C : RegType := (
       localIp        => (others => '0'),  -- big endianness
       localMac       => (others => '0'),  -- big endianness
+      bypRssi        => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -77,6 +80,7 @@ begin
       -- Map the read registers
       axiSlaveRegister(regCon, x"00", 0, v.localMac);
       axiSlaveRegister(regCon, x"04", 0, v.localIp);
+      axiSlaveRegister(regCon, x"08", 0, v.bypRssi);
       axiSlaveRegisterR(regCon, x"10", 0, phyReady);
 
       axiSlaveRegisterR(regCon, x"80", 0, toSlv(NUM_LINKS_C, 32));
@@ -102,6 +106,7 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       localIp        <= r.localIp;
       localMac       <= r.localMac;
+      bypRssi        <= r.bypRssi;
 
    end process comb;
 

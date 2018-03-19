@@ -2,7 +2,7 @@
 -- File       : EthLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-02-06
+-- Last update: 2018-03-16
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -74,16 +74,22 @@ architecture mapping of EthLane is
    signal ibClientMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
    signal ibClientSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
 
+   signal obRssiTspMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+   signal obRssiTspSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
+   signal ibRssiTspMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+   signal ibRssiTspSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
+
+   signal obRssiAppMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+   signal obRssiAppSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
+   signal ibRssiAppMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+   signal ibRssiAppSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
+
    signal localIp  : slv(31 downto 0);
    signal localMac : slv(47 downto 0);
+   signal bypRssi  : slv(RSSI_PER_LINK_C-1 downto 0);
 
    signal statusReg : Slv7Array(RSSI_PER_LINK_C-1 downto 0);
    signal linkUp    : slv(RSSI_PER_LINK_C-1 downto 0);
-
-   signal ibMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
-   signal ibSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
-   signal obMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
-   signal obSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
 
 begin
 
@@ -123,6 +129,7 @@ begin
          phyReady        => phyReady,
          localIp         => localIp,
          localMac        => localMac,
+         bypRssi         => bypRssi,
          -- AXI-Lite Register Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -173,10 +180,42 @@ begin
          clk             => axilClk,
          rst             => axilRst);
 
-   --------------------------
-   -- Software's RSSI Clients
-   --------------------------
    GEN_LANE : for i in RSSI_PER_LINK_C-1 downto 0 generate
+
+      U_EthTrafficSwitch : entity work.EthTrafficSwitch
+         generic map (
+            TPD_G => TPD_G)
+         port map(
+            -- Clock and reset
+            axisClk         => axilClk,
+            axisRst         => axilRst,
+            -- Controls Interface
+            rssiLinkUp      => linkUp(i),
+            bypRssi         => bypRssi(i),
+            -- UDP Interface
+            sUdpMaster      => obClientMasters(i),
+            sUdpSlave       => obClientSlaves(i),
+            mUdpMaster      => ibClientMasters(i),
+            mUdpSlave       => ibClientSlaves(i),
+            -- RSSI Transport Interface
+            sRssiTspMaster  => obRssiTspMasters(i),
+            sRssiTspSlave   => obRssiTspSlaves(i),
+            mRssiTspMaster  => ibRssiTspMasters(i),
+            mRssiTspSlave   => ibRssiTspSlaves(i),
+            -- RSSI Application Interface
+            sRssiAppMasters => obRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            sRssiAppSlaves  => obRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            mRssiAppMasters => ibRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            mRssiAppSlaves  => ibRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            -- DMA Interface
+            sDmaMasters     => rssiIbMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            sDmaSlaves      => rssiIbSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            mDmaMasters     => rssiObMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            mDmaSlaves      => rssiObSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)));
+
+      --------------------------
+      -- Software's RSSI Clients
+      --------------------------
       U_RssiClient : entity work.RssiCoreWrapper
          generic map (
             TPD_G               => TPD_G,
@@ -203,16 +242,16 @@ begin
          port map (
             clk_i             => axilClk,
             rst_i             => axilRst,
-            -- Application Layer Interface
-            sAppAxisMasters_i => ibMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            sAppAxisSlaves_o  => ibSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mAppAxisMasters_o => obMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mAppAxisSlaves_i  => obSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
             -- Transport Layer Interface
-            sTspAxisMaster_i  => obClientMasters(i),
-            sTspAxisSlave_o   => obClientSlaves(i),
-            mTspAxisMaster_o  => ibClientMasters(i),
-            mTspAxisSlave_i   => ibClientSlaves(i),
+            sTspAxisMaster_i  => ibRssiTspMasters(i),
+            sTspAxisSlave_o   => ibRssiTspSlaves(i),
+            mTspAxisMaster_o  => obRssiTspMasters(i),
+            mTspAxisSlave_i   => obRssiTspSlaves(i),
+            -- Application Layer Interface
+            sAppAxisMasters_i => ibRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            sAppAxisSlaves_o  => ibRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            mAppAxisMasters_o => obRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            mAppAxisSlaves_i  => obRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
             -- High level  Application side interface
             openRq_i          => '0',   -- Enabled via software
             closeRq_i         => '0',
@@ -235,40 +274,5 @@ begin
       end process;
 
    end generate GEN_LANE;
-
-   process (ibSlaves, linkUp, obMasters, rssiIbMasters, rssiObSlaves) is
-      variable tmpIbMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
-      variable tmpIbSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
-      variable tmpObMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
-      variable tmpObSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
-      variable i            : natural;
-      variable idx          : natural;
-   begin
-      -- Make copy of inbound
-      tmpIbMasters := rssiIbMasters;
-      tmpIbSlaves  := ibSlaves;
-      -- Make copy of outbound
-      tmpObMasters := obMasters;
-      tmpObSlaves  := rssiObSlaves;
-      -- Loop through the channels
-      for i in AXIS_PER_LINK_C-1 downto 0 loop
-         -- Get the link index
-         idx := (i mod RSSI_STREAMS_C);
-         -- Check if the link is up
-         if (linkUp(idx) = '0') then
-            -- Prevent DMA back pressure
-            tmpIbMasters(i).tValid := '0';
-            tmpIbSlaves(i).tReady  := '1';
-            tmpObMasters(i).tValid := '0';
-            tmpObSlaves(i).tReady  := '1';
-         end if;
-      end loop;
-      -- Forward the inbound result
-      ibMasters     <= tmpIbMasters;
-      rssiIbSlaves  <= tmpIbSlaves;
-      -- Forward the outbound result
-      rssiObMasters <= tmpObMasters;
-      obSlaves      <= tmpObSlaves;
-   end process;
 
 end mapping;
