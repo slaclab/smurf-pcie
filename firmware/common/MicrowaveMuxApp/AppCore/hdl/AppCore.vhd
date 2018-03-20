@@ -241,7 +241,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_CLK_FREQ_G   => 156.25E+6,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
          jesdSysRef      => jesdSysRef,
@@ -272,7 +271,6 @@ begin
    U_SysGen : entity work.DspCoreWrapper
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(DSP_INDEX_C).baseAddr)
       port map (
          -- JESD Clocks and resets   
@@ -308,7 +306,6 @@ begin
    U_RTM : entity work.RtmCryoDet
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(RTM_INDEX_C).baseAddr)
       port map (
          -- JESD Clocks and resets   
@@ -340,8 +337,7 @@ begin
    ------------------   
    U_REG : entity work.AppCoreReg
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          -- Configuration/Status
          dacSigTrigArm   => dacSigTrigArm,

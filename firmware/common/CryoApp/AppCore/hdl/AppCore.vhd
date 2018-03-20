@@ -42,7 +42,6 @@ entity AppCore is
       SIM_SPEEDUP_G    : boolean          := false;
       SIMULATION_G     : boolean          := false;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := x"80000000";
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       -- True=370MHz SysGen DSP clock, False=185MHz SysGen DSP clock
       DSP_CLK_2X_G     : boolean          := false);
    port (
@@ -207,7 +206,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -230,7 +228,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_CLK_FREQ_G   => 156.25E+6,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
          jesdSysRef      => jesdSysRef,
@@ -261,7 +258,6 @@ begin
    U_SysGen : entity work.DspCoreWrapper
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(DSP_INDEX_C).baseAddr)
       port map (
          -- JESD Clocks and resets   
@@ -297,7 +293,6 @@ begin
    U_RTM : entity work.RtmCryoDet
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(RTM_INDEX_C).baseAddr)
       port map (
          -- JESD Clocks and resets   
@@ -329,8 +324,7 @@ begin
    ------------------   
    U_REG : entity work.AppCoreReg
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          -- Configuration/Status
          dacSigTrigArm   => dacSigTrigArm,
