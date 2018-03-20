@@ -2,8 +2,8 @@ close all
 clear
 
 fAdc                   = 614.4e6;
-fNotch                 = 10e6;
-probeOffset            = 50e3;
+fNotch                 = 5e6;
+probeOffset            = 5e3;
 nSamples               = 10e6;
 bw                     = 100e3;    
 SNR                    = 70;      
@@ -13,29 +13,26 @@ timeDelayFrac          = timeDelay*fAdc - timeDelaySamples;
 phaseNoiseProfile.freq = [1e2   1e3  1e4  1e5  2e5  1e6];
 phaseNoiseProfile.dBc  = [-83   -95 -100 -101 -100 -130]-30;
 
-% % % This creates real notch i.e. filters symmetric around DC
-% % [numNotch, denNotch] = iirnotch(fNotch*2/fAdc, bw/fAdc, 15);
-% % 
-% % fvtool(numNotch, denNotch)
+% Notch
+Qc = 20000;
+Qr = 17000;
+trim = 1e4;
 
+[notch, notchComplex] = generateNotch(Qc, Qr, 5e9, fNotch, fAdc);
 
-% Let's make a complex notch
-%     - baseband DC block
-%     - modulated to notch center
-N = 2000;
-R = 0.995;
-num = [1 -1];
-den = [1 -R];
+opts = bodeoptions;
+opts.FreqUnits = 'Hz';
+figure;
+bode(notchComplex, opts);
+title('Notch response')
+grid minor;
 
+figure;
+nyquist(notchComplex);
+title('Notch response');
+xlim([0 1]); 
+grid minor;
 
-% truncate IIR response
-h = impz(num, den, N);
-hmod = exp(-j*2*pi*(0:N-1)*fNotch/fAdc);
-h = h.*hmod';
-fvtool(h)
-
-numNotch = h;
-denNotch = 1;
 
 % Probe tone is offset from notch by probeOffset
 probeTone  = exp(j*2*pi*(0:nSamples+timeDelaySamples-1)*(fNotch+probeOffset)/fAdc);
@@ -57,7 +54,10 @@ txTone    = txTone(1:nSamples);
 
 
 % complex tone through complex notch
-notchTone   = filter(h, 1, txTone);
+% notchTone   = filter(h, 1, txTone);
+simout = lsim(notch, [real(txTone); imag(txTone)]);
+notchTone = simout(:,1)' + 1i*simout(:,2)';
+
 
 % let's convert to baseband and send through DC block instead
 % notchTone   = filter(num,den, exp(-j*2*pi*(0:length(txTone)-1)*fNotch/fAdc));
@@ -69,7 +69,7 @@ rxTone  = notchTone_d;
 
 baseband    = rxTone.*conj(probeTone(1+timeDelaySamples:end));
 
-baseband    = baseband(N+1:end); % trim by FIR length
+baseband    = baseband(trim+1:end); % trim by FIR length
 
 % baseband = txTone.*conj(probeTone(1:nSamples));
 
@@ -77,7 +77,7 @@ baseband    = baseband(N+1:end); % trim by FIR length
 
 figure;
 subplot(3,1,1)
-w = hanning(length(noisyTone)/8);
+w = hanning(floor(length(noisyTone)/8));
 pwelch(probeTone, w, 0, [], fAdc, 'centered')
 title('Noiseless probe tone')
 xlim([fNotch/1e6-2 fNotch/1e6+2])
@@ -95,25 +95,29 @@ xlim([fNotch/1e6-2 fNotch/1e6+2])
 figure;
 [pnPxx, pnF] = pwelch(phaseNoise, [], [], [], fAdc);
 semilogx(pnF, 10*log10(pnPxx))
-title('Phase noise')
+title('Input phase noise')
 xlabel('Frequency (Hz)')
 ylabel('Power density dBc/Hz')
 
 figure;
-pwelch(rxTone, [], [], [], fAdc, 'centered')
+pwelch(rxTone, w, [], [], fAdc, 'centered')
 title('Rx tone with downmix phase noise')
+xlim( [ (fNotch - 2e6) (fNotch + 2e6) ]./1e6 )
 
 
-
+t = 1:length(baseband);
+t = t./fAdc;
 I = mean(real(baseband));
 Q = mean(imag(baseband));
 aa = atan2(Q,I);
 % baseband = baseband*exp(-j*aa);
 figure;
-plot(real(baseband))
+plot(t, real(baseband))
 hold on
-plot(imag(baseband))
+plot(t, imag(baseband))
 title('Downmix IQ')
+xlabel('Time (sec)')
+legend('I','Q')
 
 
 [ddcPxxR, ddcFR] = pwelch(real(baseband)-mean(real(baseband)), [], [], [], fAdc);
@@ -124,16 +128,21 @@ semilogx(ddcFR, 10*log10(ddcPxxR))
 hold on
 semilogx(ddcFI, 10*log10(ddcPxxI))
 title('Downmix IQ PSD')
+legend('I','Q')
 
 rise = 20e3;
 run = 2/0.02043;
 slope = rise/run;
+slope = 1;
 
-freqError = (imag(baseband)-mean(imag(baseband)))*slope;
+phaseNoiseOut = angle(baseband);
+phaseNoiseOut = phaseNoiseOut - mean(phaseNoiseOut);
+freqError = phaseNoiseOut*slope;
 
 figure;
-plot(freqError)
+plot(t, freqError)
 title('Frequency error')
+xlabel('Time (sec)')
 
 figure;
 [pxxF, fF] = pwelch(freqError,[],0,[],fAdc);
@@ -143,48 +152,39 @@ title('Frequency error PSD')
 
 
 
-pause()
+% pause()
 
 %% Let's try IQ vs freq (complex plot)
 
-nSamples = 1e5;
-freqScanRange = -0.5e6:10e3:0.5e6;
-l = length(freqScanRange);
-I = zeros(1, l);
-Q = zeros(1, l);
+freqScanRange = -1e6:10e3:1e6;
+freqScan      = fNotch + freqScanRange;
+[I, Q]        = nyquist( notchComplex, 2*pi*freqScan );
 
-for i = 1:l
-    probeTone  = exp(j*2*pi*(0:nSamples+timeDelaySamples-1)*(fNotch+freqScanRange(i))/fAdc);
-    txTone    = (probeTone + noise(1:nSamples+timeDelaySamples)).*phaseNoisePhasor(1:nSamples+timeDelaySamples);
-    txTone    = txTone(1:nSamples);
+response      = I(:) + 1i*Q(:);
 
-%     notchTone   = filter(h, 1, txTone);
-    
-    workaround = exp(-j*2*pi*(0:length(txTone)-1)*fNotch/fAdc);
-    
-    notchTone = filter(num,den, txTone.*workaround);
-    notchTone = notchTone.*conj(workaround);
+responseMag   = abs(response);
 
-    notchTone_d = addFracTimingDelay(notchTone, timeDelayFrac);
+responsePhase = angle( response - 0.5 ); % Phase wrt IQ circle center
+responsePhase = unwrap( responsePhase );
+responsePhase = responsePhase - mean( responsePhase );
 
-    % rxTone      = notchTone_d.*conj(phaseNoisePhasor(1+timeDelaySamples:end));
-    rxTone  = notchTone_d;
-
-    baseband    = rxTone.*conj(probeTone(1+timeDelaySamples:nSamples+timeDelaySamples))*exp(j*pi/3);
-
-%     baseband    = rxTone.*conj(probeTone(1+timeDelaySamples:nSamples+timeDelaySamples));
-    
-    baseband    = baseband(N+1:end); % trim by FIR length
-    
-    
-    I(i) = mean(real(baseband));
-    Q(i) = mean(imag(baseband));
-    
-end
 
 figure;
-plot(I + j*Q,'.')
+subplot(2,1,1)
+plot(freqScan./1e6, 20*log10(responseMag))
+title('Notch response')
+xlabel('Frequency (MHz)')
+ylabel('Magnitude (dB)')
+subplot(2,1,2)
+plot(freqScan./1e6, responsePhase)
+xlabel('Frequency (MHz)')
+ylabel('Phase (rad)')
+
+figure;
+plot(response,'.')
 title('Complex response (IQ)')
+
+
 
 % from plot -0.02043 is -10kHz
 %            0.02043 is +10kHz

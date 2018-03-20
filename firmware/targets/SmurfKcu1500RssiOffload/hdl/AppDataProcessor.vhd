@@ -59,19 +59,9 @@ begin
    ------------------------------
    -- Placeholder for future code
    ------------------------------
-   mAxisMaster <= sAxisMaster;
-   sAxisSlave  <= mAxisSlave;
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
-
+   mAxisMaster    <= sAxisMaster;
+   sAxisSlave     <= mAxisSlave;
+   axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;   
 
 end mapping;
