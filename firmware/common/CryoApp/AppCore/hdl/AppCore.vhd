@@ -54,7 +54,7 @@ entity AppCore is
       jesdUsrRst          : in    slv(1 downto 0);
       -- DaqMux/Trig Interface (timingClk domain) 
       freezeHw            : out   slv(1 downto 0);
-      evrTrig             : in    AppTopTrigType;
+      timingTrig          : in    TimingTrigType;
       trigHw              : out   slv(1 downto 0);
       trigCascBay         : in    slv(1 downto 0);
       -- JESD SYNC Interface (jesdClk[1:0] domain)
@@ -197,8 +197,8 @@ begin
    mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
    timingPhy   <= TIMING_PHY_INIT_C;
 
-   trigHw(1)   <= evrTrig.trigPulse(1);
-   freezeHw(1) <= evrTrig.trigPulse(1);
+   trigHw(1)   <= timingTrig.trigPulse(1);
+   freezeHw(1) <= timingTrig.trigPulse(1);
 
    ---------------------
    -- AXI-Lite Crossbar
