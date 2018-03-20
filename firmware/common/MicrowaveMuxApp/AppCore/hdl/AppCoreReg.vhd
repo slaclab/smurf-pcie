@@ -80,7 +80,7 @@ begin
       axiSlaveRegister(regCon, x"04", 0, v.dacSigTrigArm);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_OK_C);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then
