@@ -245,7 +245,7 @@ class CryoChannels(pr.Device):
         ))
 
         self.add(pr.LocalVariable(
-            name        = "etaScanBand",
+            name        = "etaScanChannel",
             description = "etaScan frequency band",
             mode        = "RW",
             value       = 0,
@@ -294,8 +294,7 @@ class CryoChannels(pr.Device):
 
         @self.command(description="Run etaScan",)
         def runEtaScan():
-            band    = self.etaScanBand.get()
-            subchan = 16*band
+            subchan = self.etaScanChannel.get()
             ampl    = self.etaScanAmplitude.get()
             freqs   = self.etaScanFreqs.get()
             # workaround for rogue local variables
