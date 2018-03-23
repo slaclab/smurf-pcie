@@ -30,7 +30,6 @@ use work.AppPkg.all;
 entity EthLane is
    generic (
       TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := BAR0_ERROR_RESP_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- RSSI Interface (axilClk domain)
@@ -102,7 +101,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -123,8 +121,7 @@ begin
    ---------------------
    U_EthConfig : entity work.EthConfig
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          phyReady        => phyReady,
          localIp         => localIp,

@@ -9,13 +9,11 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-import pyrogue.gui
-import PyQt4.QtGui
 import sys
 import argparse
-
-from FpgaTopLevel import *
+import pyrogue as pr
+import rogue.hardware.axi
+import SmurfKcu1500RssiOffload as smurf
 
 #################################################################
 
@@ -27,43 +25,20 @@ parser = argparse.ArgumentParser()
 
 # Add arguments
 parser.add_argument(
-    "--simGui", 
-    type     = argBool,
-    required = False,
-    default  = False,
-    help     = "Enable hardware emulation",
-)  
-
-parser.add_argument(
-    "--commType", 
-    type     = str,
-    required = True,
-    help     = "Sets the communication type",
-)
-
-parser.add_argument(
-    "--ipAddr", 
+    "--dev", 
     type     = str,
     required = False,
-    default  = '10.0.0.100',
-    help     = "IP address",
+    default  = '/dev/datadev_0',
+    help     = "path to device",
 ) 
 
 parser.add_argument(
-    "--slot", 
-    type     = int,
+    "--yaml", 
+    type     = str,
     required = False,
-    default  = 2,
-    help     = "ATCA slot",
+    default  = 'config/pcie_rssi_config.yml',
+    help     = "path to YAML configuration",
 ) 
-
-parser.add_argument(
-    "--pollEn", 
-    type     = argBool,
-    required = False,
-    default  = True,
-    help     = "auto-polling",
-)  
 
 # Get the arguments
 args = parser.parse_args()
@@ -71,35 +46,23 @@ args = parser.parse_args()
 #################################################################
 
 # Set base
-base = pr.Root(name='base',description='')    
+base = pr.Root(name='pcie',description='')    
+
+# Create the stream interface
+memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 
 # Add Base Device
-base.add(FpgaTopLevel(
-    simGui       = args.simGui,
-    commType     = args.commType,
-    ipAddr       = args.ipAddr,
-    pcieRssiLink = (int(args.slot)-2),
-))
+base.add(smurf.Core(memBase=memMap))
 
 # Start the system
-base.start(
-    pollEn   = args.pollEn,
-)
+base.start(pollEn=False,initRead=False)
 
 # Print the AxiVersion Summary
-base.FpgaTopLevel.AmcCarrierCore.AxiVersion.printStatus()
+base.Core.AxiPcieCore.AxiVersion.printStatus()
 
-# Create GUI
-appTop = PyQt4.QtGui.QApplication(sys.argv)
-appTop.setStyle('Fusion')
-guiTop = pyrogue.gui.GuiTop(group='rootMesh')
-guiTop.addTree(base)
-guiTop.resize(800, 1000)
-
-print("Starting GUI...\n");
-
-# Run GUI
-appTop.exec_()    
+# Load the YAML file
+print( 'Loading %s YAML file' % args.yaml);
+base.ReadConfig(args.yaml) 
     
 # Close
 base.stop()
