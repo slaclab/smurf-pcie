@@ -1,7 +1,7 @@
 ##########################################################################################
 # Applications must define the 32-bitFirmware Version Number
 ##########################################################################################
-export PRJ_VERSION = 0xF0000002
+export PRJ_VERSION = 0xF0000004
 
 ##########################################################################################
 # Applications must define if using advance AMC carrier build

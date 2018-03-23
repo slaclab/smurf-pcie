@@ -36,7 +36,7 @@ class Core(pr.Device):
                 name        = ('EthLane[%d]' % i),
                 offset      = (0x00800000 + i*0x80000), 
                 rssiPerLink = rssiPerLink,
-                expand      = False,
+                expand      = True,
             )) 
 
         # Add Application Processing Lane

@@ -1,7 +1,7 @@
 # How to load the PCIe driver
 
 ```
-# Program the KCU1500 FPGA
+# Programing the KCU1500 FPGA for the first time
 https://docs.google.com/presentation/d/10eIsAbLmslcNk94yV-F1D3hBfxudBf0EFo4xjcn9qPk/edit?usp=sharing
 
 # Confirm that you have the board the computer with VID=1a4a ("SLAC") and PID=2030 ("DataDev")
@@ -44,10 +44,15 @@ $ source setup_CryoDetCmbHcd.csh
 # Configure the PCIe card
 $ python3 scripts/PcieLoadConfig.py --yaml config/pcie_rssi_config.yml
 
-# Launch the GUI
+# How to launch the GUI
 # In this example, ATCA Slot# is 4
 $ python3 scripts/AmccGui.py --commType pcie-rssi-interleaved --slot 4
 
+# How to Reprogram the AMC carrier's FPGA
+$ python3 scripts/AmccProgramFpga.py --commType pcie-rssi-interleaved --slot 4 -mcs <PATH_TO_MCS_FILE>
+
+# How to Reprogram the PCIe's FPGA
+# Note: A power cycle (not reboot) of the PC required after running the PcieProgramKcu1500.py script
+$ python3 scripts/PcieProgramKcu1500.py --mcs_pri <PATH_TO_PRIMARY_MCS_FILE> --mcs_sec <PATH_TO_SECONDARY_MCS_FILE>
+
 ```
-
-
