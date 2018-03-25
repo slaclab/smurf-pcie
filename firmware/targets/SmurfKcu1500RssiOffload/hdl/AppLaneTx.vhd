@@ -2,7 +2,7 @@
 -- File       : AppLaneTx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-02-06
+-- Last update: 2018-03-25
 -------------------------------------------------------------------------------
 -- Description: AppLaneTx File
 -------------------------------------------------------------------------------
@@ -85,25 +85,28 @@ begin
          mAxisMaster => txMaster,
          mAxisSlave  => txSlave);
 
-   U_SOF : entity work.SsiInsertSof
-      generic map (
-         TPD_G               => TPD_G,
-         COMMON_CLK_G        => true,
-         SLAVE_FIFO_G        => false,
-         MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => DMA_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => DMA_AXIS_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => txMaster,
-         sAxisSlave  => txSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => txMasterSof,
-         mAxisSlave  => txSlaveSof);
+   -- U_SOF : entity work.SsiInsertSof
+   -- generic map (
+   -- TPD_G               => TPD_G,
+   -- COMMON_CLK_G        => true,
+   -- SLAVE_FIFO_G        => false,
+   -- MASTER_FIFO_G       => false,
+   -- SLAVE_AXI_CONFIG_G  => DMA_AXIS_CONFIG_C,
+   -- MASTER_AXI_CONFIG_G => DMA_AXIS_CONFIG_C)
+   -- port map (
+   -- -- Slave Port
+   -- sAxisClk    => axilClk,
+   -- sAxisRst    => axilRst,
+   -- sAxisMaster => txMaster,
+   -- sAxisSlave  => txSlave,
+   -- -- Master Port
+   -- mAxisClk    => axilClk,
+   -- mAxisRst    => axilRst,
+   -- mAxisMaster => txMasterSof,
+   -- mAxisSlave  => txSlaveSof);
+
+   txMasterSof <= txMaster;
+   txSlaveSof  <= txSlave;
 
    U_DeMux : entity work.AxiStreamDeMux
       generic map (

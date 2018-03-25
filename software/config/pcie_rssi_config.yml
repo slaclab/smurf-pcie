@@ -13,11 +13,11 @@ pcie:
         BypRssi: 0x0                
       ############################
       UdpClient[0]: # Slot#2 Link
-        ClientRemotePort: 0
+        ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.102
       ############################
       UdpClient[1]: # Slot#3 Link
-        ClientRemotePort: 0
+        ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.103
       ############################
       UdpClient[2]: # Slot#4 Link
@@ -25,15 +25,15 @@ pcie:
         ClientRemoteIp: 10.0.3.104
       ############################
       UdpClient[3]: # Slot#5 Link
-        ClientRemotePort: 0
+        ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.105
       ############################
       UdpClient[4]: # Slot#6 Link
-        ClientRemotePort: 0
+        ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.106
       ############################
       UdpClient[5]: # Slot#7 Link
-        ClientRemotePort: 0
+        ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.107
       #####################################
       # Open the RSSI connections for links
