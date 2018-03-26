@@ -276,9 +276,18 @@ begin
          dacSigValids    => dacSigValids,
          dacSigValues    => dacSigValues,
          -- Digital I/O Interface
-         startRamp       => startRamp,
-         selectRamp      => selectRamp,
-         rampCnt         => rampCnt,
+         
+         kRelay          => "00",
+         startRamp       => open,
+         selectRamp      => open,
+         lemo1           => '0',
+         lemo2           => open,         
+         
+--         startRamp       => startRamp,
+--         selectRamp      => selectRamp,
+--         rampCnt         => rampCnt,
+
+
          -- AXI-Lite Port
          axilClk         => axilClk,
          axilRst         => axilRst,
