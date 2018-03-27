@@ -71,7 +71,7 @@ args = parser.parse_args()
 #################################################################
 
 # Set base
-base = pr.Root(name='base',description='')    
+base = pr.Root(name='AMCc',description='')    
 
 # Add Base Device
 base.add(FpgaTopLevel(
