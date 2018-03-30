@@ -38,3 +38,4 @@ build*
 .Xil/
 *.r2015b
 *.autosave
+*slprj/

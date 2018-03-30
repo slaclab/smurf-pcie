@@ -30,7 +30,7 @@ class FpgaTopLevel(app.TopLevel):
             simGui          = simGui,
             commType        = commType,
             ipAddr          = ipAddr,
-            pcieRssiLink    = pcieRssiLink,        
+            pcieRssiLink    = pcieRssiLink,              
             numRxLanes      = [10,0],      # 10x JESD  on BAY[0] only
             numTxLanes      = [10,0],      # 10x JESD  on BAY[0] only
             numSigGen       = [2,0],       # 2x SIGGEN on BAY[0] Only

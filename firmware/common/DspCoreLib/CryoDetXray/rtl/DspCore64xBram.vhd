@@ -2,7 +2,7 @@
 -- File       : DspCore64xBram.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-24
--- Last update: 2017-10-24
+-- Last update: 2018-03-30
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -25,9 +25,8 @@ use work.AxiLitePkg.all;
 
 entity DspCore64xBram is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- BRAM Interface
       jesdClk         : in  sl;
@@ -64,7 +63,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -87,9 +85,8 @@ begin
       --------------------------------          
       U_Mem : entity work.DspCore8xBram
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
+            TPD_G           => TPD_G,
+            AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map (
             -- Clock and Reset
             jesdClk         => jesdClk,

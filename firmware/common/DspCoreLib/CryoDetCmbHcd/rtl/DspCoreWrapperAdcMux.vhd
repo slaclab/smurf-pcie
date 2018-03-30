@@ -26,8 +26,7 @@ use work.Jesd204bPkg.all;
 
 entity DspCoreWrapperAdcMux is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C);
+      TPD_G            : time            := 1 ns);
    port (
       -- ADC Interface
       jesdClk         : in  slv(1 downto 0);
@@ -150,7 +149,7 @@ begin
       end loop;
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_SLVERR_C);
 
       -- Register the variable for next clock cycle
       rin <= v;

@@ -29,7 +29,6 @@ entity DspCoreWrapper is
    generic (
       TPD_G            : time             := 1 ns;
       BUILD_DSP_G      : slv(7 downto 0)  := x"01";
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clocks and resets   
@@ -167,8 +166,7 @@ begin
 
    U_AdcMux : entity work.DspCoreWrapperAdcMux
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          -- ADC Interface
          jesdClk         => jesdClk,
@@ -208,7 +206,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -235,7 +232,6 @@ begin
          U_DSP : entity work.DspCoreWrapperBase
             generic map (
                TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
                AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
             port map (
                -- JESD Clocks and resets   
