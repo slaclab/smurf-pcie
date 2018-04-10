@@ -256,54 +256,57 @@ class CryoChannels(pr.Device):
         @self.command(description="Run etaScan",)
         def runEtaScan():
             self.etaScanInProgress.set( 1 )
-            subchan = self.etaScanChannel.get()
-            ampl    = self.etaScanAmplitude.get()
-            freqs   = self.etaScanFreqs.get()
-            # workaround for rogue local variables
-            # list objects get written as string, not list of float when set by GUI
-            if isinstance(freqs, str):
-                freqs = eval(freqs)
 
-            dwell   = self.etaScanDwell.get()
-
-            self.CryoChannel[subchan].amplitudeScale.set( ampl )
-            self.CryoChannel[subchan].etaMagScaled.set( 1 )
-            self.CryoChannel[subchan].feedbackEnable.set( 0 )
-
-            # run scan in phase
-            self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
-            resultsReal = []
-            f           = []
-            for freqMHz in freqs:
-                # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
-                # out list of freqs may do several measurements at a single freq
-                # dont' want to write the same value again
-                if f != freqMHz:
-                    f = freqMHz
-                    self.CryoChannel[subchan].centerFrequencyMHz.set( f )
-                    time.sleep( dwell )
-                # do we need a dwell?
-                freqError = self.CryoChannel[subchan].frequencyError.get()
-                resultsReal.append( freqError )
-
-            # run scan in quadrature
-            self.CryoChannel[subchan].etaPhaseDegree.set( -90 )
-            resultsImag = []
-            f           = []
-            for freqMHz in freqs:
-                if f != freqMHz:
-                    f = freqMHz
-                    self.CryoChannel[subchan].centerFrequencyMHz.set( f )
-                    time.sleep( dwell )
-                # do we need a dwell?
-                freqError = self.CryoChannel[subchan].frequencyError.get()
-                resultsImag.append( freqError )
-           
-
-            self.etaScanResultsReal.set( resultsReal )
-            self.etaScanResultsImag.set( resultsImag )
-
-            self.etaScanInProgress.set( 0 )
+            # defer update callbacks
+            with self.root.updateGroup():
+                subchan = self.etaScanChannel.get()
+                ampl    = self.etaScanAmplitude.get()
+                freqs   = self.etaScanFreqs.get()
+                # workaround for rogue local variables
+                # list objects get written as string, not list of float when set by GUI
+                if isinstance(freqs, str):
+                    freqs = eval(freqs)
+    
+                dwell   = self.etaScanDwell.get()
+    
+                self.CryoChannel[subchan].amplitudeScale.set( ampl )
+                self.CryoChannel[subchan].etaMagScaled.set( 1 )
+                self.CryoChannel[subchan].feedbackEnable.set( 0 )
+    
+                # run scan in phase
+                self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
+                resultsReal = []
+                f           = []
+                for freqMHz in freqs:
+                    # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
+                    # out list of freqs may do several measurements at a single freq
+                    # dont' want to write the same value again
+                    if f != freqMHz:
+                        f = freqMHz
+                        self.CryoChannel[subchan].centerFrequencyMHz.set( f )
+                        time.sleep( dwell )
+                    # do we need a dwell?
+                    freqError = self.CryoChannel[subchan].frequencyError.get()
+                    resultsReal.append( freqError )
+    
+                # run scan in quadrature
+                self.CryoChannel[subchan].etaPhaseDegree.set( -90 )
+                resultsImag = []
+                f           = []
+                for freqMHz in freqs:
+                    if f != freqMHz:
+                        f = freqMHz
+                        self.CryoChannel[subchan].centerFrequencyMHz.set( f )
+                        time.sleep( dwell )
+                    # do we need a dwell?
+                    freqError = self.CryoChannel[subchan].frequencyError.get()
+                    resultsImag.append( freqError )
+               
+    
+                self.etaScanResultsReal.set( resultsReal )
+                self.etaScanResultsImag.set( resultsImag )
+    
+                self.etaScanInProgress.set( 0 )
 
         @self.command(description="Set all amplitudeScale values",value=0)
         def setAmplitudeScales(arg):
