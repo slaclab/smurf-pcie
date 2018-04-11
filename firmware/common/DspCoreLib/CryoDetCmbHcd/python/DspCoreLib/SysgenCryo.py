@@ -194,6 +194,65 @@ class CryoChannels(pr.Device):
                 expand = False,
             ))
 
+        # make waveform of etaMag
+        self.add(pr.LinkVariable(
+            name         = "etaMagArray",
+            hidden       = True,
+            description  = "eta mag array (scaled)",
+            dependencies = [chan.etaMagScaled for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
+
+        # make waveform of etaPhase
+        self.add(pr.LinkVariable(
+            name         = "etaPhaseArray",
+            hidden       = True,
+            description  = "eta phase array (degree)",
+            dependencies = [chan.etaPhaseDegree for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
+
+        # make waveform of feedbackEnable
+        self.add(pr.LinkVariable(
+            name         = "feedbackEnableArray",
+            hidden       = True,
+            description  = "feedback enable array",
+            dependencies = [chan.feedbackEnable for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
+
+        # make waveform of amplitudeScale
+        self.add(pr.LinkVariable(
+            name         = "amplitude scale array",
+            hidden       = True,
+            description  = "amplitude scale array (0...15)",
+            dependencies = [chan.amplitudeScale for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
+
+        # make waveform of centerFrequencyMHz
+        self.add(pr.LinkVariable(
+            name         = "centerFrequencyArray",
+            hidden       = True,
+            description  = "center frequency array (MHz)",
+            dependencies = [chan.centerFrequencyMHz for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
+
+        # make waveform of frequencyError
+        self.add(pr.LinkVariable(
+            name         = "frequencyErrorArray",
+            hidden       = True,
+            description  = "frequency error array (MHz)",
+            dependencies = [chan.frequencyErrorMHz for chan in self.CryoChannel.values()],
+            linkedGet    = self.getArray,
+            linkedSet    = self.setArray,
+        ))
 
         self.add(pr.LocalVariable(
             name        = "etaScanChannel",
