@@ -202,6 +202,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.etaMagScaled for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of etaPhase
@@ -212,6 +213,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.etaPhaseDegree for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of feedbackEnable
@@ -222,6 +224,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.feedbackEnable for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of amplitudeScale
@@ -232,6 +235,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.amplitudeScale for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of centerFrequencyMHz
@@ -242,6 +246,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.centerFrequencyMHz for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of frequencyError
@@ -252,6 +257,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.frequencyErrorMHz for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         self.add(pr.LocalVariable(
