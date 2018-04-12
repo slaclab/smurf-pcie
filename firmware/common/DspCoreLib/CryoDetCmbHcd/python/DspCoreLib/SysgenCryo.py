@@ -51,6 +51,7 @@ class CryoChannel(pr.Device):
             dependencies = [self.etaMag],
             linkedGet    = lambda: self.etaMag.value()*2**-10,
             linkedSet    = lambda value, write: self.etaMag.set(round(value*2**10), write=write),
+            typeStr      = "Float64",
         ))
 
         self.add(pr.RemoteVariable(
@@ -70,6 +71,7 @@ class CryoChannel(pr.Device):
             dependencies = [self.etaPhase],
             linkedGet    = lambda: self.etaPhase.value()*180*2**-15,
             linkedSet    = lambda value, write: self.etaPhase.set(round(value*2**15./180), write=write),
+            typeStr      = "Float64",
         ))
 
         # Cryo channel frequency word
@@ -94,17 +96,6 @@ class CryoChannel(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(
-            name         = "centerFrequency",
-            hidden       = True,
-            description  = "Center frequency UFix_24_24",
-            offset       =  0x0800,
-            bitSize      =  24,
-            bitOffset    =  0,
-            base         = pr.UInt,
-            mode         = "RW",
-        ))
-
-        self.add(pr.RemoteVariable(
             name         = "centerFrequencyS",
             hidden       = True,
             description  = "Center frequency UFix_24_24",
@@ -113,6 +104,7 @@ class CryoChannel(pr.Device):
             bitOffset    =  0,
             base         = pr.Int,
             mode         = "RW",
+            typeStr      = "Float64",
         ))
 
         self.add(pr.LinkVariable(
@@ -121,6 +113,7 @@ class CryoChannel(pr.Device):
             dependencies = [self.centerFrequencyS],
             linkedGet    = lambda: self.centerFrequencyS.value()*2**-24*freqSpanMHz,
             linkedSet    = lambda value, write: self.centerFrequencyS.set(round((value*2**24./freqSpanMHz)), write=write),
+            typeStr      = "Float64",
         ))
 
 
