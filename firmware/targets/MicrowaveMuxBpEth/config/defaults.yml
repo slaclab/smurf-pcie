@@ -319,7 +319,8 @@ AMCc:
             DacReg[89]: 0x0000
             DacReg[90]: 0x0026  # sync_request_ena_link3
             DacReg[91]: 0x0026  # error_ena_link3
-            DacReg[92]: 0x1133  # Set up sysref mode for links - use eval board settings
+            #DacReg[92]: 0x1133  # Set up sysref mode for links - use eval board settings
+            DacReg[92]: 0x1111  # Set up sysref mode for links - use defaults
             DacReg[93]: 0x0000
             DacReg[94]: 0x0000
             DacReg[95]: 0x0123  # cross switch for JESDlanes, not sure we want this as it may depend on their board - this set up is serds0 to jesdlane4, serdes1 to jesdlane2, serdes2 to jesdlane1, serdes3 to jesdlane0

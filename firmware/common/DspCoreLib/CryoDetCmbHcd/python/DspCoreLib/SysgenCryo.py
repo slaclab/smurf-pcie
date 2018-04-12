@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-##import time
+import time
 
 class CryoChannel(pr.Device):
     def __init__(   self,
@@ -51,6 +51,7 @@ class CryoChannel(pr.Device):
             dependencies = [self.etaMag],
             linkedGet    = lambda: self.etaMag.value()*2**-10,
             linkedSet    = lambda value, write: self.etaMag.set(round(value*2**10), write=write),
+            typeStr      = "Float64",
         ))
 
         self.add(pr.RemoteVariable(
@@ -70,6 +71,7 @@ class CryoChannel(pr.Device):
             dependencies = [self.etaPhase],
             linkedGet    = lambda: self.etaPhase.value()*180*2**-15,
             linkedSet    = lambda value, write: self.etaPhase.set(round(value*2**15./180), write=write),
+            typeStr      = "Float64",
         ))
 
         # Cryo channel frequency word
@@ -94,7 +96,7 @@ class CryoChannel(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(
-            name         = "centerFrequency",
+            name         = "centerFrequencyS",
             hidden       = True,
             description  = "Center frequency UFix_24_24",
             offset       =  0x0800,
@@ -102,14 +104,16 @@ class CryoChannel(pr.Device):
             bitOffset    =  0,
             base         = pr.Int,
             mode         = "RW",
+            typeStr      = "Float64",
         ))
 
         self.add(pr.LinkVariable(
             name         = "centerFrequencyMHz",
             description  = "Center frequency MHz",
-            dependencies = [self.centerFrequency],
-            linkedGet    = lambda: self.centerFrequency.value()*2**-24*freqSpanMHz,
-            linkedSet    = lambda value, write: self.centerFrequency.set(round((value*2**24./freqSpanMHz)), write=write),
+            dependencies = [self.centerFrequencyS],
+            linkedGet    = lambda: self.centerFrequencyS.value()*2**-24*freqSpanMHz,
+            linkedSet    = lambda value, write: self.centerFrequencyS.set(round((value*2**24./freqSpanMHz)), write=write),
+            typeStr      = "Float64",
         ))
 
 
@@ -183,8 +187,7 @@ class CryoChannels(pr.Device):
                 expand = False,
             ))
 
-
-        # make waveform of etaMag 
+        # make waveform of etaMag
         self.add(pr.LinkVariable(
             name         = "etaMagArray",
             hidden       = True,
@@ -192,9 +195,10 @@ class CryoChannels(pr.Device):
             dependencies = [chan.etaMagScaled for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
-        # make waveform of etaPhase 
+        # make waveform of etaPhase
         self.add(pr.LinkVariable(
             name         = "etaPhaseArray",
             hidden       = True,
@@ -202,6 +206,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.etaPhaseDegree for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of feedbackEnable
@@ -212,9 +217,10 @@ class CryoChannels(pr.Device):
             dependencies = [chan.feedbackEnable for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
-        # make waveform of amplitudeScale 
+        # make waveform of amplitudeScale
         self.add(pr.LinkVariable(
             name         = "amplitude scale array",
             hidden       = True,
@@ -222,9 +228,10 @@ class CryoChannels(pr.Device):
             dependencies = [chan.amplitudeScale for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
-        # make waveform of centerFrequencyMHz 
+        # make waveform of centerFrequencyMHz
         self.add(pr.LinkVariable(
             name         = "centerFrequencyArray",
             hidden       = True,
@@ -232,6 +239,7 @@ class CryoChannels(pr.Device):
             dependencies = [chan.centerFrequencyMHz for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         # make waveform of frequencyError
@@ -242,11 +250,22 @@ class CryoChannels(pr.Device):
             dependencies = [chan.frequencyErrorMHz for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
+            typeStr      = "List[Float64]",
         ))
 
         self.add(pr.LocalVariable(
             name        = "etaScanChannel",
             description = "etaScan frequency band",
+            mode        = "RW",
+            value       = 0,
+        ))
+
+        # keeps track of whether or not an etaScan is currently
+        # in progress.  default zero, meaning scan isn't running
+        # currently.  runEtaScan sets it to one while it's scanning
+        self.add(pr.LocalVariable(
+            name        = "etaScanInProgress",
+            description = "etaScan in progress",
             mode        = "RW",
             value       = 0,
         ))
@@ -294,50 +313,58 @@ class CryoChannels(pr.Device):
 
         @self.command(description="Run etaScan",)
         def runEtaScan():
-            subchan = self.etaScanChannel.get()
-            ampl    = self.etaScanAmplitude.get()
-            freqs   = self.etaScanFreqs.get()
-            # workaround for rogue local variables
-            # list objects get written as string, not list of float when set by GUI
-            if isinstance(freqs, str):
-                freqs = eval(freqs)
+            self.etaScanInProgress.set( 1 )
 
-            dwell   = self.etaScanDwell.get()
-
-            self.CryoChannel[subchan].amplitudeScale.set( ampl )
-            self.CryoChannel[subchan].etaMagScaled.set( 1 )
-
-
-            # run scan in phase
-            self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
-            resultsReal = []
-            f           = []
-            for freqMHz in freqs:
-                # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
-                # out list of freqs may do several measurements at a single freq
-                # dont' want to write the same value again
-                if f != freqMHz:
-                    f = freqMHz
-                    self.CryoChannel[subchan].centerFrequencyMHz.set( f )
-                # do we need a dwell?
-                freqError = self.CryoChannel[subchan].frequencyError.get()
-                resultsReal.append( freqError )
-
-            # run scan in quadrature
-            self.CryoChannel[subchan].etaPhaseDegree.set( -90 )
-            resultsImag = []
-            f           = []
-            for freqMHz in freqs:
-                if f != freqMHz:
-                    f = freqMHz
-                    self.CryoChannel[subchan].centerFrequencyMHz.set( f )
-                # do we need a dwell?
-                freqError = self.CryoChannel[subchan].frequencyError.get()
-                resultsImag.append( freqError )
-
-            self.etaScanResultsReal.set( resultsReal )
-            self.etaScanResultsImag.set( resultsImag )
-
+            # defer update callbacks
+            with self.root.updateGroup():
+                subchan = self.etaScanChannel.get()
+                ampl    = self.etaScanAmplitude.get()
+                freqs   = self.etaScanFreqs.get()
+                # workaround for rogue local variables
+                # list objects get written as string, not list of float when set by GUI
+                if isinstance(freqs, str):
+                    freqs = eval(freqs)
+    
+                dwell   = self.etaScanDwell.get()
+    
+                self.CryoChannel[subchan].amplitudeScale.set( ampl )
+                self.CryoChannel[subchan].etaMagScaled.set( 1 )
+                self.CryoChannel[subchan].feedbackEnable.set( 0 )
+    
+                # run scan in phase
+                self.CryoChannel[subchan].etaPhaseDegree.set( 0 )
+                resultsReal = []
+                f           = []
+                for freqMHz in freqs:
+                    # is there overhead of setting freqMHz if prevFreqMHz == freqMHz
+                    # out list of freqs may do several measurements at a single freq
+                    # dont' want to write the same value again
+                    if f != freqMHz:
+                        f = freqMHz
+                        self.CryoChannel[subchan].centerFrequencyMHz.set( f )
+                        time.sleep( dwell )
+                    # do we need a dwell?
+                    freqError = self.CryoChannel[subchan].frequencyError.get()
+                    resultsReal.append( freqError )
+    
+                # run scan in quadrature
+                self.CryoChannel[subchan].etaPhaseDegree.set( -90 )
+                resultsImag = []
+                f           = []
+                for freqMHz in freqs:
+                    if f != freqMHz:
+                        f = freqMHz
+                        self.CryoChannel[subchan].centerFrequencyMHz.set( f )
+                        time.sleep( dwell )
+                    # do we need a dwell?
+                    freqError = self.CryoChannel[subchan].frequencyError.get()
+                    resultsImag.append( freqError )
+               
+    
+                self.etaScanResultsReal.set( resultsReal )
+                self.etaScanResultsImag.set( resultsImag )
+    
+                self.etaScanInProgress.set( 0 )
 
         @self.command(description="Set all amplitudeScale values",value=0)
         def setAmplitudeScales(arg):
@@ -768,4 +795,5 @@ class SysgenCryo(pr.Device):
             offset = 0x00800100,
             expand = False,
         ))
+
 
