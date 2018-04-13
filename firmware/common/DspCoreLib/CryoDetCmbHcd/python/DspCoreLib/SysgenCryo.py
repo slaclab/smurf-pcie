@@ -104,7 +104,6 @@ class CryoChannel(pr.Device):
             bitOffset    =  0,
             base         = pr.Int,
             mode         = "RW",
-            typeStr      = "Float64",
         ))
 
         self.add(pr.LinkVariable(
@@ -161,6 +160,7 @@ class CryoChannel(pr.Device):
             mode         = "RO",
             dependencies = [self.frequencyError],
             linkedGet    = lambda: self.frequencyError.get(read=False)*2**-23*freqSpanMHz,
+            typeStr      = "Float64",
         ))
 
 
@@ -187,7 +187,7 @@ class CryoChannels(pr.Device):
                 expand = False,
             ))
 
-        # make waveform of etaMag
+        # make waveform of etaMag 
         self.add(pr.LinkVariable(
             name         = "etaMagArray",
             hidden       = True,
@@ -198,7 +198,7 @@ class CryoChannels(pr.Device):
             typeStr      = "List[Float64]",
         ))
 
-        # make waveform of etaPhase
+        # make waveform of etaPhase 
         self.add(pr.LinkVariable(
             name         = "etaPhaseArray",
             hidden       = True,
@@ -220,7 +220,7 @@ class CryoChannels(pr.Device):
             typeStr      = "List[Float64]",
         ))
 
-        # make waveform of amplitudeScale
+        # make waveform of amplitudeScale 
         self.add(pr.LinkVariable(
             name         = "amplitude scale array",
             hidden       = True,
@@ -231,7 +231,7 @@ class CryoChannels(pr.Device):
             typeStr      = "List[Float64]",
         ))
 
-        # make waveform of centerFrequencyMHz
+        # make waveform of centerFrequencyMHz 
         self.add(pr.LinkVariable(
             name         = "centerFrequencyArray",
             hidden       = True,
@@ -297,6 +297,13 @@ class CryoChannels(pr.Device):
         ))
 
         self.add(pr.LocalVariable(
+            name        = "etaScanDelF",
+            description = "etaScan frequencies",
+            mode        = "RW",
+            value       = 0.05,
+        ))
+
+        self.add(pr.LocalVariable(
             name        = "etaScanDwell",
             description = "etaScan frequencies",
             mode        = "RW",
@@ -309,7 +316,6 @@ class CryoChannels(pr.Device):
             mode        = "RW",
             value       = 0,
         ))
-
 
         @self.command(description="Run etaScan",)
         def runEtaScan():
@@ -326,7 +332,6 @@ class CryoChannels(pr.Device):
                     freqs = eval(freqs)
     
                 dwell   = self.etaScanDwell.get()
-    
                 self.CryoChannel[subchan].amplitudeScale.set( ampl )
                 self.CryoChannel[subchan].etaMagScaled.set( 1 )
                 self.CryoChannel[subchan].feedbackEnable.set( 0 )
@@ -342,8 +347,6 @@ class CryoChannels(pr.Device):
                     if f != freqMHz:
                         f = freqMHz
                         self.CryoChannel[subchan].centerFrequencyMHz.set( f )
-                        time.sleep( dwell )
-                    # do we need a dwell?
                     freqError = self.CryoChannel[subchan].frequencyError.get()
                     resultsReal.append( freqError )
     
@@ -355,8 +358,6 @@ class CryoChannels(pr.Device):
                     if f != freqMHz:
                         f = freqMHz
                         self.CryoChannel[subchan].centerFrequencyMHz.set( f )
-                        time.sleep( dwell )
-                    # do we need a dwell?
                     freqError = self.CryoChannel[subchan].frequencyError.get()
                     resultsImag.append( freqError )
                
@@ -364,7 +365,7 @@ class CryoChannels(pr.Device):
                 self.etaScanResultsReal.set( resultsReal )
                 self.etaScanResultsImag.set( resultsImag )
     
-                self.etaScanInProgress.set( 0 )
+            self.etaScanInProgress.set( 0 )
 
         @self.command(description="Set all amplitudeScale values",value=0)
         def setAmplitudeScales(arg):
@@ -399,13 +400,47 @@ class CryoChannels(pr.Device):
        return [variable.value() for variable in var.dependencies]
 
 
-
 class CryoFreqBand(pr.Device):
     def __init__(   self,
             name        = "SysgenCryoBase",
+            bandCenter  = 4250.0,
             description = "Cryo SYSGEN Module",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
+
+        ##############################
+        # Freq band parameters
+        ##############################
+
+        self.add(pr.LocalVariable(
+            name        = "digitizerFrequencyMHz",
+            description = "ADC/DAC sampling rate MHz",
+            mode        = "RO",
+            value       = 614.4,
+        ))
+
+        self.add(pr.LocalVariable(
+            name        = "bandCenterMHz",
+            description = "bandCenter MHz",
+            mode        = "RW",
+            value       = bandCenter,
+        ))
+
+        self.add(pr.LocalVariable(
+            name        = "numberSubBands",
+            description = "number of DSP sub bands",
+            mode        = "RO",
+            value       = 32,
+        ))
+
+        self.add(pr.LocalVariable(
+            name        = "subBandNo",
+            description = "frequency to subband",
+            mode        = "RO",
+            value       = [8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23],
+        ))
+
+
 
         ##############################
         # Devices
@@ -779,10 +814,13 @@ class SysgenCryo(pr.Device):
         for i in range(numberPairs):
             if ( i<2 ) and ( i>=0) :
                 self.add(CryoFreqBand(
-                    name   = ('Base[%d]'%i),
-                    offset = (i*0x00100000),
-                    expand = False,
+                    name       = ('Base[%d]'%i),
+                    bandCenter = 4250.0 + i*500.0,
+                    offset     = (i*0x00100000),
+                    expand     = False,
                 ))
+
+                #self.Base[i].bandCenter.set( 4250.0 )
 
         self.add(CryoAdcMux(
             name   = 'CryoAdcMux[0]',
