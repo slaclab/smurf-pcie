@@ -217,18 +217,18 @@ class CryoChannels(pr.Device):
             dependencies = [chan.feedbackEnable for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
-            typeStr      = "List[Float64]",
+            typeStr      = "List[Int1]",
         ))
 
         # make waveform of amplitudeScale 
         self.add(pr.LinkVariable(
-            name         = "amplitude scale array",
+            name         = "amplitudeScaleArray",
             hidden       = True,
             description  = "amplitude scale array (0...15)",
             dependencies = [chan.amplitudeScale for chan in self.CryoChannel.values()],
             linkedGet    = self.getArray,
             linkedSet    = self.setArray,
-            typeStr      = "List[Float64]",
+            typeStr      = "List[Int4]",
         ))
 
         # make waveform of centerFrequencyMHz 
@@ -420,6 +420,13 @@ class CryoFreqBand(pr.Device):
         ))
 
         self.add(pr.LocalVariable(
+            name        = "channelFrequencyMHz",
+            description = "channel processing rate MHz",
+            mode        = "RO",
+            value       = 2.4,
+        ))
+
+        self.add(pr.LocalVariable(
             name        = "bandCenterMHz",
             description = "bandCenter MHz",
             mode        = "RW",
@@ -439,8 +446,6 @@ class CryoFreqBand(pr.Device):
             mode        = "RO",
             value       = [8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23],
         ))
-
-
 
         ##############################
         # Devices
