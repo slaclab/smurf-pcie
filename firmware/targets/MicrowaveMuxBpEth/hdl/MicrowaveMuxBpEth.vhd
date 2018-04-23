@@ -341,6 +341,11 @@ begin
       generic map (
          TPD_G                  => TPD_G,
          BUILD_INFO_G           => BUILD_INFO_G,
+         ------------------------------------------------------------------
+         RSSI_ILEAVE_EN_G    => true,    -- true for interleaved RSSI
+         ------------------------------------------------------------------
+         -- RSSI_ILEAVE_EN_G       => false,   -- false for non-interleaved RSSI
+         ------------------------------------------------------------------
          DISABLE_BSA_G          => true,
          RTM_ETH_G              => false,
          WAVEFORM_TDATA_BYTES_G => 8,
