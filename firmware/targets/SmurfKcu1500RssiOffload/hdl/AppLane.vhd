@@ -35,7 +35,6 @@ entity AppLane is
    generic (
       TPD_G            : time             := 1 ns;
       LANE_G           : natural          := 0;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := BAR0_ERROR_RESP_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- DMA Interfaces (dmaClk domain)
@@ -84,7 +83,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          LANE_G           => LANE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G)
       port map (
          -- DMA Interfaces (dmaClk domain)

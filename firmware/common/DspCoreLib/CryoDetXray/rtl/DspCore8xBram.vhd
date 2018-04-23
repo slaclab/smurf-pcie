@@ -2,7 +2,7 @@
 -- File       : DspCore8xBram.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-24
--- Last update: 2017-10-24
+-- Last update: 2018-03-30
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -25,9 +25,8 @@ use work.AxiLitePkg.all;
 
 entity DspCore8xBram is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- BRAM Interface
       jesdClk         : in  sl;
@@ -64,7 +63,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -87,15 +85,14 @@ begin
       --------------------------------          
       U_Mem : entity work.AxiDualPortRam
          generic map (
-            TPD_G            => TPD_G,
-            BRAM_EN_G        => true,
-            REG_EN_G         => true,  -- true = 2 cycle read access latency, but higher performance
-            AXI_WR_EN_G      => true,
-            SYS_WR_EN_G      => true,
-            COMMON_CLK_G     => false,
-            ADDR_WIDTH_G     => 8,
-            DATA_WIDTH_G     => 32,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            TPD_G        => TPD_G,
+            BRAM_EN_G    => true,
+            REG_EN_G     => true,  -- true = 2 cycle read access latency, but higher performance
+            AXI_WR_EN_G  => true,
+            SYS_WR_EN_G  => true,
+            COMMON_CLK_G => false,
+            ADDR_WIDTH_G => 8,
+            DATA_WIDTH_G => 32)
          port map (
             -- Clock and Reset
             clk            => jesdClk,

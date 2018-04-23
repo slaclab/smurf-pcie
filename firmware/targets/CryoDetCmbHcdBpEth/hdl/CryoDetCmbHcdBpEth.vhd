@@ -2,7 +2,7 @@
 -- File       : CryoDetCmbHcdBpEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-09
--- Last update: 2017-11-28
+-- Last update: 2018-03-20
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -- 
@@ -341,6 +341,11 @@ begin
       generic map (
          TPD_G                  => TPD_G,
          BUILD_INFO_G           => BUILD_INFO_G,
+         ------------------------------------------------------------------
+         RSSI_ILEAVE_EN_G    => true,    -- true for interleaved RSSI
+         ------------------------------------------------------------------
+         -- RSSI_ILEAVE_EN_G       => false,   -- false for non-interleaved RSSI
+         ------------------------------------------------------------------
          DISABLE_BSA_G          => true,
          RTM_ETH_G              => false,
          WAVEFORM_TDATA_BYTES_G => 8,

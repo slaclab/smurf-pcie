@@ -34,7 +34,6 @@ use unisim.vcomponents.all;
 entity AppDataProcessor is
    generic (
       TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := BAR0_ERROR_RESP_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- -- Streaming Interfaces

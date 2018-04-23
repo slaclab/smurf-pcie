@@ -35,7 +35,6 @@ entity AppLaneRx is
    generic (
       TPD_G            : time             := 1 ns;
       LANE_G           : natural          := 0;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := BAR0_ERROR_RESP_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- DMA Interfaces (dmaClk domain)
@@ -114,7 +113,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => RSSI_PER_LINK_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -136,8 +134,7 @@ begin
       U_AppDataProc : entity work.AppDataProcessor
          generic map (
             TPD_G            => TPD_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
          port map (
             -- Streaming Interfaces
             linkUp          => rssiLinkUp(i),

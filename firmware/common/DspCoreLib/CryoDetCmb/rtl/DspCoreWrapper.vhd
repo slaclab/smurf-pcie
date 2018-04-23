@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-11-09
+-- Last update: 2018-03-30
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -28,7 +28,6 @@ use work.AppTopPkg.all;
 entity DspCoreWrapper is
    generic (
       TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clocks and resets   
@@ -47,11 +46,9 @@ entity DspCoreWrapper is
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      kRelay          : in  slv(1 downto 0);
-      startRamp       : out sl;
-      selectRamp      : out sl;
-      lemo1           : in  sl;
-      lemo2           : out sl;
+      startRamp       : in  sl;
+      selectRamp      : in  sl;
+      rampCnt         : in  slv(31 downto 0);
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -285,12 +282,12 @@ begin
          sigGenStart(0)             => sigGenStart,
          sigGen0                    => sigGen(0),
          sigGen1                    => sigGen(1),
-         -- Digital I/O Interface (dsp_clk domain)         
-         kRelay                     => kRelay,
-         startRamp(0)               => startRamp,
-         selectRamp(0)              => selectRamp,
-         lemo1(0)                   => lemo1,
-         lemo2(0)                   => lemo2,
+         -- Digital I/O Interface         
+         kRelay                     => "00",
+         startRamp(0)               => open,
+         selectRamp(0)              => open,
+         lemo1(0)                   => '0',
+         lemo2(0)                   => open,
          -- AXI-Lite Interface (dsp_axi_lite_clk domain)
          dsp_axi_lite_clk           => axilClk,
          dsp_axi_lite_aresetn       => axilRstL,

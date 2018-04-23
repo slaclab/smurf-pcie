@@ -26,7 +26,6 @@ use work.AxiLitePkg.all;
 entity DspCoreWrapperBram is
    generic (
       TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- BRAM Interface
@@ -64,7 +63,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
