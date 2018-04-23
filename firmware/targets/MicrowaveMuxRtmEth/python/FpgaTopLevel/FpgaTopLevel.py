@@ -22,7 +22,7 @@ import AppTop as app
 class FpgaTopLevel(app.TopLevel):
     def __init__( self, 
         simGui          = False,
-        commType        = "eth-rssi-non-interleaved",
+        commType        = "eth-rssi-interleaved",
         ipAddr          = "10.0.1.101",
         pcieRssiLink    = 0,        
     ):

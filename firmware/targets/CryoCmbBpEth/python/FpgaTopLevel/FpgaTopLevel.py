@@ -22,7 +22,7 @@ import AppTop as app
 class FpgaTopLevel(app.TopLevel):
     def __init__( self, 
         simGui          = False,
-        commType        = "eth-rssi-non-interleaved",
+        commType        = "eth-rssi-interleaved",
         ipAddr          = "10.0.1.101",
         pcieRssiLink    = 0,        
     ):
@@ -31,8 +31,8 @@ class FpgaTopLevel(app.TopLevel):
             commType        = commType,
             ipAddr          = ipAddr,
             pcieRssiLink    = pcieRssiLink,              
-            numRxLanes      = [10,10],      # 10x JESD  on BAY[0] only
-            numTxLanes      = [10,10],      # 10x JESD  on BAY[0] only
+            numRxLanes      = [10,0],      # 10x JESD  on BAY[0] only
+            numTxLanes      = [10,0],      # 10x JESD  on BAY[0] only
             numSigGen       = [2,0],       # 2x SIGGEN on BAY[0] Only
             sizeSigGen      = [2**13,0],   # 2^12 buffer size for BAY[0] Only
             modeSigGen      = [True,False],# True = 32-bit RAM, True =16-bit RAM
