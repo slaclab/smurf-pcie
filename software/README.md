@@ -45,11 +45,11 @@ $ source setup_MicrowaveMux.csh
 $ python3 scripts/PcieLoadConfig.py --yaml config/pcie_rssi_config.yml
 
 # How to launch the GUI
-# In this example, ATCA Slot# is 4
+# In this example, ATCA Slot# is 5
 $ python3 scripts/AmccGui.py --commType pcie-rssi-interleaved --slot 5
 
 # How to Reprogram the AMC carrier's FPGA
-$ python3 scripts/AmccProgramFpga.py --commType pcie-rssi-interleaved --slot 5 -mcs <PATH_TO_MCS_FILE>
+$ python3 scripts/AmccProgramFpga.py --commType pcie-rssi-interleaved --slot <ATCA_SLOT_NUMBER> -mcs <PATH_TO_MCS_FILE>
 
 # How to Reprogram the PCIe's FPGA
 # Note: A power cycle (not reboot) of the PC required after running the PcieProgramKcu1500.py script
