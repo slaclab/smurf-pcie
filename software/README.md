@@ -21,18 +21,18 @@ $ make
 $ sudo /sbin/insmod datadev.ko || exit 1
 
 # give appropriate group/permissions
-$ sudo chmod 666 /dev/data_dev*
+$ sudo chmod 666 /dev/datadev_*
 
 # Check for the loaded device
-$ cat /proc/data_dev0
+$ cat /proc/datadev_0
 
 ```
 
 # How to configure and run the PCIe based software
 
 ```
-# Load the driver (see section above)
-$ cat /proc/data_dev0
+# Check that driver was loaded in previous section (see section above)
+$ cat /proc/datadev_0
 
 # Go to software directory
 $ cd cryo-det/software
