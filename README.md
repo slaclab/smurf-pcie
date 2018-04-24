@@ -78,7 +78,7 @@ https://confluence.slac.stanford.edu/x/tHFODQ
 $ ssh tid-pc93130 -Y
 
 # Program the FPGA
-$ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --cpu tid-pc93130 --addr 2 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-3fc2f4b.mcs
+$ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --addr 3 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-3fc2f4b.mcs
 
 # Check the IPMI status
 $ source /afs/slac/g/reseng/IPMC/env.csh
