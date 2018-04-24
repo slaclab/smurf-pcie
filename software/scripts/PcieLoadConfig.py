@@ -55,7 +55,7 @@ memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 base.add(smurf.Core(memBase=memMap))
 
 # Start the system
-base.start(pollEn=False,initRead=False)
+base.start(pollEn=True,initRead=True)
 
 # Print the AxiVersion Summary
 base.Core.AxiPcieCore.AxiVersion.printStatus()
