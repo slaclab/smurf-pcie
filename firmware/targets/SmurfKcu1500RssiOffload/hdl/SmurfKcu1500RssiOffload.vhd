@@ -254,7 +254,6 @@ begin
    U_Application : entity work.Application
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => BAR0_ERROR_RESP_C,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(OFFLOAD_INDEX_C).baseAddr)
       port map (
          -- DMA Interface (dmaClk domain)
@@ -290,7 +289,6 @@ begin
    U_Hardware : entity work.Hardware
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => BAR0_ERROR_RESP_C,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(HW_INDEX_C).baseAddr)
       port map (
          ------------------------      

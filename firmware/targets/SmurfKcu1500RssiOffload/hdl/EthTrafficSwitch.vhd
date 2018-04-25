@@ -2,7 +2,7 @@
 -- File       : EthTrafficSwitch.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-03-16
--- Last update: 2018-03-16
+-- Last update: 2018-03-23
 -------------------------------------------------------------------------------
 -- Description: Ethernet Traffic Switch for routing either RAW UDP or RSSI+UDP
 -------------------------------------------------------------------------------
@@ -211,6 +211,14 @@ begin
          end loop;
 
       end if;
+
+      -- Force write the application-to-RSSI TDESET
+      v.mRssiAppMasters(0).tdest := x"00";  -- SRPv3
+      for i in RSSI_STREAMS_C-1 downto 1 loop
+         -- Terminate defined path
+         v.mRssiAppMasters(i).tValid := '0';
+         v.mRssiAppMasters(i).tdest  := x"FF";
+      end loop;
 
       -- Combinatorial outputs before the reset
       sUdpSlave      <= v.sUdpSlave;

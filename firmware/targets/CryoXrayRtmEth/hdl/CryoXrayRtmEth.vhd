@@ -185,6 +185,7 @@ architecture top_level of CryoXrayRtmEth is
    signal timingPhy            : TimingPhyType;
    signal timingPhyClk         : sl;
    signal timingPhyRst         : sl;
+   signal timingTrig           : TimingTrigType;   
    -- Diagnostic Interface (diagnosticClk domain)
    signal diagnosticClk        : sl;
    signal diagnosticRst        : sl;
@@ -242,11 +243,7 @@ begin
          SIG_GEN_SIZE_G         => (0 => 2, 1 => 0),  -- Configured by application
          SIG_GEN_ADDR_WIDTH_G   => (others => 13),  -- Configured by application
          SIG_GEN_LANE_MODE_G    => (others => "0000000000"),  -- '0': 32 bit mode
-         SIG_GEN_RAM_CLK_G      => (others => "1111111111"),  -- '1': RAM using jesdClk (not jesdClk2x)
-         -- Triggering Generics
-         TRIG_SIZE_G            => 2,   -- Configured by application
-         TRIG_DELAY_WIDTH_G     => 32,  -- Configured by application
-         TRIG_PULSE_WIDTH_G     => 32)  -- Configured by application
+         SIG_GEN_RAM_CLK_G      => (others => "1111111111"))  -- '1': RAM using jesdClk (not jesdClk2x)
       port map (
          ----------------------
          -- Top Level Interface
@@ -265,6 +262,7 @@ begin
          timingPhy            => timingPhy,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
+         timingTrig           => timingTrig,
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
@@ -343,6 +341,11 @@ begin
       generic map (
          TPD_G                  => TPD_G,
          BUILD_INFO_G           => BUILD_INFO_G,
+         ------------------------------------------------------------------
+         RSSI_ILEAVE_EN_G    => true,    -- true for interleaved RSSI
+         ------------------------------------------------------------------
+         -- RSSI_ILEAVE_EN_G       => false,   -- false for non-interleaved RSSI
+         ------------------------------------------------------------------
          DISABLE_BSA_G          => true,
          RTM_ETH_G              => true,
          WAVEFORM_TDATA_BYTES_G => 8,
@@ -365,6 +368,7 @@ begin
          timingPhy            => timingPhy,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
+         timingTrig           => timingTrig,
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,

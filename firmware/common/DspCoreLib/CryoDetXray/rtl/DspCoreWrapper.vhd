@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-10-24
+-- Last update: 2018-03-30
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -27,9 +27,8 @@ use work.AppTopPkg.all;
 
 entity DspCoreWrapper is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clocks and resets   
       jesdClk         : in  slv(1 downto 0);
@@ -47,13 +46,9 @@ entity DspCoreWrapper is
       dacSigValids    : in  Slv10Array(1 downto 0);
       dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      startRamp       : in sl;
-      selectRamp      : in sl;      
-      -- kRelay          : in  slv(1 downto 0);
-      -- startRamp       : out sl;
-      -- selectRamp      : out sl;
-      -- lemo1           : in  sl;
-      -- lemo2           : out sl;
+      startRamp       : in  sl;
+      selectRamp      : in  sl;
+      rampCnt         : in  slv(31 downto 0);
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -258,7 +253,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -302,9 +296,8 @@ begin
    --------------------------------
    U_Mem : entity work.DspCore64xBram
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(1).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(1).baseAddr)
       port map (
          -- Clock and Reset
          jesdClk         => jesdClk(0),
@@ -320,7 +313,7 @@ begin
          axilReadSlave   => axilReadSlaves(1),
          axilWriteMaster => axilWriteMasters(1),
          axilWriteSlave  => axilWriteSlaves(1));
-         
+
    -------------------
    -- System Generator
    -------------------

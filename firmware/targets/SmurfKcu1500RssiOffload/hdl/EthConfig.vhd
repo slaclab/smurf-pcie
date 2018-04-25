@@ -26,8 +26,7 @@ use work.AppPkg.all;
 
 entity EthConfig is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns);
    port (
       phyReady        : in  sl;
       localIp         : out slv(31 downto 0);  -- big endianness
@@ -79,8 +78,8 @@ begin
 
       -- Map the read registers
       axiSlaveRegister(regCon, x"00", 0, v.localMac);
-      axiSlaveRegister(regCon, x"04", 0, v.localIp);
-      axiSlaveRegister(regCon, x"08", 0, v.bypRssi);
+      axiSlaveRegister(regCon, x"08", 0, v.localIp);
+      axiSlaveRegister(regCon, x"0C", 0, v.bypRssi);
       axiSlaveRegisterR(regCon, x"10", 0, phyReady);
 
       axiSlaveRegisterR(regCon, x"80", 0, toSlv(NUM_LINKS_C, 32));
@@ -91,7 +90,7 @@ begin
       axiSlaveRegisterR(regCon, x"94", 0, toSlv(NUM_RSSI_C, 32));
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then

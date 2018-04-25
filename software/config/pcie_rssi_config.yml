@@ -1,0 +1,45 @@
+pcie:
+  Core:
+    #####################################
+    # Configure Link[0] (QSFP[0].lane[0])
+    #####################################
+    EthLane[0]:
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 08:00:56:00:45:50 
+        # Set the local IP address
+        LocalIp: 10.0.3.99          
+        # Don't bypass any RSSI modules (only for FSBL)
+        BypRssi: 0x0                
+      ############################
+      UdpClient[0]: # Slot#2 Link
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.102
+      ############################
+      UdpClient[1]: # Slot#3 Link
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.103
+      ############################
+      UdpClient[2]: # Slot#4 Link
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.104
+      ############################
+      UdpClient[3]: # Slot#5 Link
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.105
+      ############################
+      UdpClient[4]: # Slot#6 Link
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.106
+      ############################
+      UdpClient[5]: # Slot#7 Link
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.107
+      #####################################
+      # Open the RSSI connections for links
+      #####################################
+      RssiServer[:]:
+        OpenConn: 0x1
+        CloseConn: 0x0       
+        HeaderChksumEn: 0x1
+        
