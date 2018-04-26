@@ -10,7 +10,7 @@
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
 --    DATA[0].BIT[15:8]   = channel index
 --    DATA[0].BIT[63:16]  = event id
---    DATA[1].BIT[127:64] = timestamp
+--    DATA[1].BIT[63:0]   = timestamp
 --    DATA[2].BIT[63:32]  = DATA[I][0];
 --    DATA[2].BIT[31:0]   = DATA[Q][0];
 --    DATA[3].BIT[63:32]  = DATA[I][1];
