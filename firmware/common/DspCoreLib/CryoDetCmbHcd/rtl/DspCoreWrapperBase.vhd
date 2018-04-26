@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapperBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-12-01
+-- Last update: 2018-04-25
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -27,8 +27,8 @@ use work.AppTopPkg.all;
 
 entity DspCoreWrapperBase is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clocks and resets   
       jesdClk         : in  sl;
@@ -45,6 +45,11 @@ entity DspCoreWrapperBase is
       startRamp       : in  sl;
       selectRamp      : in  sl;
       rampCnt         : in  slv(31 downto 0);
+      -- Processed Data Interface (jesdClk domain)
+      dataValid       : out sl               := '0';
+      dataIndex       : out slv(8 downto 0)  := (others => '0');
+      dataI           : out slv(31 downto 0) := (others => '0');
+      dataQ           : out slv(31 downto 0) := (others => '0');
       -- AXI-Lite Port
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -253,8 +258,8 @@ begin
    --------------------------------
    U_Mem : entity work.DspCoreWrapperBram
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(1).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(1).baseAddr)
       port map (
          -- Clock and Reset
          jesdClk         => jesdClk,

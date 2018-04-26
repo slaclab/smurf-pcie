@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2017-12-06
+-- Last update: 2018-04-25
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -22,41 +22,51 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 use work.Jesd204bPkg.all;
 use work.AppTopPkg.all;
 
 entity DspCoreWrapper is
    generic (
-      TPD_G            : time             := 1 ns;
-      BUILD_DSP_G      : slv(7 downto 0)  := x"01";
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      BUILD_DSP_G     : slv(7 downto 0)  := x"01";
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clocks and resets   
-      jesdClk         : in  slv(1 downto 0);
-      jesdRst         : in  slv(1 downto 0);
+      jesdClk          : in  slv(1 downto 0);
+      jesdRst          : in  slv(1 downto 0);
       -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
-      adcValids       : in  Slv10Array(1 downto 0);
-      adcValues       : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
-      dacValids       : out Slv10Array(1 downto 0);
-      dacValues       : out sampleDataVectorArray(1 downto 0, 9 downto 0);
-      debugValids     : out Slv4Array(1 downto 0);
-      debugValues     : out sampleDataVectorArray(1 downto 0, 3 downto 0);
+      adcValids        : in  Slv10Array(1 downto 0);
+      adcValues        : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
+      dacValids        : out Slv10Array(1 downto 0);
+      dacValues        : out sampleDataVectorArray(1 downto 0, 9 downto 0);
+      debugValids      : out Slv4Array(1 downto 0);
+      debugValues      : out sampleDataVectorArray(1 downto 0, 3 downto 0);
       -- DAC Signal Generator Interface (jesdClk[1:0] domain)
-      dacSigCtrl      : out DacSigCtrlArray(1 downto 0);
-      dacSigStatus    : in  DacSigStatusArray(1 downto 0);
-      dacSigValids    : in  Slv10Array(1 downto 0);
-      dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
+      dacSigCtrl       : out DacSigCtrlArray(1 downto 0);
+      dacSigStatus     : in  DacSigStatusArray(1 downto 0);
+      dacSigValids     : in  Slv10Array(1 downto 0);
+      dacSigValues     : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      startRamp       : in  sl;
-      selectRamp      : in  sl;
-      rampCnt         : in  slv(31 downto 0);
+      startRamp        : in  sl;
+      selectRamp       : in  sl;
+      rampCnt          : in  slv(31 downto 0);
+      -- Input timing interface (timingClk domain)
+      timingClk        : in  sl;
+      timingRst        : in  sl;
+      timingTimestamp  : in  slv(63 downto 0);
+      -- Application Debug Interface (axilClk domain)
+      obAppDebugMaster : out AxiStreamMasterType;
+      obAppDebugSlave  : in  AxiStreamSlaveType;
+      ibAppDebugMaster : in  AxiStreamMasterType;
+      ibAppDebugSlave  : out AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
       -- AXI-Lite Port
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType);
+      axilClk          : in  sl;
+      axilRst          : in  sl;
+      axilReadMaster   : in  AxiLiteReadMasterType;
+      axilReadSlave    : out AxiLiteReadSlaveType;
+      axilWriteMaster  : in  AxiLiteWriteMasterType;
+      axilWriteSlave   : out AxiLiteWriteSlaveType);
 end DspCoreWrapper;
 
 architecture mapping of DspCoreWrapper is
@@ -68,7 +78,7 @@ architecture mapping of DspCoreWrapper is
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
 
 
    signal adcValidsRemap : Slv10Array(1 downto 0);
@@ -86,6 +96,11 @@ architecture mapping of DspCoreWrapper is
    signal sigGenStartSync : slv(7 downto 0) := (others => '0');
 
    signal debugvalid : Slv2Array(7 downto 0) := (others => "00");
+
+   signal dataValid : slv(7 downto 0);
+   signal dataIndex : Slv9Array(7 downto 0);
+   signal dataI     : Slv32Array(7 downto 0);
+   signal dataQ     : Slv32Array(7 downto 0);
 
 begin
 
@@ -166,7 +181,7 @@ begin
 
    U_AdcMux : entity work.DspCoreWrapperAdcMux
       generic map (
-         TPD_G            => TPD_G)
+         TPD_G => TPD_G)
       port map (
          -- ADC Interface
          jesdClk         => jesdClk,
@@ -231,8 +246,8 @@ begin
 
          U_DSP : entity work.DspCoreWrapperBase
             generic map (
-               TPD_G            => TPD_G,
-               AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
+               TPD_G           => TPD_G,
+               AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
             port map (
                -- JESD Clocks and resets   
                jesdClk         => jesdClkVec(i),
@@ -253,6 +268,11 @@ begin
                startRamp       => startRamp,
                selectRamp      => selectRamp,
                rampCnt         => rampCnt,
+               -- Processed Data Interface (jesdClk domain)
+               dataValid       => dataValid(i),
+               dataIndex       => dataIndex(i),
+               dataI           => dataI(i),
+               dataQ           => dataQ(i),
                -- AXI-Lite Interface
                axilClk         => axilClk,
                axilRst         => axilRst,
@@ -274,5 +294,26 @@ begin
       end generate;
 
    end generate GEN_VEC;
+
+   U_ProcDataFramer : entity work.AxisSysgenProcDataFramer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- Input timing interface (timingClk domain)
+         timingClk       => timingClk,
+         timingRst       => timingRst,
+         timingTimestamp => timingTimestamp,
+         -- Input Data Interface (jesdClk domain)
+         jesdClk         => jesdClkVec,
+         jesdRst         => jesdRstVec,
+         dataValid       => dataValid,
+         dataIndex       => dataIndex,
+         dataI           => dataI,
+         dataQ           => dataQ,
+         -- Output AXIS Interface (axisClk domain)
+         axisClk         => axilClk,
+         axisRst         => axilRst,
+         axisMaster      => obAppDebugMaster,
+         axisSlave       => obAppDebugSlave);
 
 end mapping;
