@@ -31,6 +31,9 @@ $ cat /proc/datadev_0
 # How to configure and run the PCIe based software
 
 ```
+# log into the computer
+$ ssh ppa-pc87444 -Y
+
 # Check that driver was loaded in previous section (see section above)
 $ cat /proc/datadev_0
 
