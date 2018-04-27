@@ -13,9 +13,6 @@ export NUM_MIG_CORES = 0
 # Select either GEN1 or GEN2 or GEN3 PCIe
 export PCIE_GEN_NUM = GEN3
 
-# BYPASS Partial Reconfiguration
-export BYPASS_RECONFIG = 1
-
 # Define target output
 target: prom
 
