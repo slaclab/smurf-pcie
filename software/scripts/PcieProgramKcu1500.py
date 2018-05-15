@@ -65,11 +65,23 @@ base.add(pcie.AxiPcieCore(memBase=memMap,useSpi=True))
 # Start the system
 base.start(pollEn=False)
 
+# Create useful pointers
+AxiVersion = base.AxiPcieCore.AxiVersion
+PROM_PRI   = base.AxiPcieCore.AxiMicronN25Q[0]
+PROM_SEC   = base.AxiPcieCore.AxiMicronN25Q[1]
+
 # Load the primary MCS file to QSPI[0]
-base.AxiPcieCore.AxiMicronN25Q[0].LoadMcsFile(args.mcs_pri)  
+PROM_PRI.LoadMcsFile(args.mcs_pri)  
 
 # Load the secondary MCS file to QSPI[1]
-base.AxiPcieCore.AxiMicronN25Q[1].LoadMcsFile(args.mcs_sec)  
+PROM_SEC.LoadMcsFile(args.mcs_sec)  
+
+if(PROM_PRI._progDone and PROM_SEC._progDone):
+    print('\nReloading FPGA firmware from PROM ....')
+    AxiVersion.FpgaReload()
+    print('\nPlease reboot the computer')
+else:
+    print('Failed to program FPGA')
     
 # Close out
 base.stop()
