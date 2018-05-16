@@ -31,14 +31,14 @@ class EthLane(pr.Device):
             self.add(udp.UdpEngineClient(
                 name         = "UdpClient[%i]" % (i),
                 offset       = (0x10000) + (i*8),
-                description  = "UdpClient Server: %i" % (i),  
-                expand       =  False,                                    
-            ))        
+                description  = "Udp Client: %i" % (i),
+                expand       =  False,
+            ))
         
         for i in range(rssiPerLink):
             self.add(rssi.RssiCore(
-                name         = "RssiServer[%i]" % (i),
+                name         = "RssiClient[%i]" % (i),
                 offset       =  (0x20000) + (i*0x10000),
-                description  = "RssiServer Server: %i" % (i),                                
-                expand       =  False,                                    
-            ))        
+                description  = "Rssi Client: %i" % (i),
+                expand       =  False,
+            ))
