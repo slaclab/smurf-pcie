@@ -2,7 +2,7 @@
 -- File       : AppLaneTx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-03-25
+-- Last update: 2018-05-14
 -------------------------------------------------------------------------------
 -- Description: AppLaneTx File
 -------------------------------------------------------------------------------
@@ -36,16 +36,19 @@ entity AppLaneTx is
       TPD_G : time := 1 ns);
    port (
       -- DMA Interfaces (dmaClk domain)
-      dmaClk        : in  sl;
-      dmaRst        : in  sl;
-      dmaObMaster   : in  AxiStreamMasterType;
-      dmaObSlave    : out AxiStreamSlaveType;
+      dmaClk          : in  sl;
+      dmaRst          : in  sl;
+      dmaObMaster     : in  AxiStreamMasterType;
+      dmaObSlave      : out AxiStreamSlaveType;
+      -- Loop Interfaces (axilClk domain)
+      loopbackMasters : out AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+      loopbackSlaves  : in  AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
       -- RSSI Interface (axilClk domain)
-      axilClk       : in  sl;
-      axilRst       : in  sl;
-      rssiLinkUp    : in  slv(RSSI_PER_LINK_C-1 downto 0);
-      rssiIbMasters : out AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
-      rssiIbSlaves  : in  AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0));
+      axilClk         : in  sl;
+      axilRst         : in  sl;
+      rssiLinkUp      : in  slv(RSSI_PER_LINK_C-1 downto 0);
+      rssiIbMasters   : out AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+      rssiIbSlaves    : in  AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0));
 end AppLaneTx;
 
 architecture mapping of AppLaneTx is
@@ -53,8 +56,8 @@ architecture mapping of AppLaneTx is
    signal txMaster : AxiStreamMasterType;
    signal txSlave  : AxiStreamSlaveType;
 
-   signal txMasterSof : AxiStreamMasterType;
-   signal txSlaveSof  : AxiStreamSlaveType;
+   signal txMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+   signal txSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
 
 begin
 
@@ -85,29 +88,6 @@ begin
          mAxisMaster => txMaster,
          mAxisSlave  => txSlave);
 
-   -- U_SOF : entity work.SsiInsertSof
-   -- generic map (
-   -- TPD_G               => TPD_G,
-   -- COMMON_CLK_G        => true,
-   -- SLAVE_FIFO_G        => false,
-   -- MASTER_FIFO_G       => false,
-   -- SLAVE_AXI_CONFIG_G  => DMA_AXIS_CONFIG_C,
-   -- MASTER_AXI_CONFIG_G => DMA_AXIS_CONFIG_C)
-   -- port map (
-   -- -- Slave Port
-   -- sAxisClk    => axilClk,
-   -- sAxisRst    => axilRst,
-   -- sAxisMaster => txMaster,
-   -- sAxisSlave  => txSlave,
-   -- -- Master Port
-   -- mAxisClk    => axilClk,
-   -- mAxisRst    => axilRst,
-   -- mAxisMaster => txMasterSof,
-   -- mAxisSlave  => txSlaveSof);
-
-   txMasterSof <= txMaster;
-   txSlaveSof  <= txSlave;
-
    U_DeMux : entity work.AxiStreamDeMux
       generic map (
          TPD_G         => TPD_G,
@@ -121,10 +101,35 @@ begin
          axisClk      => axilClk,
          axisRst      => axilRst,
          -- Slave         
-         sAxisMaster  => txMasterSof,
-         sAxisSlave   => txSlaveSof,
+         sAxisMaster  => txMaster,
+         sAxisSlave   => txSlave,
          -- Masters
-         mAxisMasters => rssiIbMasters,
-         mAxisSlaves  => rssiIbSlaves);
+         mAxisMasters => txMasters,
+         mAxisSlaves  => txSlaves);
+
+   process (loopbackSlaves, rssiIbSlaves, txMasters) is
+      variable i   : natural;
+      variable j   : natural;
+      variable idx : natural;
+   begin
+      -- Loop through the channels
+      for i in RSSI_PER_LINK_C-1 downto 0 loop
+         for j in RSSI_STREAMS_C-1 downto 0 loop
+            -- Calculate index
+            idx := (i*RSSI_STREAMS_C) + j;
+            -- Check for the Application data streams
+            if (j = 2) then
+               -- Reroute traffic to inbound data processing
+               loopbackMasters(i) <= txMasters(idx);
+               txSlaves(idx)      <= loopbackSlaves(i);
+               -- Reroute traffic to outbound data processing
+               rssiIbMasters(idx) <= AXI_STREAM_MASTER_INIT_C;
+            else
+               rssiIbMasters(idx) <= txMasters(idx);
+               txSlaves(idx)      <= rssiIbSlaves(idx);
+            end if;
+         end loop;
+      end loop;
+   end process;
 
 end mapping;
