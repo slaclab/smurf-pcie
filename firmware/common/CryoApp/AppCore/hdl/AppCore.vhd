@@ -42,8 +42,7 @@ entity AppCore is
       SIM_SPEEDUP_G    : boolean          := false;
       SIMULATION_G     : boolean          := false;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := x"80000000";
-      -- True=370MHz SysGen DSP clock, False=185MHz SysGen DSP clock
-      DSP_CLK_2X_G     : boolean          := false);
+      JESD_USR_DIV_G   : natural          := 4);
    port (
       -- Clocks and resets   
       jesdClk             : in    slv(1 downto 0);
@@ -230,6 +229,7 @@ begin
          AXI_CLK_FREQ_G   => 156.25E+6,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
+         jesdclk         => jesdclk,      
          jesdSysRef      => jesdSysRef,
          jesdRxSync      => jesdRxSync,
          jesdTxSync      => jesdTxSync,
