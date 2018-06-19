@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-11-03
+-- Last update: 2018-04-25
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -177,17 +177,17 @@ architecture mapping of AppCore is
    signal selectRamp : sl;
    signal rampCnt    : slv(31 downto 0);
 
-   signal s_dacValues  :  sampleDataVectorArray(1 downto 0, 9 downto 0);
+   signal s_dacValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
 begin
 
-   DAC_HACK : -- tie all DAC to DAC0 output
+   DAC_HACK :                           -- tie all DAC to DAC0 output
    for i in 3 downto 0 generate
-       dacValues(0, (2*i))   <= s_dacValues(0, 0);
-       dacValues(0, (2*i)+1) <= s_dacValues(0, 1);
+      dacValues(0, (2*i))   <= s_dacValues(0, 0);
+      dacValues(0, (2*i)+1) <= s_dacValues(0, 1);
 
-       dacValues(1, (2*i))   <= s_dacValues(0, 0);
-       dacValues(1, (2*i)+1) <= s_dacValues(0, 1);
+      dacValues(1, (2*i))   <= s_dacValues(0, 0);
+      dacValues(1, (2*i)+1) <= s_dacValues(0, 1);
    end generate DAC_HACK;
    ---------------------
    -- Unused Connections
@@ -201,9 +201,6 @@ begin
 
    obBpMsgServerMaster <= AXI_STREAM_MASTER_INIT_C;
    ibBpMsgServerSlave  <= AXI_STREAM_SLAVE_FORCE_C;
-
-   obAppDebugMaster <= AXI_STREAM_MASTER_INIT_C;
-   ibAppDebugSlave  <= AXI_STREAM_SLAVE_FORCE_C;
 
    mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
    timingPhy   <= TIMING_PHY_INIT_C;
@@ -238,9 +235,9 @@ begin
    ----------------
    U_DUAL_AMC : entity work.AmcMicrowaveMuxDualCore
       generic map (
-         TPD_G            => TPD_G,
-         AXI_CLK_FREQ_G   => 156.25E+6,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_CLK_FREQ_G  => 156.25E+6,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(AMC_INDEX_C).baseAddr)
       port map (
          jesdclk         => jesdclk,
          jesdSysRef      => jesdSysRef,
@@ -270,43 +267,52 @@ begin
    -------------------     
    U_SysGen : entity work.DspCoreWrapper
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(DSP_INDEX_C).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(DSP_INDEX_C).baseAddr)
       port map (
          -- JESD Clocks and resets   
-         jesdClk         => jesdClk,
-         jesdRst         => jesdRst,
+         jesdClk          => jesdClk,
+         jesdRst          => jesdRst,
          -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
-         adcValids       => adcValids,
-         adcValues       => adcValues,
-         dacValids       => dacValids,
-         dacValues       => s_dacValues,
-         debugValids     => debugValids,
-         debugValues     => debugValues,
+         adcValids        => adcValids,
+         adcValues        => adcValues,
+         dacValids        => dacValids,
+         dacValues        => s_dacValues,
+         debugValids      => debugValids,
+         debugValues      => debugValues,
          -- DAC Signal Generator Interface (jesdClk[1:0] domain)
-         dacSigCtrl      => dacSigCtrl,
-         dacSigStatus    => dacSigStatus,
-         dacSigValids    => dacSigValids,
-         dacSigValues    => dacSigValues,
+         dacSigCtrl       => dacSigCtrl,
+         dacSigStatus     => dacSigStatus,
+         dacSigValids     => dacSigValids,
+         dacSigValues     => dacSigValues,
          -- Digital I/O Interface
-         startRamp       => startRamp,
-         selectRamp      => selectRamp,
-         rampCnt         => rampCnt,
+         startRamp        => startRamp,
+         selectRamp       => selectRamp,
+         rampCnt          => rampCnt,
+         -- Input timing interface (timingClk domain)
+         timingClk        => timingClk,
+         timingRst        => timingRst,
+         timingTimestamp  => timingBus.message.timestamp,
+         -- Application Debug Interface (axilClk domain)
+         obAppDebugMaster => obAppDebugMaster,
+         obAppDebugSlave  => obAppDebugSlave,
+         ibAppDebugMaster => ibAppDebugMaster,
+         ibAppDebugSlave  => ibAppDebugSlave,
          -- AXI-Lite Port
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(DSP_INDEX_C),
-         axilReadSlave   => axilReadSlaves(DSP_INDEX_C),
-         axilWriteMaster => axilWriteMasters(DSP_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(DSP_INDEX_C));
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => axilReadMasters(DSP_INDEX_C),
+         axilReadSlave    => axilReadSlaves(DSP_INDEX_C),
+         axilWriteMaster  => axilWriteMasters(DSP_INDEX_C),
+         axilWriteSlave   => axilWriteSlaves(DSP_INDEX_C));
 
    ---------------
    -- CRYO-DET RTM
    ---------------
    U_RTM : entity work.RtmCryoDet
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(RTM_INDEX_C).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(RTM_INDEX_C).baseAddr)
       port map (
          -- JESD Clocks and resets   
          jesdClk         => jesdClk(0),
@@ -337,7 +343,7 @@ begin
    ------------------   
    U_REG : entity work.AppCoreReg
       generic map (
-         TPD_G            => TPD_G)
+         TPD_G => TPD_G)
       port map (
          -- Configuration/Status
          dacSigTrigArm   => dacSigTrigArm,

@@ -2,7 +2,7 @@
 -- File       : DspCoreWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-28
--- Last update: 2018-03-30
+-- Last update: 2018-04-25
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -22,6 +22,7 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 use work.Jesd204bPkg.all;
 use work.AppTopPkg.all;
 
@@ -31,31 +32,40 @@ entity DspCoreWrapper is
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clocks and resets   
-      jesdClk         : in  slv(1 downto 0);
-      jesdRst         : in  slv(1 downto 0);
+      jesdClk          : in  slv(1 downto 0);
+      jesdRst          : in  slv(1 downto 0);
       -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
-      adcValids       : in  Slv10Array(1 downto 0);
-      adcValues       : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
-      dacValids       : out Slv10Array(1 downto 0);
-      dacValues       : out sampleDataVectorArray(1 downto 0, 9 downto 0);
-      debugValids     : out Slv4Array(1 downto 0);
-      debugValues     : out sampleDataVectorArray(1 downto 0, 3 downto 0);
+      adcValids        : in  Slv10Array(1 downto 0);
+      adcValues        : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
+      dacValids        : out Slv10Array(1 downto 0);
+      dacValues        : out sampleDataVectorArray(1 downto 0, 9 downto 0);
+      debugValids      : out Slv4Array(1 downto 0);
+      debugValues      : out sampleDataVectorArray(1 downto 0, 3 downto 0);
       -- DAC Signal Generator Interface (jesdClk[1:0] domain)
-      dacSigCtrl      : out DacSigCtrlArray(1 downto 0);
-      dacSigStatus    : in  DacSigStatusArray(1 downto 0);
-      dacSigValids    : in  Slv10Array(1 downto 0);
-      dacSigValues    : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
+      dacSigCtrl       : out DacSigCtrlArray(1 downto 0);
+      dacSigStatus     : in  DacSigStatusArray(1 downto 0);
+      dacSigValids     : in  Slv10Array(1 downto 0);
+      dacSigValues     : in  sampleDataVectorArray(1 downto 0, 9 downto 0);
       -- Digital I/O Interface
-      startRamp       : in  sl;
-      selectRamp      : in  sl;
-      rampCnt         : in  slv(31 downto 0);
+      startRamp        : in  sl;
+      selectRamp       : in  sl;
+      rampCnt          : in  slv(31 downto 0);
+      -- Input timing interface (timingClk domain)
+      timingClk       : in  sl;
+      timingRst       : in  sl;
+      timingTimestamp : in  slv(63 downto 0);      
+      -- Application Debug Interface (axilClk domain)
+      obAppDebugMaster : out AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+      obAppDebugSlave  : in  AxiStreamSlaveType;
+      ibAppDebugMaster : in  AxiStreamMasterType;
+      ibAppDebugSlave  : out AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
       -- AXI-Lite Port
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType);
+      axilClk          : in  sl;
+      axilRst          : in  sl;
+      axilReadMaster   : in  AxiLiteReadMasterType;
+      axilReadSlave    : out AxiLiteReadSlaveType;
+      axilWriteMaster  : in  AxiLiteWriteMasterType;
+      axilWriteSlave   : out AxiLiteWriteSlaveType);
 end DspCoreWrapper;
 
 architecture mapping of DspCoreWrapper is
