@@ -2,7 +2,7 @@
 -- File       : AppDataProcessor.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-02-06
+-- Last update: 2018-05-14
 -------------------------------------------------------------------------------
 -- Description: AppDataProcessor File
 -------------------------------------------------------------------------------
@@ -33,8 +33,8 @@ use unisim.vcomponents.all;
 
 entity AppDataProcessor is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- -- Streaming Interfaces
       linkUp          : in  sl;
@@ -42,6 +42,8 @@ entity AppDataProcessor is
       sAxisSlave      : out AxiStreamSlaveType;
       mAxisMaster     : out AxiStreamMasterType;
       mAxisSlave      : in  AxiStreamSlaveType;
+      loopbackMaster  : in  AxiStreamMasterType;
+      loopbackSlave   : out AxiStreamSlaveType;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -58,9 +60,10 @@ begin
    ------------------------------
    -- Placeholder for future code
    ------------------------------
-   mAxisMaster    <= sAxisMaster;
-   sAxisSlave     <= mAxisSlave;
+   mAxisMaster    <= loopbackMaster;
+   loopbackSlave  <= mAxisSlave;
+   sAxisSlave     <= AXI_STREAM_SLAVE_FORCE_C;
    axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
-   axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;   
+   axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
 end mapping;

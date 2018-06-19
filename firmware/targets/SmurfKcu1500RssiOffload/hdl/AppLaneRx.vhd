@@ -2,7 +2,7 @@
 -- File       : AppLaneRx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-02-06
+-- Last update: 2018-05-14
 -------------------------------------------------------------------------------
 -- Description: AppLaneRx File
 -------------------------------------------------------------------------------
@@ -33,15 +33,18 @@ use unisim.vcomponents.all;
 
 entity AppLaneRx is
    generic (
-      TPD_G            : time             := 1 ns;
-      LANE_G           : natural          := 0;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
+      TPD_G           : time             := 1 ns;
+      LANE_G          : natural          := 0;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- DMA Interfaces (dmaClk domain)
       dmaClk          : in  sl;
       dmaRst          : in  sl;
       dmaIbMaster     : out AxiStreamMasterType;
       dmaIbSlave      : in  AxiStreamSlaveType;
+      -- Loop Interfaces (axilClk domain)
+      loopbackMasters : in  AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+      loopbackSlaves  : out AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
       -- RSSI Interface (axilClk domain)
       rssiLinkUp      : in  slv(RSSI_PER_LINK_C-1 downto 0);
       rssiObMasters   : in  AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
@@ -89,24 +92,27 @@ begin
 
    process (rssiObMasters, slaves, tapIbSlaves, tapObMasters) is
       variable i   : natural;
+      variable j   : natural;
       variable idx : natural;
    begin
       -- Loop through the channels
-      for i in AXIS_PER_LINK_C-1 downto 0 loop
-         -- Get the link index
-         idx := (i mod RSSI_STREAMS_C);
-         -- Check for the Application data streams
-         if (idx = 2) then
-            -- Reroute traffic to inbound data processing
-            tapIbMasters(idx) <= rssiObMasters(i);
-            rssiObSlaves(i)   <= tapIbSlaves(idx);
-            -- Reroute traffic to outbound data processing
-            masters(i)        <= tapObMasters(idx);
-            tapObSlaves(idx)  <= slaves(i);
-         else
-            masters(i)      <= rssiObMasters(i);
-            rssiObSlaves(i) <= slaves(i);
-         end if;
+      for i in RSSI_PER_LINK_C-1 downto 0 loop
+         for j in RSSI_STREAMS_C-1 downto 0 loop
+            -- Calculate index
+            idx := (i*RSSI_STREAMS_C) + j;
+            -- Check for the Application data streams
+            if (j = 2) then
+               -- Reroute traffic to inbound data processing
+               tapIbMasters(i)   <= rssiObMasters(idx);
+               rssiObSlaves(idx) <= tapIbSlaves(i);
+               -- Reroute traffic to outbound data processing
+               masters(idx)      <= tapObMasters(i);
+               tapObSlaves(i)    <= slaves(idx);
+            else
+               masters(idx)      <= rssiObMasters(idx);
+               rssiObSlaves(idx) <= slaves(idx);
+            end if;
+         end loop;
       end loop;
    end process;
 
@@ -133,8 +139,8 @@ begin
 
       U_AppDataProc : entity work.AppDataProcessor
          generic map (
-            TPD_G            => TPD_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
+            TPD_G           => TPD_G,
+            AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map (
             -- Streaming Interfaces
             linkUp          => rssiLinkUp(i),
@@ -142,6 +148,8 @@ begin
             sAxisSlave      => tapIbSlaves(i),
             mAxisMaster     => tapObMasters(i),
             mAxisSlave      => tapObSlaves(i),
+            loopbackMaster  => loopbackMasters(i),
+            loopbackSlave   => loopbackSlaves(i),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,

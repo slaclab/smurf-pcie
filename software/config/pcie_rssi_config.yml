@@ -38,7 +38,7 @@ pcie:
       #####################################
       # Open the RSSI connections for links
       #####################################
-      RssiServer[:]:
+      RssiClient[:]:
         OpenConn: 0x1
         CloseConn: 0x0       
         HeaderChksumEn: 0x1
