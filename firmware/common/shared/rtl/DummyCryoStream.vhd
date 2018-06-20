@@ -53,15 +53,15 @@ architecture rtl of DummyCryoStream is
       DATA_S);
 
    type RegType is record
-      valid      : sl;
-      dataIndex        : slv(8 downto 0);
+      dataValid  : sl;
+      dataIndex  : slv(8 downto 0);
       dataI      : slv(31 downto 0);
       dataQ      : slv(31 downto 0);
-      state      : StateType);
+      state      : StateType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      valid      => '0',
+      dataValid  => '0',
       dataIndex  => (others => '0'),
       dataI      => (others => '0'),
       dataQ      => (others => '0'),
@@ -86,20 +86,20 @@ begin
          ----------------------------------------------------------------------
          when IDLE_S =>
             -- Reset
-            v.valid     := '0';
+            v.dataValid := '0';
             v.dataIndex := (others => '0');
             if (trig = '1') then
                v.state     := DATA_S;
                v.dataQ     := r.dataQ + '1';
-            end if
+            end if;
          ----------------------------------------------------------------------
          when DATA_S =>
             -- valid data out
-            v.valid     := '1';
-            v.dataIndex := r.cnt + 1;
+            v.dataValid := '1';
+            v.dataIndex := r.dataIndex + 1;
             if ( r.dataIndex = EOF_CNT_C ) then
                v.state := IDLE_S;
-            end
+            end if;
          ----------------------------------------------------------------------
          end case;
 
@@ -113,7 +113,7 @@ begin
 
       -- Outputs
       dataIndex <= r.dataIndex;
-      valid     <= r.valid;
+      dataValid <= r.dataValid;
       dataI     <= r.dataI;
       dataQ     <= r.dataQ;
 
