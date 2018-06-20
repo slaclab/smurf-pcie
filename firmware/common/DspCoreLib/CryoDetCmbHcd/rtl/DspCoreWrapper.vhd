@@ -290,6 +290,10 @@ begin
          debug(((2*i)+0)) <= (others => '0');
          debug(((2*i)+1)) <= (others => '0');
          sigGenStart(i)   <= '0';
+         dataValid(i)     <= '0';
+         dataIndex(i)     <= (others => '0');
+         dataI(i)         <= (others => '0');
+         dataQ(i)         <= (others => '0');
 
       end generate;
 

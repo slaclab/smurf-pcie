@@ -254,6 +254,21 @@ begin
          dsp_axi_lite_s_axi_rvalid  => axilReadSlaves(0).rvalid);
 
    --------------------------------          
+   -- Dummy streaming interface
+   --------------------------------
+   U_CryoStream : entity work.DummyCryoStream
+      port map (
+         clk       => jesdClk,
+         rst       => jesdRst,
+         -- trigger
+         trig      => startRamp,
+         -- SYSGEN interface
+         dataValid => dataValid,
+         dataIndex => dataIndex,
+         dataI     => dataI,
+         dataQ     => dataQ);
+
+   --------------------------------          
    -- AXI-Lite Shared Memory Module
    --------------------------------
    U_Mem : entity work.DspCoreWrapperBram
