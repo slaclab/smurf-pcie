@@ -33,8 +33,9 @@ use unisim.vcomponents.all;
 
 entity AppDataProcessor is
    generic (
-      TPD_G           : time             := 1 ns;
-      AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
+      TPD_G            : time             := 1 ns;
+      SW_LOOPBACK_G    : boolean          := false;
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- -- Streaming Interfaces
       linkUp          : in  sl;
@@ -60,9 +61,22 @@ begin
    ------------------------------
    -- Placeholder for future code
    ------------------------------
-   mAxisMaster    <= loopbackMaster;
-   loopbackSlave  <= mAxisSlave;
-   sAxisSlave     <= AXI_STREAM_SLAVE_FORCE_C;
+   SW_LOOPBACK : if SW_LOOPBACK_G generate
+
+      mAxisMaster    <= loopbackMaster;
+      sAxisSlave     <= AXI_STREAM_SLAVE_FORCE_C;
+      loopbackSlave  <= mAxisSlave;
+
+   end generate;
+
+   FW_LOOPBACK : if (not SW_LOOPBACK_G) generate
+
+      mAxisMaster    <= sAxisMaster;
+      sAxisSlave     <= mAxisSlave;
+      loopbackSlave  <= AXI_STREAM_SLAVE_FORCE_C;
+
+   end generate;
+
    axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
    axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
