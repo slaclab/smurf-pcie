@@ -86,19 +86,18 @@ begin
          ----------------------------------------------------------------------
          when IDLE_S =>
             -- Reset
-            v.dataValid := '0';
             v.dataIndex := (others => '0');
             if (trig = '1') then
                v.state     := DATA_S;
+               v.dataValid := '1';
                v.dataQ     := r.dataQ + '1';
             end if;
          ----------------------------------------------------------------------
          when DATA_S =>
-            -- valid data out
-            v.dataValid := '1';
             v.dataIndex := r.dataIndex + 1;
             if ( r.dataIndex = EOF_CNT_C ) then
-               v.state := IDLE_S;
+               v.state     := IDLE_S;
+               v.dataValid := '0';
             end if;
          ----------------------------------------------------------------------
          end case;
