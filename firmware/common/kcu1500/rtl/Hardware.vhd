@@ -2,7 +2,7 @@
 -- File       : Hardware.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-05-10
+-- Last update: 2018-07-24
 -------------------------------------------------------------------------------
 -- Description: Hardware File
 -------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ use work.AppPkg.all;
 entity Hardware is
    generic (
       TPD_G           : time             := 1 ns;
+      ETH_10G_G       : boolean          := true;
       AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       ------------------------      
@@ -88,12 +89,13 @@ architecture mapping of Hardware is
 
 begin
 
-   --------------------------------
-   -- 10 GigE Modules for QSFP[1:0]
-   --------------------------------
+   --------------------------------------------
+   -- 10 GigE (or 1 GigE) Modules for QSFP[1:0]
+   --------------------------------------------
    U_EthPhyMac : entity work.EthPhyWrapper
       generic map (
-         TPD_G => TPD_G)
+         TPD_G     => TPD_G,
+         ETH_10G_G => ETH_10G_G)
       port map (
          -- Local Configurations
          localMac     => localMac,

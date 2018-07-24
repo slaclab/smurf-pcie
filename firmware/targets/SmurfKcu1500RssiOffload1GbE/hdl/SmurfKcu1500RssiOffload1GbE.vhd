@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : SmurfKcu1500RssiOffload.vhd
+-- File       : SmurfKcu1500RssiOffload1GbE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-02-06
+-- Last update: 2018-07-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ use work.AppPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity SmurfKcu1500RssiOffload is
+entity SmurfKcu1500RssiOffload1GbE is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -88,9 +88,9 @@ entity SmurfKcu1500RssiOffload is
       pciRxN       : in    slv(7 downto 0);
       pciTxP       : out   slv(7 downto 0);
       pciTxN       : out   slv(7 downto 0));
-end SmurfKcu1500RssiOffload;
+end SmurfKcu1500RssiOffload1GbE;
 
-architecture top_level of SmurfKcu1500RssiOffload is
+architecture top_level of SmurfKcu1500RssiOffload1GbE is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
@@ -253,8 +253,8 @@ begin
    ---------------------
    U_Application : entity work.Application
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(OFFLOAD_INDEX_C).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(OFFLOAD_INDEX_C).baseAddr)
       port map (
          -- DMA Interface (dmaClk domain)
          dmaClk          => dmaClk,
@@ -288,8 +288,9 @@ begin
    ------------------
    U_Hardware : entity work.Hardware
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(HW_INDEX_C).baseAddr)
+         TPD_G           => TPD_G,
+         ETH_10G_G       => false,       -- false = 1 GbE
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(HW_INDEX_C).baseAddr)
       port map (
          ------------------------      
          --  Top Level Interfaces
