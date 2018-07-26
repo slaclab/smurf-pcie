@@ -56,6 +56,5 @@ $ python3 scripts/AmccProgramFpga.py --commType pcie-rssi-interleaved --slot <AT
 
 # How to Reprogram the PCIe's FPGA
 # Note: A power cycle (not reboot) of the PC required after running the PcieProgramKcu1500.py script
-$ python3 scripts/PcieProgramKcu1500.py --mcs_pri <PATH_TO_PRIMARY_MCS_FILE> --mcs_sec <PATH_TO_SECONDARY_MCS_FILE>
-
+$ python3 ../firmware/submodules/axi-pcie-core/python/updateKcu1500.py --path <PATH_TO_IMAGE_DIR>
 ```
