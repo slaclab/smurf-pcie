@@ -2,7 +2,7 @@
 -- File       : Hardware.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-07-24
+-- Last update: 2018-07-27
 -------------------------------------------------------------------------------
 -- Description: Hardware File
 -------------------------------------------------------------------------------
@@ -84,10 +84,22 @@ architecture mapping of Hardware is
    signal macIbMasters : AxiStreamMasterArray(NUM_LINKS_C-1 downto 0);
    signal macIbSlaves  : AxiStreamSlaveArray(NUM_LINKS_C-1 downto 0);
 
+   signal extRst   : sl;
    signal phyReady : slv(NUM_LINKS_C-1 downto 0);
    signal localMac : Slv48Array(NUM_LINKS_C-1 downto 0);
 
 begin
+
+   -----------------
+   -- Power Up Reset
+   -----------------
+   U_PwrUpRst : entity work.PwrUpRst
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         arst   => axilRst,
+         clk    => axilClk,
+         rstOut => extRst);
 
    --------------------------------------------
    -- 10 GigE (or 1 GigE) Modules for QSFP[1:0]
@@ -107,7 +119,7 @@ begin
          dmaObMasters => macIbMasters,
          dmaObSlaves  => macIbSlaves,
          -- Misc. Signals
-         extRst       => axilRst,
+         extRst       => extRst,
          phyReady     => phyReady,
          ---------------------
          --  Hardware Ports

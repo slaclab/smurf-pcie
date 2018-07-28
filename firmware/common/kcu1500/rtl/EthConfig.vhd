@@ -54,7 +54,7 @@ architecture rtl of EthConfig is
    constant REG_INIT_C : RegType := (
       localIp        => (others => '0'),  -- big endianness
       localMac       => (others => '0'),  -- big endianness
-      bypRssi        => (others => '0'),
+      bypRssi        => (others => '1'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 

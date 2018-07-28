@@ -251,7 +251,7 @@ begin
             mAppAxisSlaves_i  => obRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
             -- High level  Application side interface
             openRq_i          => '0',   -- Enabled via software
-            closeRq_i         => '0',
+            closeRq_i         => bypRssi(i),
             inject_i          => '0',
             -- AXI-Lite Interface
             axiClk_i          => axilClk,
