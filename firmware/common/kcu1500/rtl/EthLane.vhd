@@ -219,16 +219,9 @@ begin
             APP_ILEAVE_EN_G     => true,
             APP_STREAMS_G       => RSSI_STREAMS_C,
             APP_STREAM_ROUTES_G => (
-               0                => X"00",       -- TDEST 0 routed to stream 0 (SRPv3)
-               1                => X"80",       -- TDEST x80 routed to stream 1 (Raw Data)
-               2                => X"81",       -- TDEST x81 routed to stream 1 (Raw Data)
-               3                => X"82",       -- TDEST x82 routed to stream 1 (Raw Data)
-               4                => X"83",       -- TDEST x83 routed to stream 1 (Raw Data)
-               5                => X"84",       -- TDEST x84 routed to stream 1 (Raw Data)
-               6                => X"85",       -- TDEST x85 routed to stream 1 (Raw Data)
-               7                => X"86",       -- TDEST x86 routed to stream 1 (Raw Data)
-               8                => X"87",       -- TDEST x87 routed to stream 1 (Raw Data)
-               9                => "11------"), -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
+               0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
+               1                => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+               2                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
             CLK_FREQUENCY_G     => APP_CLK_FREQ_C,
             TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds 
             SERVER_G            => false,  -- false = Client mode

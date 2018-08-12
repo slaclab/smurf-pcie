@@ -101,7 +101,7 @@ begin
             -- Calculate index
             idx := (i*RSSI_STREAMS_C) + j;
             -- Check for the Application data streams
-            if (j = 9) then
+            if (j = 2) then
                -- Reroute traffic to inbound data processing
                tapIbMasters(i)   <= rssiObMasters(idx);
                rssiObSlaves(idx) <= tapIbSlaves(i);
