@@ -2,7 +2,7 @@
 -- File       : EthLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-03-16
+-- Last update: 2018-08-02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -29,8 +29,9 @@ use work.AppPkg.all;
 
 entity EthLane is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
+      TPD_G           : time             := 1 ns;
+      CLK_FREQUENCY_G : real := 156.25E+6;  -- units of Hz
+      AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- RSSI Interface (axilClk domain)
       rssiLinkUp      : out slv(RSSI_PER_LINK_C-1 downto 0);
@@ -56,8 +57,7 @@ end EthLane;
 
 architecture mapping of EthLane is
 
-   constant WINDOW_ADDR_SIZE_C  : positive                                        := 2;
-   constant APP_STREAM_CONFIG_C : AxiStreamConfigArray(RSSI_STREAMS_C-1 downto 0) := (others => DMA_AXIS_CONFIG_C);
+   constant WINDOW_ADDR_SIZE_C : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := (2+RSSI_PER_LINK_C);
 
@@ -121,7 +121,7 @@ begin
    ---------------------
    U_EthConfig : entity work.EthConfig
       generic map (
-         TPD_G            => TPD_G)
+         TPD_G => TPD_G)
       port map (
          phyReady        => phyReady,
          localIp         => localIp,
@@ -200,15 +200,15 @@ begin
             mRssiTspMaster  => ibRssiTspMasters(i),
             mRssiTspSlave   => ibRssiTspSlaves(i),
             -- RSSI Application Interface
-            sRssiAppMasters => obRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            sRssiAppSlaves  => obRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mRssiAppMasters => ibRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mRssiAppSlaves  => ibRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            sRssiAppMasters => obRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            sRssiAppSlaves  => obRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            mRssiAppMasters => ibRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            mRssiAppSlaves  => ibRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
             -- DMA Interface
-            sDmaMasters     => rssiIbMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            sDmaSlaves      => rssiIbSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mDmaMasters     => rssiObMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mDmaSlaves      => rssiObSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)));
+            sDmaMasters     => rssiIbMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            sDmaSlaves      => rssiIbSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            mDmaMasters     => rssiObMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            mDmaSlaves      => rssiObSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)));
 
       --------------------------
       -- Software's RSSI Clients
@@ -217,24 +217,21 @@ begin
          generic map (
             TPD_G               => TPD_G,
             APP_ILEAVE_EN_G     => true,
-            APP_STREAMS_G       => RSSI_STREAMS_C,
-            APP_STREAM_ROUTES_G => (
-               0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
-               1                => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
-               2                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
-            CLK_FREQUENCY_G     => APP_CLK_FREQ_C,
+            APP_STREAMS_G       => APP_STREAMS_C,
+            APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_C,
+            CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
             TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds 
-            SERVER_G            => false,  -- false = Client mode
+            SERVER_G            => false,   -- false = Client mode
             RETRANSMIT_ENABLE_G => true,
             WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
             MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
             PIPE_STAGES_G       => 1,
             APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
             TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
-            RETRANS_TOUT_G      => 100,    -- unit depends on TIMEOUT_UNIT_G  
+            RETRANS_TOUT_G      => 100,     -- unit depends on TIMEOUT_UNIT_G  
             ACK_TOUT_G          => 50,  -- unit depends on TIMEOUT_UNIT_G 
-            NULL_TOUT_G         => 400,    -- unit depends on TIMEOUT_UNIT_G 
-            MAX_RETRANS_CNT_G   => 1,   -- 0x1 for HW-to-HW communication
+            NULL_TOUT_G         => 400,     -- unit depends on TIMEOUT_UNIT_G 
+            MAX_RETRANS_CNT_G   => 16,
             MAX_CUM_ACK_CNT_G   => 1)  -- 0x1 for HW-to-HW communication         
          port map (
             clk_i             => axilClk,
@@ -245,10 +242,10 @@ begin
             mTspAxisMaster_o  => obRssiTspMasters(i),
             mTspAxisSlave_i   => obRssiTspSlaves(i),
             -- Application Layer Interface
-            sAppAxisMasters_i => ibRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            sAppAxisSlaves_o  => ibRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mAppAxisMasters_o => obRssiAppMasters((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
-            mAppAxisSlaves_i  => obRssiAppSlaves((RSSI_STREAMS_C-1)+(RSSI_STREAMS_C*i) downto (RSSI_STREAMS_C*i)),
+            sAppAxisMasters_i => ibRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            sAppAxisSlaves_o  => ibRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            mAppAxisMasters_o => obRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            mAppAxisSlaves_i  => obRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
             -- High level  Application side interface
             openRq_i          => '0',   -- Enabled via software
             closeRq_i         => bypRssi(i),

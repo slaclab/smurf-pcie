@@ -2,7 +2,7 @@
 -- File       : AppLaneTx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-05-14
+-- Last update: 2018-08-02
 -------------------------------------------------------------------------------
 -- Description: AppLaneTx File
 -------------------------------------------------------------------------------
@@ -35,11 +35,9 @@ entity AppLaneTx is
    generic (
       TPD_G : time := 1 ns);
    port (
-      -- DMA Interfaces (dmaClk domain)
-      dmaClk          : in  sl;
-      dmaRst          : in  sl;
-      dmaObMaster     : in  AxiStreamMasterType;
-      dmaObSlave      : out AxiStreamSlaveType;
+      -- DMA Interfaces (axilClk domain)
+      appIbMasters    : in  AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+      appIbSlaves     : out AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
       -- Loop Interfaces (axilClk domain)
       loopbackMasters : out AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
       loopbackSlaves  : in  AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
@@ -53,59 +51,40 @@ end AppLaneTx;
 
 architecture mapping of AppLaneTx is
 
-   signal txMaster : AxiStreamMasterType;
-   signal txSlave  : AxiStreamSlaveType;
-
    signal txMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
    signal txSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
 
 begin
 
-   U_ASYNC : entity work.AxiStreamFifoV2
-      generic map (
-         -- General Configurations
-         TPD_G               => TPD_G,
-         INT_PIPE_STAGES_G   => 1,
-         PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 1,
-         -- FIFO configurations
-         BRAM_EN_G           => true,
-         GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 9,
-         -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => DMA_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => DMA_AXIS_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => dmaClk,
-         sAxisRst    => dmaRst,
-         sAxisMaster => dmaObMaster,
-         sAxisSlave  => dmaObSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => txMaster,
-         mAxisSlave  => txSlave);
-
-   U_DeMux : entity work.AxiStreamDeMux
-      generic map (
-         TPD_G         => TPD_G,
-         NUM_MASTERS_G => AXIS_PER_LINK_C,
-         MODE_G        => "INDEXED",
-         PIPE_STAGES_G => 1,
-         TDEST_HIGH_G  => 4,
-         TDEST_LOW_G   => 0)
-      port map (
-         -- Clock and reset
-         axisClk      => axilClk,
-         axisRst      => axilRst,
-         -- Slave         
-         sAxisMaster  => txMaster,
-         sAxisSlave   => txSlave,
-         -- Masters
-         mAxisMasters => txMasters,
-         mAxisSlaves  => txSlaves);
+   GEN_LANE :
+   for i in AXIS_PER_LINK_C-1 downto 0 generate
+      U_ASYNC : entity work.AxiStreamFifoV2
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            INT_PIPE_STAGES_G   => 1,
+            PIPE_STAGES_G       => 1,
+            SLAVE_READY_EN_G    => true,
+            VALID_THOLD_G       => 1,
+            -- FIFO configurations
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => true,
+            FIFO_ADDR_WIDTH_G   => 9,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+         port map (
+            -- Slave Port
+            sAxisClk    => axilClk,
+            sAxisRst    => axilRst,
+            sAxisMaster => appIbMasters(i),
+            sAxisSlave  => appIbSlaves(i),
+            -- Master Port
+            mAxisClk    => axilClk,
+            mAxisRst    => axilRst,
+            mAxisMaster => txMasters(i),
+            mAxisSlave  => txSlaves(i));
+   end generate GEN_LANE;
 
    process (loopbackSlaves, rssiIbSlaves, txMasters) is
       variable i   : natural;
@@ -114,11 +93,11 @@ begin
    begin
       -- Loop through the channels
       for i in RSSI_PER_LINK_C-1 downto 0 loop
-         for j in RSSI_STREAMS_C-1 downto 0 loop
+         for j in APP_STREAMS_C-1 downto 0 loop
             -- Calculate index
-            idx := (i*RSSI_STREAMS_C) + j;
+            idx := (i*APP_STREAMS_C) + j;
             -- Check for the Application data streams
-            if (j = 2) then
+            if (j = APP_ASYNC_IDX_C) then
                -- Reroute traffic to inbound data processing
                loopbackMasters(i) <= txMasters(idx);
                txSlaves(idx)      <= loopbackSlaves(i);

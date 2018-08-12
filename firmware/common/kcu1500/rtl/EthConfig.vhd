@@ -84,7 +84,7 @@ begin
 
       axiSlaveRegisterR(regCon, x"80", 0, toSlv(NUM_LINKS_C, 32));
       axiSlaveRegisterR(regCon, x"84", 0, toSlv(RSSI_PER_LINK_C, 32));
-      axiSlaveRegisterR(regCon, x"88", 0, toSlv(RSSI_STREAMS_C, 32));
+      axiSlaveRegisterR(regCon, x"88", 0, toSlv(APP_STREAMS_C, 32));
       axiSlaveRegisterR(regCon, x"8C", 0, toSlv(AXIS_PER_LINK_C, 32));
       axiSlaveRegisterR(regCon, x"90", 0, toSlv(NUM_AXIS_C, 32));
       axiSlaveRegisterR(regCon, x"94", 0, toSlv(NUM_RSSI_C, 32));

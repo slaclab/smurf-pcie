@@ -168,6 +168,7 @@ begin
       U_Lane : entity work.EthLane
          generic map (
             TPD_G           => TPD_G,
+            CLK_FREQUENCY_G => ite(ETH_10G_G,156.25E+6,125.0E+6),
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map (
             -- RSSI Interface (axilClk domain)

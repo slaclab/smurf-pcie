@@ -2,7 +2,7 @@
 -- File       : AppLaneRx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-05-14
+-- Last update: 2018-08-02
 -------------------------------------------------------------------------------
 -- Description: AppLaneRx File
 -------------------------------------------------------------------------------
@@ -37,11 +37,9 @@ entity AppLaneRx is
       LANE_G          : natural          := 0;
       AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
-      -- DMA Interfaces (dmaClk domain)
-      dmaClk          : in  sl;
-      dmaRst          : in  sl;
-      dmaIbMaster     : out AxiStreamMasterType;
-      dmaIbSlave      : in  AxiStreamSlaveType;
+      -- DMA Interfaces (axilClk domain)
+      appObMasters    : out AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+      appObSlaves     : in  AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
       -- Loop Interfaces (axilClk domain)
       loopbackMasters : in  AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
       loopbackSlaves  : out AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
@@ -60,15 +58,6 @@ end AppLaneRx;
 
 architecture mapping of AppLaneRx is
 
-   function TdestRoutes return Slv8Array is
-      variable retConf : Slv8Array(AXIS_PER_LINK_C-1 downto 0);
-   begin
-      for i in AXIS_PER_LINK_C-1 downto 0 loop
-         retConf(i) := toSlv((32*LANE_G)+i, 8);
-      end loop;
-      return retConf;
-   end function;
-
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(RSSI_PER_LINK_C-1 downto 0) := genAxiLiteConfig(RSSI_PER_LINK_C, AXI_BASE_ADDR_G, 19, 16);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(RSSI_PER_LINK_C-1 downto 0);
@@ -85,9 +74,6 @@ architecture mapping of AppLaneRx is
    signal masters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
    signal slaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
 
-   signal dmaIbMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
-   signal dmaIbSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
-
 begin
 
    process (rssiObMasters, slaves, tapIbSlaves, tapObMasters) is
@@ -97,11 +83,11 @@ begin
    begin
       -- Loop through the channels
       for i in RSSI_PER_LINK_C-1 downto 0 loop
-         for j in RSSI_STREAMS_C-1 downto 0 loop
+         for j in APP_STREAMS_C-1 downto 0 loop
             -- Calculate index
-            idx := (i*RSSI_STREAMS_C) + j;
+            idx := (i*APP_STREAMS_C) + j;
             -- Check for the Application data streams
-            if (j = 2) then
+            if (j = APP_ASYNC_IDX_C) then
                -- Reroute traffic to inbound data processing
                tapIbMasters(i)   <= rssiObMasters(idx);
                rssiObSlaves(idx) <= tapIbSlaves(i);
@@ -168,15 +154,15 @@ begin
             INT_PIPE_STAGES_G   => 1,
             PIPE_STAGES_G       => 1,
             SLAVE_READY_EN_G    => true,
-            VALID_THOLD_G       => 128,  -- Hold until enough to burst into the interleaving MUX
+            VALID_THOLD_G       => (2048/APP_AXIS_CONFIG_C.TDATA_BYTES_C),  -- Hold until enough to burst into the interleaving MUX
             VALID_BURST_MODE_G  => true,
             -- FIFO configurations
             BRAM_EN_G           => true,
-            GEN_SYNC_FIFO_G     => false,
+            GEN_SYNC_FIFO_G     => true,
             FIFO_ADDR_WIDTH_G   => 9,
             -- AXI Stream Port Configurations
-            SLAVE_AXI_CONFIG_G  => DMA_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => DMA_AXIS_CONFIG_C)
+            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
          port map (
             -- Slave Port
             sAxisClk    => axilClk,
@@ -184,31 +170,10 @@ begin
             sAxisMaster => masters(i),
             sAxisSlave  => slaves(i),
             -- Master Port
-            mAxisClk    => dmaClk,
-            mAxisRst    => dmaRst,
-            mAxisMaster => dmaIbMasters(i),
-            mAxisSlave  => dmaIbSlaves(i));
+            mAxisClk    => axilClk,
+            mAxisRst    => axilRst,
+            mAxisMaster => appObMasters(i),
+            mAxisSlave  => appObSlaves(i));
    end generate GEN_LANE;
-
-   U_Mux : entity work.AxiStreamMux
-      generic map (
-         TPD_G                => TPD_G,
-         NUM_SLAVES_G         => AXIS_PER_LINK_C,
-         MODE_G               => "ROUTED",
-         TDEST_ROUTES_G       => TdestRoutes,
-         ILEAVE_EN_G          => true,
-         ILEAVE_ON_NOTVALID_G => false,
-         ILEAVE_REARB_G       => 128,
-         PIPE_STAGES_G        => 1)
-      port map (
-         -- Clock and reset
-         axisClk      => dmaClk,
-         axisRst      => dmaRst,
-         -- Slaves
-         sAxisMasters => dmaIbMasters,
-         sAxisSlaves  => dmaIbSlaves,
-         -- Master
-         mAxisMaster  => dmaIbMaster,
-         mAxisSlave   => dmaIbSlave);
 
 end mapping;
