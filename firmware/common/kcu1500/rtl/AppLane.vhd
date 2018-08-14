@@ -2,7 +2,7 @@
 -- File       : AppLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-08-02
+-- Last update: 2018-08-13
 -------------------------------------------------------------------------------
 -- Description: AppLane File
 -------------------------------------------------------------------------------
@@ -95,15 +95,15 @@ begin
             APP_STREAM_CONFIG_G => APP_STREAM_CONFIG_C)
          port map (
             -- Application Interfaces (RAW AXI Stream)
-            appClk          => axilClk,
-            appRst          => axilRst,            
+            appClk       => axilClk,
+            appRst       => axilRst,
             appObMasters => appObMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
             appObSlaves  => appObSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
             appIbMasters => appIbMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
             appIbSlaves  => appIbSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
             -- DMA Interface (PackerV2 encoded, 128-bit AXI Stream)
-            dmaClk          => dmaClk,
-            dmaRst          => dmaRst,
+            dmaClk       => dmaClk,
+            dmaRst       => dmaRst,
             dmaObMaster  => dmaObMasters(i),
             dmaObSlave   => dmaObSlaves(i),
             dmaIbMaster  => dmaIbMasters(i),

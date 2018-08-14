@@ -74,6 +74,23 @@ architecture mapping of AxiPcieDmaLanePackVer2 is
    signal obMaster : AxiStreamMasterType;
    signal obSlave  : AxiStreamSlaveType;
 
+   -- attribute dont_touch : string;
+
+   -- attribute dont_touch of rxMasters : signal is "TRUE";
+   -- attribute dont_touch of rxSlaves  : signal is "TRUE";
+   -- attribute dont_touch of txMasters : signal is "TRUE";
+   -- attribute dont_touch of txSlaves  : signal is "TRUE";
+
+   -- attribute dont_touch of rxMaster : signal is "TRUE";
+   -- attribute dont_touch of rxSlave  : signal is "TRUE";
+   -- attribute dont_touch of txMaster : signal is "TRUE";
+   -- attribute dont_touch of txSlave  : signal is "TRUE";
+
+   -- attribute dont_touch of ibMaster : signal is "TRUE";
+   -- attribute dont_touch of ibSlave  : signal is "TRUE";
+   -- attribute dont_touch of obMaster : signal is "TRUE";
+   -- attribute dont_touch of obSlave  : signal is "TRUE";
+
 begin
 
    -------------------------------------------------------------------------------
@@ -150,7 +167,7 @@ begin
          VALID_BURST_MODE_G  => true,
          -- FIFO configurations
          BRAM_EN_G           => true,
-         GEN_SYNC_FIFO_G     => true,
+         GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 9,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
@@ -182,7 +199,7 @@ begin
          -- FIFO configurations
          BRAM_EN_G           => false,
          USE_BUILT_IN_G      => false,
-         GEN_SYNC_FIFO_G     => true,
+         GEN_SYNC_FIFO_G     => false,
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
