@@ -2,7 +2,7 @@
 -- File       : EthLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-08-02
+-- Last update: 2018-08-15
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ use work.AppPkg.all;
 entity EthLane is
    generic (
       TPD_G           : time             := 1 ns;
-      CLK_FREQUENCY_G : real := 156.25E+6;  -- units of Hz
+      CLK_FREQUENCY_G : real             := 156.25E+6;  -- units of Hz
       AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       -- RSSI Interface (axilClk domain)
@@ -67,6 +67,11 @@ architecture mapping of EthLane is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
+   signal obUdpMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+   signal obUdpSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
+   signal ibUdpMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+   signal ibUdpSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
 
    signal obClientMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
    signal obClientSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
@@ -164,10 +169,10 @@ begin
          ibMacMaster     => macIbMaster,
          ibMacSlave      => macIbSlave,
          -- Interface to UDP Client engine(s)
-         obClientMasters => obClientMasters,
-         obClientSlaves  => obClientSlaves,
-         ibClientMasters => ibClientMasters,
-         ibClientSlaves  => ibClientSlaves,
+         obClientMasters => obUdpMasters,
+         obClientSlaves  => obUdpSlaves,
+         ibClientMasters => ibUdpMasters,
+         ibClientSlaves  => ibUdpSlaves,
          -- AXI-Lite Interface
          axilReadMaster  => axilReadMasters(1),
          axilReadSlave   => axilReadSlaves(1),
@@ -178,6 +183,44 @@ begin
          rst             => axilRst);
 
    GEN_LANE : for i in RSSI_PER_LINK_C-1 downto 0 generate
+
+      U_Resize_OB : entity work.AxiStreamResize
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            READY_EN_G          => true,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+         port map (
+            -- Clock and reset
+            axisClk     => axilClk,
+            axisRst     => axilRst,
+            -- Slave Port
+            sAxisMaster => obUdpMasters(i),
+            sAxisSlave  => obUdpSlaves(i),
+            -- Master Port
+            mAxisMaster => obClientMasters(i),
+            mAxisSlave  => obClientSlaves(i));
+
+      U_Resize_IB : entity work.AxiStreamResize
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            READY_EN_G          => true,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+         port map (
+            -- Clock and reset
+            axisClk     => axilClk,
+            axisRst     => axilRst,
+            -- Slave Port
+            sAxisMaster => ibClientMasters(i),
+            sAxisSlave  => ibClientSlaves(i),
+            -- Master Port
+            mAxisMaster => ibUdpMasters(i),
+            mAxisSlave  => ibUdpSlaves(i));
 
       U_EthTrafficSwitch : entity work.EthTrafficSwitch
          generic map (
@@ -227,7 +270,7 @@ begin
             MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
             PIPE_STAGES_G       => 1,
             APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
-            TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
+            TSP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
             RETRANS_TOUT_G      => 100,     -- unit depends on TIMEOUT_UNIT_G  
             ACK_TOUT_G          => 50,  -- unit depends on TIMEOUT_UNIT_G 
             NULL_TOUT_G         => 400,     -- unit depends on TIMEOUT_UNIT_G 
