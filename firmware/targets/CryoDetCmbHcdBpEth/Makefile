@@ -1,3 +1,6 @@
+# Using custom common/shared/rtl/TimingExtnPkg.vhd
+export TIMING_EXT_PKG = 1
+
 ##########################################################################################
 # Applications must define the 32-bitFirmware Version Number
 ##########################################################################################

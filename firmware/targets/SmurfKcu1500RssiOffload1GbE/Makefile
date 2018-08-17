@@ -1,3 +1,6 @@
+# Using custom common/shared/rtl/TimingExtnPkg.vhd
+export TIMING_EXT_PKG = 1
+
 # Define Firmware Version Number
 export PRJ_VERSION = 0x00000020
 
