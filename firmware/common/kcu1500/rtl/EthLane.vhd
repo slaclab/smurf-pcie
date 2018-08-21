@@ -2,7 +2,7 @@
 -- File       : EthLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-08-15
+-- Last update: 2018-08-17
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -57,7 +57,8 @@ end EthLane;
 
 architecture mapping of EthLane is
 
-   constant WINDOW_ADDR_SIZE_C : positive := 2;
+   constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
+   constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
 
    constant NUM_AXI_MASTERS_C : natural := (2+RSSI_PER_LINK_C);
 
@@ -259,21 +260,23 @@ begin
       U_RssiClient : entity work.RssiCoreWrapper
          generic map (
             TPD_G               => TPD_G,
+            PIPE_STAGES_G       => 1,
             APP_ILEAVE_EN_G     => true,
+            MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
+            SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
             APP_STREAMS_G       => APP_STREAMS_C,
             APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_C,
             CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
-            TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds 
-            SERVER_G            => false,   -- false = Client mode
+            TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds 
+            SERVER_G            => false,           -- false = Client mode
             RETRANSMIT_ENABLE_G => true,
             WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
             MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
-            PIPE_STAGES_G       => 1,
             APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
             TSP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
-            RETRANS_TOUT_G      => 100,     -- unit depends on TIMEOUT_UNIT_G  
+            RETRANS_TOUT_G      => 100,  -- unit depends on TIMEOUT_UNIT_G  
             ACK_TOUT_G          => 50,  -- unit depends on TIMEOUT_UNIT_G 
-            NULL_TOUT_G         => 400,     -- unit depends on TIMEOUT_UNIT_G 
+            NULL_TOUT_G         => 400,  -- unit depends on TIMEOUT_UNIT_G 
             MAX_RETRANS_CNT_G   => 16,
             MAX_CUM_ACK_CNT_G   => 1)  -- 0x1 for HW-to-HW communication         
          port map (
