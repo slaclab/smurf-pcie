@@ -2,7 +2,7 @@
 -- File       : AxiPcieDmaLanePackVer2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-08-02
--- Last update: 2018-08-12
+-- Last update: 2018-08-29
 -------------------------------------------------------------------------------
 -- Description: Wrapper for AXIS DMA Engine
 -------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ entity AxiPcieDmaLanePackVer2 is
       APP_STREAMS_G       : positive             := 1;
       APP_STREAM_ROUTES_G : Slv8Array            := (0 => "--------");
       APP_STREAM_CONFIG_G : AxiStreamConfigArray := (0 => DMA_AXIS_CONFIG_C);
-      MAX_SEG_SIZE_G      : positive             := 2**20);  -- Default: 1MB
+      MAX_SEG_SIZE_G      : positive             := 2**18);  -- Default: 256kB
    port (
       -- Application Interfaces (RAW AXI Stream)
       appClk       : in  sl;

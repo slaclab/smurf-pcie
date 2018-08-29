@@ -2,7 +2,7 @@
 export TIMING_EXT_PKG = 1
 
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000030
+export PRJ_VERSION = 0x00000031
 
 # Define the Hardware Type in the axi-pcie-core
 export PCIE_HW_TYPE = XilinxKcu1500
