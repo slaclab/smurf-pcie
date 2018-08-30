@@ -10,7 +10,7 @@
 ##############################################################################
 
 import pyrogue as pr
-import rogue.hardware.data
+import rogue.hardware.axi
 import axipcie as pcie
 import SmurfKcu1500RssiOffload as smurf
 

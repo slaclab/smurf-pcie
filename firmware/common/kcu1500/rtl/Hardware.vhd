@@ -2,7 +2,7 @@
 -- File       : Hardware.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-05-10
+-- Last update: 2018-07-27
 -------------------------------------------------------------------------------
 -- Description: Hardware File
 -------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ use work.AppPkg.all;
 entity Hardware is
    generic (
       TPD_G           : time             := 1 ns;
+      ETH_10G_G       : boolean          := true;
       AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
    port (
       ------------------------      
@@ -83,17 +84,30 @@ architecture mapping of Hardware is
    signal macIbMasters : AxiStreamMasterArray(NUM_LINKS_C-1 downto 0);
    signal macIbSlaves  : AxiStreamSlaveArray(NUM_LINKS_C-1 downto 0);
 
+   signal extRst   : sl;
    signal phyReady : slv(NUM_LINKS_C-1 downto 0);
    signal localMac : Slv48Array(NUM_LINKS_C-1 downto 0);
 
 begin
 
-   --------------------------------
-   -- 10 GigE Modules for QSFP[1:0]
-   --------------------------------
-   U_EthPhyMac : entity work.EthPhyWrapper
+   -----------------
+   -- Power Up Reset
+   -----------------
+   U_PwrUpRst : entity work.PwrUpRst
       generic map (
          TPD_G => TPD_G)
+      port map (
+         arst   => axilRst,
+         clk    => axilClk,
+         rstOut => extRst);
+
+   --------------------------------------------
+   -- 10 GigE (or 1 GigE) Modules for QSFP[1:0]
+   --------------------------------------------
+   U_EthPhyMac : entity work.EthPhyWrapper
+      generic map (
+         TPD_G     => TPD_G,
+         ETH_10G_G => ETH_10G_G)
       port map (
          -- Local Configurations
          localMac     => localMac,
@@ -105,7 +119,7 @@ begin
          dmaObMasters => macIbMasters,
          dmaObSlaves  => macIbSlaves,
          -- Misc. Signals
-         extRst       => axilRst,
+         extRst       => extRst,
          phyReady     => phyReady,
          ---------------------
          --  Hardware Ports
@@ -154,6 +168,7 @@ begin
       U_Lane : entity work.EthLane
          generic map (
             TPD_G           => TPD_G,
+            CLK_FREQUENCY_G => ite(ETH_10G_G,156.25E+6,125.0E+6),
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map (
             -- RSSI Interface (axilClk domain)

@@ -60,6 +60,9 @@ base.start(pollEn=True,initRead=True)
 # Print the AxiVersion Summary
 base.Core.AxiPcieCore.AxiVersion.printStatus()
 
+# # Reset the Application Firmware
+# base.Core.AxiPcieCore.AxiVersion.UserRst()
+
 # Load the YAML file
 print( 'Loading %s YAML file' % args.yaml);
 base.ReadConfig(args.yaml) 

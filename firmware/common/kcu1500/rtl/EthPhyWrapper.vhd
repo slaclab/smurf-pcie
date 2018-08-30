@@ -2,7 +2,7 @@
 -- File       : EthPhyWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-08
--- Last update: 2018-05-10
+-- Last update: 2018-07-24
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -30,7 +30,8 @@ use unisim.vcomponents.all;
 
 entity EthPhyWrapper is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G     : time    := 1 ns;
+      ETH_10G_G : boolean := true);
    port (
       -- Local Configurations
       localMac     : in  Slv48Array(NUM_LINKS_C-1 downto 0) := (others => MAC_ADDR_INIT_C);
@@ -89,6 +90,11 @@ architecture mapping of EthPhyWrapper is
    signal ethRxN : slv(7 downto 0);
    signal ethTxP : slv(7 downto 0);
    signal ethTxN : slv(7 downto 0);
+
+   signal sysClk125 : sl;
+   signal sysRst125 : sl;
+   signal sysClk62  : sl;
+   signal sysRst62  : sl;
 
    attribute dont_touch           : string;
    attribute dont_touch of refClk : signal is "TRUE";
@@ -199,41 +205,100 @@ begin
    end generate MAP_QSFP;
 
    ----------------
+   -- Clock Manager
+   ----------------
+   U_MMCM : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G              => TPD_G,
+         TYPE_G             => "MMCM",
+         INPUT_BUFG_G       => false,
+         FB_BUFG_G          => true,
+         RST_IN_POLARITY_G  => '1',
+         NUM_CLOCKS_G       => 2,
+         -- MMCM attributes
+         BANDWIDTH_G        => "OPTIMIZED",
+         CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
+         DIVCLK_DIVIDE_G    => 5,       -- 31.25 MHz = (156.25 MHz/5)
+         CLKFBOUT_MULT_F_G  => 32.0,    -- 1 GHz = (32 x 31.25 MHz)
+         CLKOUT0_DIVIDE_F_G => 8.0,     -- 125 MHz = (1.0 GHz/8)
+         CLKOUT1_DIVIDE_G   => 16)      -- 62.5 MHz = (1.0 GHz/16)
+      port map(
+         clkIn     => coreClk(0),
+         rstIn     => coreRst(0),
+         clkOut(0) => sysClk125,
+         clkOut(1) => sysClk62,
+         rstOut(0) => sysRst125,
+         rstOut(1) => sysRst62);
+
+   ----------------
    -- 10GigE Module 
    ----------------
    GEN_LANE :
    for i in 0 to NUM_LINKS_C-1 generate
 
-      TenGigEthGthUltraScale_Inst : entity work.TenGigEthGthUltraScale
-         generic map (
-            TPD_G         => TPD_G,
-            -- AXI-Lite Configurations
-            EN_AXI_REG_G  => false,
-            -- AXI Streaming Configurations
-            AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
-         port map (
-            -- Local Configurations
-            localMac      => localMac(i),
-            -- Streaming DMA Interface 
-            dmaClk        => dmaClk,
-            dmaRst        => dmaRst,
-            dmaIbMaster   => dmaIbMasters(i),
-            dmaIbSlave    => dmaIbSlaves(i),
-            dmaObMaster   => dmaObMasters(i),
-            dmaObSlave    => dmaObSlaves(i),
-            -- Misc. Signals
-            coreClk       => coreClkVec(i),
-            extRst        => coreRstVec(i),
-            phyReady      => phyReady(i),
-            -- Quad PLL Ports
-            qplllock      => qplllockVec(i),
-            qplloutclk    => qplloutclkVec(i),
-            qplloutrefclk => qplloutrefclkVec(i),
-            -- MGT Ports
-            gtTxP         => ethTxP(i),
-            gtTxN         => ethTxN(i),
-            gtRxP         => ethRxP(i),
-            gtRxN         => ethRxN(i));
+      GEN_10G : if (ETH_10G_G = true) generate
+         U_ETH : entity work.TenGigEthGthUltraScale
+            generic map (
+               TPD_G         => TPD_G,
+               -- AXI-Lite Configurations
+               EN_AXI_REG_G  => false,
+               -- AXI Streaming Configurations
+               AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
+            port map (
+               -- Local Configurations
+               localMac      => localMac(i),
+               -- Streaming DMA Interface 
+               dmaClk        => dmaClk,
+               dmaRst        => dmaRst,
+               dmaIbMaster   => dmaIbMasters(i),
+               dmaIbSlave    => dmaIbSlaves(i),
+               dmaObMaster   => dmaObMasters(i),
+               dmaObSlave    => dmaObSlaves(i),
+               -- Misc. Signals
+               coreClk       => coreClkVec(i),
+               extRst        => coreRstVec(i),
+               phyReady      => phyReady(i),
+               -- Quad PLL Ports
+               qplllock      => qplllockVec(i),
+               qplloutclk    => qplloutclkVec(i),
+               qplloutrefclk => qplloutrefclkVec(i),
+               -- MGT Ports
+               gtTxP         => ethTxP(i),
+               gtTxN         => ethTxN(i),
+               gtRxP         => ethRxP(i),
+               gtRxN         => ethRxN(i));
+      end generate;
+
+      GEN_1G : if (ETH_10G_G = false) generate
+         U_ETH : entity work.GigEthGthUltraScale
+            generic map (
+               TPD_G         => TPD_G,
+               -- AXI-Lite Configurations
+               EN_AXI_REG_G  => false,
+               -- AXI Streaming Configurations
+               AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
+            port map (
+               -- Local Configurations
+               localMac    => localMac(i),
+               -- Streaming DMA Interface 
+               dmaClk      => dmaClk,
+               dmaRst      => dmaRst,
+               dmaIbMaster => dmaIbMasters(i),
+               dmaIbSlave  => dmaIbSlaves(i),
+               dmaObMaster => dmaObMasters(i),
+               dmaObSlave  => dmaObSlaves(i),
+               -- PHY + MAC signals
+               sysClk62    => sysClk62,
+               sysClk125   => sysClk125,
+               sysRst125   => sysRst125,
+               extRst      => coreRst(0),
+               phyReady    => phyReady(i),
+               -- MGT Ports
+               gtTxP       => ethTxP(i),
+               gtTxN       => ethTxN(i),
+               gtRxP       => ethRxP(i),
+               gtRxN       => ethRxN(i));
+      end generate;
 
    end generate GEN_LANE;
 

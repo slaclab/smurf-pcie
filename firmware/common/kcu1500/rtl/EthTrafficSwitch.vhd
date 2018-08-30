@@ -2,7 +2,7 @@
 -- File       : EthTrafficSwitch.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-03-16
--- Last update: 2018-03-23
+-- Last update: 2018-07-27
 -------------------------------------------------------------------------------
 -- Description: Ethernet Traffic Switch for routing either RAW UDP or RSSI+UDP
 -------------------------------------------------------------------------------
@@ -44,15 +44,15 @@ entity EthTrafficSwitch is
       mRssiTspMaster  : out AxiStreamMasterType;
       mRssiTspSlave   : in  AxiStreamSlaveType;
       -- RSSI Application Interface
-      sRssiAppMasters : in  AxiStreamMasterArray(RSSI_STREAMS_C-1 downto 0);
-      sRssiAppSlaves  : out AxiStreamSlaveArray(RSSI_STREAMS_C-1 downto 0);
-      mRssiAppMasters : out AxiStreamMasterArray(RSSI_STREAMS_C-1 downto 0);
-      mRssiAppSlaves  : in  AxiStreamSlaveArray(RSSI_STREAMS_C-1 downto 0);
+      sRssiAppMasters : in  AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+      sRssiAppSlaves  : out AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+      mRssiAppMasters : out AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+      mRssiAppSlaves  : in  AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
       -- DMA Interface
-      sDmaMasters     : in  AxiStreamMasterArray(RSSI_STREAMS_C-1 downto 0);
-      sDmaSlaves      : out AxiStreamSlaveArray(RSSI_STREAMS_C-1 downto 0);
-      mDmaMasters     : out AxiStreamMasterArray(RSSI_STREAMS_C-1 downto 0);
-      mDmaSlaves      : in  AxiStreamSlaveArray(RSSI_STREAMS_C-1 downto 0));
+      sDmaMasters     : in  AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+      sDmaSlaves      : out AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+      mDmaMasters     : out AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+      mDmaSlaves      : in  AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0));
 end EthTrafficSwitch;
 
 architecture rtl of EthTrafficSwitch is
@@ -62,10 +62,10 @@ architecture rtl of EthTrafficSwitch is
       mUdpMaster      : AxiStreamMasterType;
       sRssiTspSlave   : AxiStreamSlaveType;
       mRssiTspMaster  : AxiStreamMasterType;
-      sRssiAppSlaves  : AxiStreamSlaveArray(RSSI_STREAMS_C-1 downto 0);
-      mRssiAppMasters : AxiStreamMasterArray(RSSI_STREAMS_C-1 downto 0);
-      sDmaSlaves      : AxiStreamSlaveArray(RSSI_STREAMS_C-1 downto 0);
-      mDmaMasters     : AxiStreamMasterArray(RSSI_STREAMS_C-1 downto 0);
+      sRssiAppSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+      mRssiAppMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+      sDmaSlaves      : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+      mDmaMasters     : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
 
    end record RegType;
 
@@ -96,7 +96,7 @@ begin
       -- Reset strobing signals
       v.sUdpSlave.tReady     := '0';
       v.sRssiTspSlave.tReady := '0';
-      for i in RSSI_STREAMS_C-1 downto 0 loop
+      for i in APP_STREAMS_C-1 downto 0 loop
          v.sRssiAppSlaves(i).tReady := '0';
          v.sDmaSlaves(i).tReady     := '0';
       end loop;
@@ -111,7 +111,7 @@ begin
          v.mRssiTspMaster.tValid := '0';
       end if;
 
-      for i in RSSI_STREAMS_C-1 downto 0 loop
+      for i in APP_STREAMS_C-1 downto 0 loop
 
          -- Update tValid variable
          if mRssiAppSlaves(i).tReady = '1' then
@@ -147,18 +147,18 @@ begin
          end if;
 
          -- Prevent DMA back pressure unused TDESTs
-         for i in RSSI_STREAMS_C-1 downto 1 loop
+         for i in APP_STREAMS_C-1 downto 1 loop
             v.sDmaSlaves(i).tReady := '1';
          end loop;
 
          -- Terminate the RSSI TSP interfaces
-         v.sRssiTspSlave.tReady := '1';
-         v.mRssiTspMaster       := SSI_MASTER_FORCE_EOFE_C;
+         v.sRssiTspSlave  := AXI_STREAM_SLAVE_FORCE_C;
+         v.mRssiTspMaster := AXI_STREAM_MASTER_INIT_C;
 
          -- Terminate the RSSI TSP interfaces
-         for i in RSSI_STREAMS_C-1 downto 0 loop
-            v.sRssiAppSlaves(i).tReady := '1';
-            v.mRssiAppMasters(i)       := SSI_MASTER_FORCE_EOFE_C;
+         for i in APP_STREAMS_C-1 downto 0 loop
+            v.sRssiAppSlaves(i)  := AXI_STREAM_SLAVE_FORCE_C;
+            v.mRssiAppMasters(i) := AXI_STREAM_MASTER_INIT_C;
          end loop;
 
       else
@@ -179,7 +179,7 @@ begin
             v.mUdpMaster           := sRssiTspMaster;
          end if;
 
-         for i in RSSI_STREAMS_C-1 downto 0 loop
+         for i in APP_STREAMS_C-1 downto 0 loop
 
             -- Check if RSSI Link is up
             if (rssiLinkUp = '1') then
@@ -211,15 +211,7 @@ begin
          end loop;
 
       end if;
-
-      -- Force write the application-to-RSSI TDESET
-      v.mRssiAppMasters(0).tdest := x"00";  -- SRPv3
-      for i in RSSI_STREAMS_C-1 downto 1 loop
-         -- Terminate defined path
-         v.mRssiAppMasters(i).tValid := '0';
-         v.mRssiAppMasters(i).tdest  := x"FF";
-      end loop;
-
+      
       -- Combinatorial outputs before the reset
       sUdpSlave      <= v.sUdpSlave;
       sRssiTspSlave  <= v.sRssiTspSlave;

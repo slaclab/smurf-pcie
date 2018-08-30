@@ -2,7 +2,7 @@
 -- File       : AppLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-05-14
+-- Last update: 2018-08-13
 -------------------------------------------------------------------------------
 -- Description: AppLane File
 -------------------------------------------------------------------------------
@@ -61,20 +61,102 @@ end AppLane;
 
 architecture mapping of AppLane is
 
+   function TdestRoutes return Slv8Array is
+      variable retConf : Slv8Array(RSSI_PER_LINK_C-1 downto 0);
+   begin
+      for i in RSSI_PER_LINK_C-1 downto 0 loop
+         retConf(i) := toSlv((32*LANE_G)+i, 8);
+      end loop;
+      return retConf;
+   end function;
+
+   signal appObMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+   signal appObSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
+   signal appIbMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
+   signal appIbSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
+
+   signal dmaObMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+   signal dmaObSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+   signal dmaIbMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+   signal dmaIbSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+
    signal loopbackMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
    signal loopbackSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
 
 begin
 
+   GEN_PACKER : for i in RSSI_PER_LINK_C-1 downto 0 generate
+
+      U_PackerV2 : entity work.AxiPcieDmaLanePackVer2
+         generic map (
+            TPD_G               => TPD_G,
+            APP_STREAMS_G       => APP_STREAMS_C,
+            APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_C,
+            APP_STREAM_CONFIG_G => APP_STREAM_CONFIG_C)
+         port map (
+            -- Application Interfaces (RAW AXI Stream)
+            appClk       => axilClk,
+            appRst       => axilRst,
+            appObMasters => appObMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            appObSlaves  => appObSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            appIbMasters => appIbMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            appIbSlaves  => appIbSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            -- DMA Interface (PackerV2 encoded, 128-bit AXI Stream)
+            dmaClk       => dmaClk,
+            dmaRst       => dmaRst,
+            dmaObMaster  => dmaObMasters(i),
+            dmaObSlave   => dmaObSlaves(i),
+            dmaIbMaster  => dmaIbMasters(i),
+            dmaIbSlave   => dmaIbSlaves(i));
+
+   end generate GEN_PACKER;
+
+   U_AxiStreamMux : entity work.AxiStreamMux
+      generic map (
+         TPD_G                => TPD_G,
+         NUM_SLAVES_G         => APP_STREAMS_C,
+         MODE_G               => "ROUTED",
+         TDEST_ROUTES_G       => TdestRoutes,
+         ILEAVE_EN_G          => true,
+         ILEAVE_ON_NOTVALID_G => false,
+         ILEAVE_REARB_G       => (2048/DMA_AXIS_CONFIG_C.TDATA_BYTES_C),
+         PIPE_STAGES_G        => 1)
+      port map (
+         -- Clock and reset
+         axisClk      => dmaClk,
+         axisRst      => dmaRst,
+         -- Slaves
+         sAxisMasters => dmaIbMasters,
+         sAxisSlaves  => dmaIbSlaves,
+         -- Master
+         mAxisMaster  => dmaIbMaster,
+         mAxisSlave   => dmaIbSlave);
+
+   U_AxiStreamDeMux : entity work.AxiStreamDeMux
+      generic map (
+         TPD_G          => TPD_G,
+         PIPE_STAGES_G  => 1,
+         NUM_MASTERS_G  => APP_STREAMS_C,
+         MODE_G         => "ROUTED",
+         TDEST_ROUTES_G => TdestRoutes)
+      port map (
+         -- Clock and reset
+         axisClk      => dmaClk,
+         axisRst      => dmaRst,
+         -- Slaves
+         sAxisMaster  => dmaObMaster,
+         sAxisSlave   => dmaObSlave,
+         -- Master
+         mAxisMasters => dmaObMasters,
+         mAxisSlaves  => dmaObSlaves);
+
    U_Tx : entity work.AppLaneTx
       generic map (
          TPD_G => TPD_G)
       port map (
-         -- DMA Interfaces (dmaClk domain)
-         dmaClk          => dmaClk,
-         dmaRst          => dmaRst,
-         dmaObMaster     => dmaObMaster,
-         dmaObSlave      => dmaObSlave,
+         -- DMA Interfaces (axilClk domain)
+         appIbMasters    => appIbMasters,
+         appIbSlaves     => appIbSlaves,
          -- Loop Interfaces (axilClk domain)
          loopbackMasters => loopbackMasters,
          loopbackSlaves  => loopbackSlaves,
@@ -91,11 +173,9 @@ begin
          LANE_G          => LANE_G,
          AXI_BASE_ADDR_G => AXI_BASE_ADDR_G)
       port map (
-         -- DMA Interfaces (dmaClk domain)
-         dmaClk          => dmaClk,
-         dmaRst          => dmaRst,
-         dmaIbMaster     => dmaIbMaster,
-         dmaIbSlave      => dmaIbSlave,
+         -- DMA Interfaces (axilClk domain)
+         appObMasters    => appObMasters,
+         appObSlaves     => appObSlaves,
          -- Loop Interfaces (axilClk domain)
          loopbackMasters => loopbackMasters,
          loopbackSlaves  => loopbackSlaves,
