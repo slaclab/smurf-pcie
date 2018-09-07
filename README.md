@@ -61,6 +61,8 @@ $ make gui
 ```
 
 # How to reprogram PCIe FPGA
+```
 $ source setup_rogue.sh
 $ cd smurf-pcie/firmware/submodules/axi-pcie-core/python/
 $ python3 updateKcu1500.py /path/to/mcs 
+```
