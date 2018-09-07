@@ -1,4 +1,4 @@
-# cryo-det
+# smurf-pcie
 
 # Before you clone the GIT repository
 
@@ -21,14 +21,14 @@ $ git lfs install
 
 # Clone the GIT repository
 ```
-$ git clone --recursive git@github.com:slaclab/cryo-det
+$ git clone --recursive git@github.com:slaclab/smurf-pcie
 ```
 
 # How to build the firmware
 
 1) Update your submodules to the latest version
 ```
-$ cd cryo-det/
+$ cd smurf-pcie/
 $ ./set_submodule_tags
 ```
 
@@ -36,22 +36,22 @@ $ ./set_submodule_tags
 
 > In C-Shell: 
 ```
-$ source cryo-det/firmware/setup_env_slac.csh
+$ source smurf-pcie/firmware/setup_env_slac.csh
 ```
 
 > In Bash:
 ```
-$ source cryo-det/firmware/setup_env_slac.sh
+$ source smurf-pcie/firmware/setup_env_slac.sh
 ```
 
 3) If not done yet, make a symbolic link to the firmware/
 ```
-$ ln -s /u1/$USER/build cryo-det/firmware/build
+$ ln -s /u1/$USER/build smurf-pcie/firmware/build
 ```
 
 4) Go to the target directory and make the firmware:
 ```
-$ cd cryo-det/firmware/targets/CryoRtmEth/
+$ cd smurf-pcie/firmware/targets/SmurfKcu1500RssiOffload10GbE/
 $ make
 ```
 
@@ -60,37 +60,7 @@ $ make
 $ make gui
 ```
 
-# How to reprogram your AMC Carrier's FPGA
-https://confluence.slac.stanford.edu/x/aYZwD
-
-# How to run the QT GUI Software
-https://confluence.slac.stanford.edu/x/sXFODQ
-
-# How to take data using the development ROGUE QT GUI
-https://confluence.slac.stanford.edu/x/v3FODQ
-
-# How to run EPICS Software
-https://confluence.slac.stanford.edu/x/tHFODQ
-
-# How to program FPGA and run the QT GUI (example)
-```
-# Log into PC
-$ ssh tid-pc93130 -Y
-
-# Program the FPGA
-$ /afs/slac/g/lcls/package/cpsw/utils/ProgramFPGA/current/ProgramFPGA.bash --shelfmanager shm-b084-sp07 --slot 4 --addr 3 --mcs ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-3fc2f4b.mcs
-
-# Check the IPMI status
-$ source /afs/slac/g/reseng/IPMC/env.csh
-$ amcc_dump_bsi --all shm-b084-sp07/4
-
-# Go to software directory
-$ cd /afs/slac/g/lcls/package/pyrogue/control-server/current
-
-# Launch the GUI
-$ ./start_server.sh -a 10.0.3.104 -t ~ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/images/CryoRtmEth-0x00000013-20170720163850-ruckman-3fc2f4b.pyrogue.tar.gz
-
-# Use these default configurations
-/afs/slac.stanford.edu/u/re/ruckman/projects/lcls/cryo-det/firmware/targets/CryoRtmEth/config/defaults.yml
-
-```
+# How to reprogram PCIe FPGA
+$ source setup_rogue.sh
+$ cd smurf-pcie/firmware/submodules/axi-pcie-core/python/
+$ python3 updateKcu1500.py /path/to/mcs 

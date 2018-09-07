@@ -4,15 +4,6 @@
 [submodule "firmware/submodules/ruckus"]
 	path = firmware/submodules/ruckus
 	url = git@github.com:slaclab/ruckus.git
-[submodule "firmware/submodules/amc-carrier-core"]
-	path = firmware/submodules/amc-carrier-core
-	url = git@github.com:slaclab/amc-carrier-core.git
-[submodule "firmware/submodules/sysgen-dsp-lib"]
-	path = firmware/submodules/sysgen-dsp-lib
-	url = git@github.com:slaclab/sysgen-dsp-lib.git
-[submodule "firmware/submodules/lcls-timing-core"]
-	path = firmware/submodules/lcls-timing-core
-	url = git@github.com:slaclab/lcls-timing-core.git
 [submodule "firmware/submodules/axi-pcie-core"]
 	path = firmware/submodules/axi-pcie-core
 	url = git@github.com:slaclab/axi-pcie-core

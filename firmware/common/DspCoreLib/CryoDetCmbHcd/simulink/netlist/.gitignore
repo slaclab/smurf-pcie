@@ -1,8 +1,0 @@
-*.tcl
-*.veo
-*.vho
-*.v
-*.vhd
-sysgen/
-hdl_netlist/
-Synthesized\ Checkpoint/

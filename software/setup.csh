@@ -1,9 +1,8 @@
 ###################
 # Setup environment
 ###################
-#source /afs/slac/g/reseng/rogue/v2.8.3/setup_env.csh
-source /afs/slac/g/reseng/rogue/pre-release/setup_env.csh
-#source /afs/slac/g/reseng/rogue/master/setup_env.csh
+source /afs/slac/g/lcls/package/pyrogue/rogue/v2.12.0/setup_slac.sh
+source /afs/slac/g/lcls/package/pyrogue/rogue/v2.12.0/setup_rogue.sh
 
 # Python Package directories
 setenv AMCC_DIR     ${PWD}/../firmware/submodules/amc-carrier-core/python
