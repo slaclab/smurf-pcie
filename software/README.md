@@ -41,8 +41,7 @@ $ cat /proc/datadev_0
 $ cd cryo-det/software
 
 # Source the setup script with respect to your application
-# In this example, our application is MicrowaveMux 
-$ source setup_MicrowaveMux.csh
+$ source setup.csh
 
 # Configure the PCIe card
 $ python3 scripts/PcieLoadConfig.py --yaml config/pcie_rssi_config.yml
