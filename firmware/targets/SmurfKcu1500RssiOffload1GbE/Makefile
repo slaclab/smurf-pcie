@@ -2,7 +2,7 @@
 export TIMING_EXT_PKG = 1
 
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000020
+export PRJ_VERSION = 0x00000032
 
 # Define the Hardware Type in the axi-pcie-core
 export PCIE_HW_TYPE = XilinxKcu1500
@@ -14,7 +14,7 @@ export PRJ_PART = xcku115-flvb2104-2-e
 export NUM_MIG_CORES = 0
 
 # Select either GEN1 or GEN2 or GEN3 PCIe
-export PCIE_GEN_NUM = GEN3
+export PCIE_GEN_NUM = GEN1
 
 # Define target output
 target: prom
