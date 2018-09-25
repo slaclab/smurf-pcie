@@ -11,7 +11,7 @@
 
 import sys
 import argparse
-import PyQt4.QtGui
+import PyQt5.QtWidgets
 import pyrogue as pr
 import pyrogue.gui
 import rogue.hardware.axi
@@ -71,7 +71,7 @@ base.start(pollEn=args.pollEn,initRead=args.initRead)
 base.Core.AxiPcieCore.AxiVersion.printStatus()
 
 # Create GUI
-appTop = PyQt4.QtGui.QApplication(sys.argv)
+appTop = PyQt5.QtWidgets.QApplication(sys.argv)
 appTop.setStyle('Fusion')
 guiTop = pyrogue.gui.GuiTop(group='rootMesh')
 guiTop.addTree(base)
