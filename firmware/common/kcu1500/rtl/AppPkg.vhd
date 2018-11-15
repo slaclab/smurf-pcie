@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-02-06
--- Last update: 2018-08-02
 -------------------------------------------------------------------------------
 -- Description: Package file for Application
 -------------------------------------------------------------------------------
@@ -20,7 +18,6 @@ use ieee.std_logic_1164.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
-use work.AxiPciePkg.all;
 
 package AppPkg is
  
@@ -44,26 +41,22 @@ package AppPkg is
       MEM_DATA_IDX_C   => X"04",        -- TDEST 4 routed to stream 3 (MEM)
       RAW_DATA_IDX_C   => "10------",  -- TDEST x80-0xBF routed to stream 4 (Raw Data)            
       APP_ASYNC_IDX_C  => "11------");  -- TDEST 0xC0-0xFF routed to stream 5 (Application)  
-
+      
    constant APP_AXIS_CONFIG_C : AxiStreamConfigType := (
-      TSTRB_EN_C    => DMA_AXIS_CONFIG_C.TSTRB_EN_C,
+      TSTRB_EN_C    => false,
       TDATA_BYTES_C => 8,               -- 64-bit interface to match RSSI/PackVer2
-      TDEST_BITS_C  => DMA_AXIS_CONFIG_C.TDEST_BITS_C,
-      TID_BITS_C    => DMA_AXIS_CONFIG_C.TID_BITS_C,
-      TKEEP_MODE_C  => DMA_AXIS_CONFIG_C.TKEEP_MODE_C,
-      TUSER_BITS_C  => DMA_AXIS_CONFIG_C.TUSER_BITS_C,
-      TUSER_MODE_C  => DMA_AXIS_CONFIG_C.TUSER_MODE_C);
+      TDEST_BITS_C  => 8,
+      TID_BITS_C    => 0,
+      TKEEP_MODE_C  => TKEEP_COMP_C,
+      TUSER_BITS_C  => 4,
+      TUSER_MODE_C => TUSER_FIRST_LAST_C);       
 
    constant APP_STREAM_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => APP_AXIS_CONFIG_C);      
 
    ---------------------------------
    --  General Configuration
    ---------------------------------
-
-   constant NUM_LINKS_C     : positive := 1;  -- Only using 1 of the 8 QSFP links
-   constant RSSI_PER_LINK_C : positive := 6;  -- 6 RSSI clients per QSFP link
-   constant AXIS_PER_LINK_C : positive := RSSI_PER_LINK_C*APP_STREAMS_C;
-   constant NUM_AXIS_C      : positive := NUM_LINKS_C*AXIS_PER_LINK_C;
-   constant NUM_RSSI_C      : positive := NUM_LINKS_C*RSSI_PER_LINK_C;
+   constant NUM_RSSI_C : positive := 6;  -- 6 RSSI clients per ETH link (only 1 ETH per KCU1500)
+   constant NUM_AXIS_C : positive := NUM_RSSI_C*APP_STREAMS_C;
 
 end package AppPkg;

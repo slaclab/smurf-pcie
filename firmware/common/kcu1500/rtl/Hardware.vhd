@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : Hardware.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-02-06
--- Last update: 2018-07-27
 -------------------------------------------------------------------------------
 -- Description: Hardware File
 -------------------------------------------------------------------------------
@@ -25,15 +23,14 @@ use work.StdRtlPkg.all;
 use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
-use work.AxiPciePkg.all;
 use work.EthMacPkg.all;
 use work.AppPkg.all;
 
 entity Hardware is
    generic (
-      TPD_G           : time             := 1 ns;
-      ETH_10G_G       : boolean          := true;
-      AXI_BASE_ADDR_G : slv(31 downto 0) := BAR0_BASE_ADDR_C);
+      TPD_G           : time    := 1 ns;
+      ETH_10G_G       : boolean := true;
+      AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
       ------------------------      
       --  Top Level Interfaces
@@ -72,21 +69,14 @@ end Hardware;
 
 architecture mapping of Hardware is
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_LINKS_C-1 downto 0) := genAxiLiteConfig(NUM_LINKS_C, AXI_BASE_ADDR_G, 22, 19);
-
-   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_LINKS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_LINKS_C-1 downto 0);
-   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_LINKS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_LINKS_C-1 downto 0);
-
-   signal macObMasters : AxiStreamMasterArray(NUM_LINKS_C-1 downto 0);
-   signal macObSlaves  : AxiStreamSlaveArray(NUM_LINKS_C-1 downto 0);
-   signal macIbMasters : AxiStreamMasterArray(NUM_LINKS_C-1 downto 0);
-   signal macIbSlaves  : AxiStreamSlaveArray(NUM_LINKS_C-1 downto 0);
+   signal macObMaster : AxiStreamMasterType;
+   signal macObSlave  : AxiStreamSlaveType;
+   signal macIbMaster : AxiStreamMasterType;
+   signal macIbSlave  : AxiStreamSlaveType;
 
    signal extRst   : sl;
-   signal phyReady : slv(NUM_LINKS_C-1 downto 0);
-   signal localMac : Slv48Array(NUM_LINKS_C-1 downto 0);
+   signal phyReady : sl;
+   signal localMac : slv(47 downto 0);
 
 begin
 
@@ -114,10 +104,10 @@ begin
          -- Streaming DMA Interface 
          dmaClk       => axilClk,
          dmaRst       => axilRst,
-         dmaIbMasters => macObMasters,
-         dmaIbSlaves  => macObSlaves,
-         dmaObMasters => macIbMasters,
-         dmaObSlaves  => macIbSlaves,
+         dmaIbMaster  => macObMaster,
+         dmaIbSlave   => macObSlave,
+         dmaObMaster  => macIbMaster,
+         dmaObSlave   => macIbSlave,
          -- Misc. Signals
          extRst       => extRst,
          phyReady     => phyReady,
@@ -139,59 +129,34 @@ begin
          qsfp1TxN     => qsfp1TxN,
          qsfp1TxP     => qsfp1TxP);
 
-   ---------------------
-   -- AXI-Lite Crossbar
-   ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_LINKS_C,
-         MASTERS_CONFIG_G   => AXI_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
-
    ------------
    -- ETH Lanes
    ------------
-   GEN_VEC : for i in NUM_LINKS_C-1 downto 0 generate
-
-      U_Lane : entity work.EthLane
-         generic map (
-            TPD_G           => TPD_G,
-            CLK_FREQUENCY_G => ite(ETH_10G_G,156.25E+6,125.0E+6),
-            AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
-         port map (
-            -- RSSI Interface (axilClk domain)
-            rssiLinkUp      => rssiLinkUp((RSSI_PER_LINK_C-1)+(RSSI_PER_LINK_C*i) downto (RSSI_PER_LINK_C*i)),
-            rssiIbMasters   => rssiIbMasters((AXIS_PER_LINK_C-1)+(AXIS_PER_LINK_C*i) downto (AXIS_PER_LINK_C*i)),
-            rssiIbSlaves    => rssiIbSlaves((AXIS_PER_LINK_C-1)+(AXIS_PER_LINK_C*i) downto (AXIS_PER_LINK_C*i)),
-            rssiObMasters   => rssiObMasters((AXIS_PER_LINK_C-1)+(AXIS_PER_LINK_C*i) downto (AXIS_PER_LINK_C*i)),
-            rssiObSlaves    => rssiObSlaves((AXIS_PER_LINK_C-1)+(AXIS_PER_LINK_C*i) downto (AXIS_PER_LINK_C*i)),
-            -- PHY Interface (axilClk domain)
-            macObMaster     => macObMasters(i),
-            macObSlave      => macObSlaves(i),
-            macIbMaster     => macIbMasters(i),
-            macIbSlave      => macIbSlaves(i),
-            phyReady        => phyReady(i),
-            mac             => localMac(i),
-            -- AXI-Lite Interface (axilClk domain)
-            axilClk         => axilClk,
-            axilRst         => axilRst,
-            axilReadMaster  => axilReadMasters(i),
-            axilReadSlave   => axilReadSlaves(i),
-            axilWriteMaster => axilWriteMasters(i),
-            axilWriteSlave  => axilWriteSlaves(i));
-
-   end generate GEN_VEC;
+   U_Lane : entity work.EthLane
+      generic map (
+         TPD_G           => TPD_G,
+         CLK_FREQUENCY_G => ite(ETH_10G_G, 156.25E+6, 125.0E+6),
+         AXI_BASE_ADDR_G => AXI_BASE_ADDR_G)
+      port map (
+         -- RSSI Interface (axilClk domain)
+         rssiLinkUp      => rssiLinkUp,
+         rssiIbMasters   => rssiIbMasters,
+         rssiIbSlaves    => rssiIbSlaves,
+         rssiObMasters   => rssiObMasters,
+         rssiObSlaves    => rssiObSlaves,
+         -- PHY Interface (axilClk domain)
+         macObMaster     => macObMaster,
+         macObSlave      => macObSlave,
+         macIbMaster     => macIbMaster,
+         macIbSlave      => macIbSlave,
+         phyReady        => phyReady,
+         mac             => localMac,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave);
 
 end mapping;

@@ -76,20 +76,20 @@ class EthConfig(pr.Device):
             mode         = "RO",
             pollInterval = 1,
         ))        
-        
+
         self.add(pr.RemoteVariable(   
-            name         = "NUM_LINKS_C",
+            name         = "NUM_RSSI_C",
             description  = "Defined in AppPkg.vhd",
             offset       =  0x80,
             mode         = "RO",
-        ))
+        ))            
         
         self.add(pr.RemoteVariable(   
-            name         = "RSSI_PER_LINK_C",
+            name         = "NUM_AXIS_C",
             description  = "Defined in AppPkg.vhd",
             offset       =  0x84,
             mode         = "RO",
-        ))
+        ))    
         
         self.add(pr.RemoteVariable(   
             name         = "RSSI_STREAMS_C",
@@ -97,25 +97,4 @@ class EthConfig(pr.Device):
             offset       =  0x88,
             mode         = "RO",
         ))
-        
-        self.add(pr.RemoteVariable(   
-            name         = "AXIS_PER_LINK_C",
-            description  = "Defined in AppPkg.vhd",
-            offset       =  0x8C,
-            mode         = "RO",
-        ))
-        
-        self.add(pr.RemoteVariable(   
-            name         = "NUM_AXIS_C",
-            description  = "Defined in AppPkg.vhd",
-            offset       =  0x90,
-            mode         = "RO",
-        ))    
-
-        self.add(pr.RemoteVariable(   
-            name         = "NUM_RSSI_C",
-            description  = "Defined in AppPkg.vhd",
-            offset       =  0x94,
-            mode         = "RO",
-        ))            
         

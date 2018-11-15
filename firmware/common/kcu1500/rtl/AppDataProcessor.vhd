@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppDataProcessor.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-02-06
--- Last update: 2018-05-14
 -------------------------------------------------------------------------------
 -- Description: AppDataProcessor File
 -------------------------------------------------------------------------------
@@ -25,7 +23,6 @@ use work.StdRtlPkg.all;
 use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
-use work.AxiPciePkg.all;
 use work.AppPkg.all;
 
 library unisim;
@@ -35,7 +32,7 @@ entity AppDataProcessor is
    generic (
       TPD_G            : time             := 1 ns;
       SW_LOOPBACK_G    : boolean          := false;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := BAR0_BASE_ADDR_C);
+      AXI_BASE_ADDR_G  : slv(31 downto 0));
    port (
       -- -- Streaming Interfaces
       linkUp          : in  sl;
