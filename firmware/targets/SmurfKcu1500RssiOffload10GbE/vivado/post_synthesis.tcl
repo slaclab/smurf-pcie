@@ -40,117 +40,39 @@ set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 #################################
 ## Set the clock for the ILA core
 #################################
-SetDebugCoreClk ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/appClk}
+SetDebugCoreClk ${ilaName} {axilClk}
 
 #######################
 ## Set the debug Probes
 #######################
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/appRst}
+ConfigProbe ${ilaName} {axilRst}
+ConfigProbe ${ilaName} {dmaRst}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/ibMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/ibMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/ibMaster[tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/ibMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/ibMaster[tLast]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/ibSlave[tReady]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tDest][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tValid]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObSlave[tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/obMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/obMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/obMaster[tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/obMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/obMaster[tLast]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/obSlave[tReady]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tDest][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tValid]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbSlave[tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMaster[tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMaster[tLast]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlave[tReady]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tDest][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tValid]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbSlaves[*][tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMaster[tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMaster[tLast]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlave[tReady]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tDest][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tValid]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObSlaves[*][tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[0][tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[0][tUser][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[0][tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[0][tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[0][tLast]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlaves[0][tReady]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tDest][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tValid]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObSlave[tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[0][tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[0][tUser][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[0][tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[0][tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[0][tLast]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlaves[0][tReady]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tDest][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tValid]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbSlave[tReady]}
 
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[1][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[1][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[1][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[1][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlaves[1][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[2][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[2][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[2][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[2][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlaves[2][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[3][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[3][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[3][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[3][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlaves[3][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[4][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[4][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[4][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[4][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlaves[4][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[5][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[5][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[5][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxMasters[5][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/rxSlaves[5][tReady]}
-
-
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[1][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[1][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[1][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[1][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlaves[1][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[2][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[2][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[2][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[2][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlaves[2][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[3][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[3][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[3][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[3][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlaves[3][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[4][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[4][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[4][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[4][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlaves[4][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[5][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[5][tUser][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[5][tKeep][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txMasters[5][tLast]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].GEN_LANE.U_Lane/GEN_PACKER[0].U_PackerV2/txSlaves[5][tReady]}
 
 ##########################
 ## Write the port map file

@@ -74,6 +74,12 @@ architecture mapping of Hardware is
    signal macIbMaster : AxiStreamMasterType;
    signal macIbSlave  : AxiStreamSlaveType;
 
+   signal linkUp    : slv(NUM_RSSI_C-1 downto 0);
+   signal ibMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
+   signal ibSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+   signal obMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
+   signal obSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+
    signal extRst   : sl;
    signal phyReady : sl;
    signal localMac : slv(47 downto 0);
@@ -139,11 +145,11 @@ begin
          AXI_BASE_ADDR_G => AXI_BASE_ADDR_G)
       port map (
          -- RSSI Interface (axilClk domain)
-         rssiLinkUp      => rssiLinkUp,
-         rssiIbMasters   => rssiIbMasters,
-         rssiIbSlaves    => rssiIbSlaves,
-         rssiObMasters   => rssiObMasters,
-         rssiObSlaves    => rssiObSlaves,
+         rssiLinkUp      => linkUp,
+         rssiIbMasters   => ibMasters,
+         rssiIbSlaves    => ibSlaves,
+         rssiObMasters   => obMasters,
+         rssiObSlaves    => obSlaves,
          -- PHY Interface (axilClk domain)
          macObMaster     => macObMaster,
          macObSlave      => macObSlave,
@@ -158,5 +164,43 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave);
+
+   -----------------------------------------------------------------
+   -- Adding Pipelining to help with making timing between SLR0/SLR1
+   -----------------------------------------------------------------
+   GEN_VEC : for i in NUM_AXIS_C-1 downto 0 generate
+
+      U_IbPipe : entity work.AxiStreamPipeline
+         generic map (
+            TPD_G         => TPD_G,
+            PIPE_STAGES_G => 1)
+         port map (
+            axisClk     => axilClk,
+            axisRst     => axilRst,
+            sAxisMaster => rssiIbMasters(i),
+            sAxisSlave  => rssiIbSlaves(i),
+            mAxisMaster => ibMasters(i),
+            mAxisSlave  => ibSlaves(i));
+
+      U_ObPipe : entity work.AxiStreamPipeline
+         generic map (
+            TPD_G         => TPD_G,
+            PIPE_STAGES_G => 1)
+         port map (
+            axisClk     => axilClk,
+            axisRst     => axilRst,
+            sAxisMaster => obMasters(i),
+            sAxisSlave  => obSlaves(i),
+            mAxisMaster => rssiObMasters(i),
+            mAxisSlave  => rssiObSlaves(i));
+
+   end generate GEN_VEC;
+
+   process(axilClk)
+   begin
+      if rising_edge(axilClk) then
+         rssiLinkUp <= linkUp after TPD_G;  -- Adding Pipelining to help with making timing between SLR0/SLR1
+      end if;
+   end process;
 
 end mapping;

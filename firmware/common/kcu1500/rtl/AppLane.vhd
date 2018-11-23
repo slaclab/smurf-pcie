@@ -89,7 +89,7 @@ begin
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => DMA_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
       port map (
          -- Slave Port
@@ -218,7 +218,7 @@ begin
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => DMA_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,

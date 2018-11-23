@@ -42,6 +42,15 @@ package AppPkg is
       RAW_DATA_IDX_C   => "10------",  -- TDEST x80-0xBF routed to stream 4 (Raw Data)            
       APP_ASYNC_IDX_C  => "11------");  -- TDEST 0xC0-0xFF routed to stream 5 (Application)  
       
+   constant DMA_AXIS_CONFIG_C : AxiStreamConfigType := (
+      TSTRB_EN_C    => false,
+      TDATA_BYTES_C => 8,               -- 64-bit interface to match RSSI/PackVer
+      TDEST_BITS_C  => 8,
+      TID_BITS_C    => 0,
+      TKEEP_MODE_C  => TKEEP_COMP_C,
+      TUSER_BITS_C  => 4,
+      TUSER_MODE_C => TUSER_FIRST_LAST_C);  
+
    constant APP_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => 8,               -- 64-bit interface to match RSSI/PackVer2
@@ -49,7 +58,7 @@ package AppPkg is
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_COMP_C,
       TUSER_BITS_C  => 4,
-      TUSER_MODE_C => TUSER_FIRST_LAST_C);       
+      TUSER_MODE_C => TUSER_FIRST_LAST_C);        
 
    constant APP_STREAM_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => APP_AXIS_CONFIG_C);      
 
