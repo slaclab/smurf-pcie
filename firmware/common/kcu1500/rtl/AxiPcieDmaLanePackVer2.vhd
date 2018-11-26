@@ -126,7 +126,7 @@ begin
          MODE_G               => "ROUTED",
          TDEST_ROUTES_G       => APP_STREAM_ROUTES_G,
          ILEAVE_EN_G          => true,
-         ILEAVE_ON_NOTVALID_G => false,
+         ILEAVE_ON_NOTVALID_G => true,
          ILEAVE_REARB_G       => (2048/AXIS_CONFIG_C.TDATA_BYTES_C),
          PIPE_STAGES_G        => 1)
       port map (
