@@ -2,7 +2,7 @@
 -- File       : AppLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-06
--- Last update: 2018-08-13
+-- Last update: 2018-11-26
 -------------------------------------------------------------------------------
 -- Description: AppLane File
 -------------------------------------------------------------------------------
@@ -75,10 +75,10 @@ architecture mapping of AppLane is
    signal appIbMasters : AxiStreamMasterArray(AXIS_PER_LINK_C-1 downto 0);
    signal appIbSlaves  : AxiStreamSlaveArray(AXIS_PER_LINK_C-1 downto 0);
 
-   signal dmaObMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-   signal dmaObSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
-   signal dmaIbMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-   signal dmaIbSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+   signal dmaObMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+   signal dmaObSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
+   signal dmaIbMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
+   signal dmaIbSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
 
    signal loopbackMasters : AxiStreamMasterArray(RSSI_PER_LINK_C-1 downto 0);
    signal loopbackSlaves  : AxiStreamSlaveArray(RSSI_PER_LINK_C-1 downto 0);
@@ -111,44 +111,58 @@ begin
 
    end generate GEN_PACKER;
 
-   U_AxiStreamMux : entity work.AxiStreamMux
-      generic map (
-         TPD_G                => TPD_G,
-         NUM_SLAVES_G         => APP_STREAMS_C,
-         MODE_G               => "ROUTED",
-         TDEST_ROUTES_G       => TdestRoutes,
-         ILEAVE_EN_G          => true,
-         ILEAVE_ON_NOTVALID_G => true,
-         ILEAVE_REARB_G       => (2048/DMA_AXIS_CONFIG_C.TDATA_BYTES_C),
-         PIPE_STAGES_G        => 1)
-      port map (
-         -- Clock and reset
-         axisClk      => dmaClk,
-         axisRst      => dmaRst,
-         -- Slaves
-         sAxisMasters => dmaIbMasters,
-         sAxisSlaves  => dmaIbSlaves,
-         -- Master
-         mAxisMaster  => dmaIbMaster,
-         mAxisSlave   => dmaIbSlave);
+   BYP_MUX : if (RSSI_PER_LINK_C = 1) generate
 
-   U_AxiStreamDeMux : entity work.AxiStreamDeMux
-      generic map (
-         TPD_G          => TPD_G,
-         PIPE_STAGES_G  => 1,
-         NUM_MASTERS_G  => APP_STREAMS_C,
-         MODE_G         => "ROUTED",
-         TDEST_ROUTES_G => TdestRoutes)
-      port map (
-         -- Clock and reset
-         axisClk      => dmaClk,
-         axisRst      => dmaRst,
-         -- Slaves
-         sAxisMaster  => dmaObMaster,
-         sAxisSlave   => dmaObSlave,
-         -- Master
-         mAxisMasters => dmaObMasters,
-         mAxisSlaves  => dmaObSlaves);
+      dmaIbMaster    <= dmaIbMasters(0);
+      dmaIbSlaves(0) <= dmaIbSlave;
+
+      dmaObMasters(0) <= dmaObMaster;
+      dmaObSlave      <= dmaObSlaves(0);
+
+   end generate;
+
+   MUX_DMA_LANES : if (RSSI_PER_LINK_C /= 1) generate
+
+      U_AxiStreamMux : entity work.AxiStreamMux
+         generic map (
+            TPD_G                => TPD_G,
+            NUM_SLAVES_G         => RSSI_PER_LINK_C,
+            MODE_G               => "ROUTED",
+            TDEST_ROUTES_G       => TdestRoutes,
+            ILEAVE_EN_G          => true,
+            ILEAVE_ON_NOTVALID_G => true,
+            ILEAVE_REARB_G       => (2048/DMA_AXIS_CONFIG_C.TDATA_BYTES_C),
+            PIPE_STAGES_G        => 1)
+         port map (
+            -- Clock and reset
+            axisClk      => dmaClk,
+            axisRst      => dmaRst,
+            -- Slaves
+            sAxisMasters => dmaIbMasters,
+            sAxisSlaves  => dmaIbSlaves,
+            -- Master
+            mAxisMaster  => dmaIbMaster,
+            mAxisSlave   => dmaIbSlave);
+
+      U_AxiStreamDeMux : entity work.AxiStreamDeMux
+         generic map (
+            TPD_G          => TPD_G,
+            PIPE_STAGES_G  => 1,
+            NUM_MASTERS_G  => RSSI_PER_LINK_C,
+            MODE_G         => "ROUTED",
+            TDEST_ROUTES_G => TdestRoutes)
+         port map (
+            -- Clock and reset
+            axisClk      => dmaClk,
+            axisRst      => dmaRst,
+            -- Slaves
+            sAxisMaster  => dmaObMaster,
+            sAxisSlave   => dmaObSlave,
+            -- Master
+            mAxisMasters => dmaObMasters,
+            mAxisSlaves  => dmaObSlaves);
+
+   end generate;
 
    U_Tx : entity work.AppLaneTx
       generic map (
