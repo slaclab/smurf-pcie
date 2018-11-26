@@ -61,7 +61,7 @@ package AppPkg is
    ---------------------------------
 
    constant NUM_LINKS_C     : positive := 1;  -- Only using 1 of the 8 QSFP links
-   constant RSSI_PER_LINK_C : positive := 6;  -- 6 RSSI clients per QSFP link
+   constant RSSI_PER_LINK_C : positive := 1;  -- 1 RSSI clients per QSFP link
    constant AXIS_PER_LINK_C : positive := RSSI_PER_LINK_C*APP_STREAMS_C;
    constant NUM_AXIS_C      : positive := NUM_LINKS_C*AXIS_PER_LINK_C;
    constant NUM_RSSI_C      : positive := NUM_LINKS_C*RSSI_PER_LINK_C;
