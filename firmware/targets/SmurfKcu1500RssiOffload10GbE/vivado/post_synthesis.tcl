@@ -46,32 +46,38 @@ SetDebugCoreClk ${ilaName} {axilClk}
 ## Set the debug Probes
 #######################
 
-ConfigProbe ${ilaName} {axilRst}
-ConfigProbe ${ilaName} {dmaRst}
+# ConfigProbe ${ilaName} {axilRst}
+# ConfigProbe ${ilaName} {dmaRst}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tDest][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObSlave[tReady]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tDest][*]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tValid]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObSlave[tReady]}
 
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tData][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tUser][*]}
 ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tDest][*]}
 ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tValid]}
 ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbSlave[tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tDest][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbSlaves[*][tReady]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tDest][*]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tValid]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbSlaves[*][tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tDest][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObSlaves[*][tReady]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tDest][*]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tValid]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObSlaves[*][tReady]}
 
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tData][*]}
+ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tUser][*]}
 ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tDest][*]}
 ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tValid]}
 ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObSlave[tReady]}
 
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tDest][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbSlave[tReady]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tDest][*]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tValid]}
+# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbSlave[tReady]}
 
 
 ##########################
