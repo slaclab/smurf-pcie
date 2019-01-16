@@ -13,8 +13,8 @@ pcie:
         BypRssi: 0x0                
       ############################
       UdpClient[0]: # Slot#2 Link
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.10
+        ClientRemotePort: 8198
+        ClientRemoteIp: 10.0.3.102
       ############################
       UdpClient[1]: # Slot#3 Link
         ClientRemotePort: 8198
