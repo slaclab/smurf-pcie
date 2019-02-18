@@ -1,8 +1,7 @@
 ###################
 # Setup environment
 ###################
-#source /afs/slac/g/lcls/package/pyrogue/rogue/v2.12.0/setup_slac.sh
-#source /afs/slac/g/lcls/package/pyrogue/rogue/v2.12.0/setup_rogue.sh
+source /afs/slac.stanford.edu/g/reseng/rogue/anaconda/rogue_pre-release.sh
 
 # Python Package directories
 TOP=/usr/local/controls/Applications/smurf/cmb_Det/smurf-pcie/master/software
