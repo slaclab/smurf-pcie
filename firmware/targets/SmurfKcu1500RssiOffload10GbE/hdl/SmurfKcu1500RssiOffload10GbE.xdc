@@ -8,6 +8,9 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware}]
+set_property USER_SLR_ASSIGNMENT SLR0 [get_cells {U_Application}]
+
 create_generated_clock -name ethRxClk0 [get_pins {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_TenGigEthGthUltraScaleCore/U0/TenGigEthGthUltraScale156p25MHzCore_local_clock_reset_block/rxusrclk2_bufg_gt_i/O}]
 create_generated_clock -name ethRxClk1 [get_pins {U_Hardware/U_EthPhyMac/GEN_LANE[1].GEN_10G.U_ETH/U_TenGigEthGthUltraScaleCore/U0/TenGigEthGthUltraScale156p25MHzCore_local_clock_reset_block/rxusrclk2_bufg_gt_i/O}]
 create_generated_clock -name ethRxClk2 [get_pins {U_Hardware/U_EthPhyMac/GEN_LANE[2].GEN_10G.U_ETH/U_TenGigEthGthUltraScaleCore/U0/TenGigEthGthUltraScale156p25MHzCore_local_clock_reset_block/rxusrclk2_bufg_gt_i/O}]

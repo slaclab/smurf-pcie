@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : EthPhyWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-08
--- Last update: 2018-07-24
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -34,17 +32,17 @@ entity EthPhyWrapper is
       ETH_10G_G : boolean := true);
    port (
       -- Local Configurations
-      localMac     : in  Slv48Array(NUM_LINKS_C-1 downto 0) := (others => MAC_ADDR_INIT_C);
+      localMac     : in  slv(47 downto 0);
       -- Streaming DMA Interface 
       dmaClk       : in  sl;
       dmaRst       : in  sl;
-      dmaIbMasters : out AxiStreamMasterArray(NUM_LINKS_C-1 downto 0);
-      dmaIbSlaves  : in  AxiStreamSlaveArray(NUM_LINKS_C-1 downto 0);
-      dmaObMasters : in  AxiStreamMasterArray(NUM_LINKS_C-1 downto 0);
-      dmaObSlaves  : out AxiStreamSlaveArray(NUM_LINKS_C-1 downto 0);
+      dmaIbMaster  : out AxiStreamMasterType;
+      dmaIbSlave   : in  AxiStreamSlaveType;
+      dmaObMaster  : in  AxiStreamMasterType;
+      dmaObSlave   : out AxiStreamSlaveType;
       -- Misc. Signals
       extRst       : in  sl;
-      phyReady     : out slv(NUM_LINKS_C-1 downto 0);
+      phyReady     : out sl;
       ---------------------
       --  Hardware Ports
       ---------------------    
@@ -62,7 +60,6 @@ entity EthPhyWrapper is
       qsfp1RxN     : in  slv(3 downto 0);
       qsfp1TxP     : out slv(3 downto 0);
       qsfp1TxN     : out slv(3 downto 0));
-
 end EthPhyWrapper;
 
 architecture mapping of EthPhyWrapper is
@@ -234,7 +231,7 @@ begin
    -- 10GigE Module 
    ----------------
    GEN_LANE :
-   for i in 0 to NUM_LINKS_C-1 generate
+   for i in 0 to 0 generate
 
       GEN_10G : if (ETH_10G_G = true) generate
          U_ETH : entity work.TenGigEthGthUltraScale
@@ -246,18 +243,18 @@ begin
                AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
             port map (
                -- Local Configurations
-               localMac      => localMac(i),
+               localMac      => localMac,
                -- Streaming DMA Interface 
                dmaClk        => dmaClk,
                dmaRst        => dmaRst,
-               dmaIbMaster   => dmaIbMasters(i),
-               dmaIbSlave    => dmaIbSlaves(i),
-               dmaObMaster   => dmaObMasters(i),
-               dmaObSlave    => dmaObSlaves(i),
+               dmaIbMaster   => dmaIbMaster,
+               dmaIbSlave    => dmaIbSlave,
+               dmaObMaster   => dmaObMaster,
+               dmaObSlave    => dmaObSlave,
                -- Misc. Signals
                coreClk       => coreClkVec(i),
                extRst        => coreRstVec(i),
-               phyReady      => phyReady(i),
+               phyReady      => phyReady,
                -- Quad PLL Ports
                qplllock      => qplllockVec(i),
                qplloutclk    => qplloutclkVec(i),
@@ -279,20 +276,20 @@ begin
                AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
             port map (
                -- Local Configurations
-               localMac    => localMac(i),
+               localMac    => localMac,
                -- Streaming DMA Interface 
                dmaClk      => dmaClk,
                dmaRst      => dmaRst,
-               dmaIbMaster => dmaIbMasters(i),
-               dmaIbSlave  => dmaIbSlaves(i),
-               dmaObMaster => dmaObMasters(i),
-               dmaObSlave  => dmaObSlaves(i),
+               dmaIbMaster => dmaIbMaster,
+               dmaIbSlave  => dmaIbSlave,
+               dmaObMaster => dmaObMaster,
+               dmaObSlave  => dmaObSlave,
                -- PHY + MAC signals
                sysClk62    => sysClk62,
                sysClk125   => sysClk125,
                sysRst125   => sysRst125,
                extRst      => coreRst(0),
-               phyReady    => phyReady(i),
+               phyReady    => phyReady,
                -- MGT Ports
                gtTxP       => ethTxP(i),
                gtTxN       => ethTxN(i),
@@ -302,17 +299,15 @@ begin
 
    end generate GEN_LANE;
 
-   GEN_GTH_TERM : if (NUM_LINKS_C /= 8) generate
-      U_GTH : entity work.Gthe3ChannelDummy
-         generic map (
-            TPD_G   => TPD_G,
-            WIDTH_G => (8-NUM_LINKS_C))
-         port map (
-            refClk => dmaClk,
-            gtTxP  => ethTxP(7 downto NUM_LINKS_C),
-            gtTxN  => ethTxN(7 downto NUM_LINKS_C),
-            gtRxP  => ethRxP(7 downto NUM_LINKS_C),
-            gtRxN  => ethRxN(7 downto NUM_LINKS_C));
-   end generate;
+   U_GTH : entity work.Gthe3ChannelDummy
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 7)
+      port map (
+         refClk => dmaClk,
+         gtTxP  => ethTxP(7 downto 1),
+         gtTxN  => ethTxN(7 downto 1),
+         gtRxP  => ethRxP(7 downto 1),
+         gtRxN  => ethRxN(7 downto 1));
 
 end mapping;

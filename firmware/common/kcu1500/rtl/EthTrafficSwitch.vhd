@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : EthTrafficSwitch.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-03-16
--- Last update: 2018-07-27
 -------------------------------------------------------------------------------
 -- Description: Ethernet Traffic Switch for routing either RAW UDP or RSSI+UDP
 -------------------------------------------------------------------------------
