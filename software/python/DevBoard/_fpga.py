@@ -26,13 +26,14 @@ import surf.xilinx         as xil
 import time
 import click 
 
+import rogue
 import rogue.hardware.axi
 
 class Fpga(pr.Device):                         
     def __init__( self,       
         name        = 'Fpga',
         fpgaType    = '',
-        commType    = '',
+        commType    = 'eth',
         description = 'Fpga Container',
         **kwargs):
         
@@ -191,35 +192,30 @@ class TopLevel(pr.Root):
     def __init__(   self, 
             name            = 'TopLevel',
             description     = 'Container for FPGA Top-Level', 
+            dev             = '/dev/datadev_0',
+            lane            = 7,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-
-        # Using PackVer2 after the DMA in firmware
-        self.dma  = rogue.hardware.axi.AxiStreamDma('/dev/datadev_0',0,True)
-        self.dma.setZeroCopyEn(False)
         
-        self.pack = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
-        pr.streamConnectBiDir( self.pack.transport(), self.dma )
+        self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
+        self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
         
         # TDEST 0 routed to stream 0 (SRPv3)
         self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir( self.srp, self.pack.application(0x0) ) 
+        pr.streamConnectBiDir(self.vc0Srp,self.srp)
         
         # Connect VC1 to FW TX PRBS
-        self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx')
-        pr.streamConnect(self.pack.application(0x1),self.prbsRx)
+        self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
+        pr.streamConnect(self.vc1Prbs,self.prbsRx)
         self.add(self.prbsRx)  
-        # self.prbsRx.checkPayload.set(0x0)
         
         # Connect VC1 to FW RX PRBS
-        self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx")
-        pr.streamConnect(self.prbTx, self.pack.application(0x1))
+        self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+        pr.streamConnect(self.prbTx, self.vc1Prbs)
         self.add(self.prbTx)          
-
-        # Loopback the PRBS data
-        #pr.streamConnect(self.pack.application(0x1),self.pack.application(0x1))            
-            
+                    
         # Add registers
         self.add(Fpga(
             memBase  = self.srp,
-        ))            
+        ))
+        

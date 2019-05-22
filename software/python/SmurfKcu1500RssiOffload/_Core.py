@@ -19,7 +19,7 @@ class Core(pr.Device):
             name        = "Core",
             description = "Container for SmurfKcu1500RssiOffload",
             numLink     = 1, # Same as AppPkg.vhd's NUM_LINKS_C constant
-            rssiPerLink = 6, # Same as AppPkg.vhd's RSSI_PER_LINK_C constant
+            rssiPerLink = 8, # Same as AppPkg.vhd's RSSI_PER_LINK_C constant
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -38,13 +38,3 @@ class Core(pr.Device):
                 rssiPerLink = rssiPerLink,
                 expand      = True,
             )) 
-
-        # Add Application Processing Lane
-        for i in range(numLink):
-            self.add(smurf.AppLane(            
-                name        = ('AppLane[%d]' % i),
-                offset      = (0x00C00000 + i*0x80000), 
-                rssiPerLink = rssiPerLink,
-                expand      = False,
-            ))
-            
