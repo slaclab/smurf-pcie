@@ -10,4 +10,4 @@ loadRuckusTcl $::env(PROJ_DIR)/../../common/kcu1500
 loadSource      -dir "$::DIR_PATH/hdl"
 loadConstraints -dir "$::DIR_PATH/hdl"
 
-#set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
+set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
