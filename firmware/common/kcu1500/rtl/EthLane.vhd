@@ -32,10 +32,10 @@ entity EthLane is
    port (
       -- RSSI Interface (axilClk domain)
       rssiLinkUp      : out slv(NUM_RSSI_C-1 downto 0);
-      rssiIbMasters   : in  AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-      rssiIbSlaves    : out AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
-      rssiObMasters   : out AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-      rssiObSlaves    : in  AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+      rssiIbMasters   : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      rssiIbSlaves    : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      rssiObMasters   : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      rssiObSlaves    : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
       -- PHY/MAC Interface (axilClk domain)
       macObMaster     : in  AxiStreamMasterType;
       macObSlave      : out AxiStreamSlaveType;
@@ -54,12 +54,12 @@ end EthLane;
 
 architecture mapping of EthLane is
 
-   constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
+   constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
    constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
 
    constant NUM_AXI_MASTERS_C : natural := (2+NUM_RSSI_C);
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 19, 16);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 16);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -81,10 +81,10 @@ architecture mapping of EthLane is
    signal ibRssiTspMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal ibRssiTspSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal obRssiAppMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal obRssiAppSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
-   signal ibRssiAppMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal ibRssiAppSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+   signal obRssiAppMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal obRssiAppSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal ibRssiAppMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal ibRssiAppSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
    signal localIp  : slv(31 downto 0);
    signal localMac : slv(47 downto 0);
@@ -156,7 +156,9 @@ begin
             2           => 9002,
             3           => 9003,
             4           => 9004,
-            5           => 9005))
+            5           => 9005,
+            6           => 9006,
+            7           => 9007))
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -241,42 +243,39 @@ begin
             mRssiTspMaster  => ibRssiTspMasters(i),
             mRssiTspSlave   => ibRssiTspSlaves(i),
             -- RSSI Application Interface
-            sRssiAppMasters => obRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            sRssiAppSlaves  => obRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            mRssiAppMasters => ibRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            mRssiAppSlaves  => ibRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            sRssiAppMaster => obRssiAppMasters(i),
+            sRssiAppSlave  => obRssiAppSlaves(i),
+            mRssiAppMaster => ibRssiAppMasters(i),
+            mRssiAppSlave  => ibRssiAppSlaves(i),
             -- DMA Interface
-            sDmaMasters     => rssiIbMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            sDmaSlaves      => rssiIbSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            mDmaMasters     => rssiObMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            mDmaSlaves      => rssiObSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)));
+            sDmaMaster     => rssiIbMasters(i),
+            sDmaSlave      => rssiIbSlaves(i),
+            mDmaMaster     => rssiObMasters(i),
+            mDmaSlave      => rssiObSlaves(i));
 
       --------------------------
       -- Software's RSSI Clients
       --------------------------
-      U_RssiClient : entity work.RssiCoreWrapper
+      U_RssiClient : entity work.RssiCoreWrapperInterleaved
          generic map (
             TPD_G                => TPD_G,
             PIPE_STAGES_G        => 1,
             APP_ILEAVE_EN_G      => true,
-            ILEAVE_ON_NOTVALID_G => false,
             MAX_SEG_SIZE_G       => MAX_SEG_SIZE_C,  -- Using Jumbo frames
             SEGMENT_ADDR_SIZE_G  => bitSize(MAX_SEG_SIZE_C/8),
-            APP_STREAMS_G        => APP_STREAMS_C,
-            APP_STREAM_ROUTES_G  => APP_STREAM_ROUTES_C,
             CLK_FREQUENCY_G      => CLK_FREQUENCY_G,
             TIMEOUT_UNIT_G       => 1.0E-3,          -- In units of seconds 
             SERVER_G             => false,           -- false = Client mode
             RETRANSMIT_ENABLE_G  => true,
             WINDOW_ADDR_SIZE_G   => WINDOW_ADDR_SIZE_C,
             MAX_NUM_OUTS_SEG_G   => (2**WINDOW_ADDR_SIZE_C),
-            APP_AXIS_CONFIG_G    => APP_STREAM_CONFIG_C,
-            TSP_AXIS_CONFIG_G    => APP_AXIS_CONFIG_C,
-            RETRANS_TOUT_G       => 100,  -- unit depends on TIMEOUT_UNIT_G  
-            ACK_TOUT_G           => 50,   -- unit depends on TIMEOUT_UNIT_G 
-            NULL_TOUT_G          => 400,  -- unit depends on TIMEOUT_UNIT_G 
             MAX_RETRANS_CNT_G    => 16,
-            MAX_CUM_ACK_CNT_G    => 1)  -- 0x1 for HW-to-HW communication         
+            APP_AXIS_CONFIG_G    => APP_STREAM_CONFIG_C,
+            TSP_AXIS_CONFIG_G    => APP_AXIS_CONFIG_C)           
+            -- RETRANS_TOUT_G       => 100,  -- unit depends on TIMEOUT_UNIT_G  
+            -- ACK_TOUT_G           => 50,   -- unit depends on TIMEOUT_UNIT_G 
+            -- NULL_TOUT_G          => 400,  -- unit depends on TIMEOUT_UNIT_G 
+            -- MAX_CUM_ACK_CNT_G    => 1)  -- 0x1 for HW-to-HW communication         
          port map (
             clk_i             => axilClk,
             rst_i             => axilRst,
@@ -286,10 +285,10 @@ begin
             mTspAxisMaster_o  => obRssiTspMasters(i),
             mTspAxisSlave_i   => obRssiTspSlaves(i),
             -- Application Layer Interface
-            sAppAxisMasters_i => ibRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            sAppAxisSlaves_o  => ibRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            mAppAxisMasters_o => obRssiAppMasters((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
-            mAppAxisSlaves_i  => obRssiAppSlaves((APP_STREAMS_C-1)+(APP_STREAMS_C*i) downto (APP_STREAMS_C*i)),
+            sAppAxisMaster_i  => ibRssiAppMasters(i),
+            sAppAxisSlave_o   => ibRssiAppSlaves(i),
+            mAppAxisMaster_o  => obRssiAppMasters(i),
+            mAppAxisSlave_i   => obRssiAppSlaves(i),
             -- High level  Application side interface
             openRq_i          => '0',   -- Enabled via software
             closeRq_i         => bypRssi(i),

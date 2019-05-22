@@ -44,10 +44,10 @@ entity Hardware is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- RSSI Interface (axilClk domain)
       rssiLinkUp      : out slv(NUM_RSSI_C-1 downto 0);
-      rssiIbMasters   : in  AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-      rssiIbSlaves    : out AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
-      rssiObMasters   : out AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-      rssiObSlaves    : in  AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+      rssiIbMasters   : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      rssiIbSlaves    : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      rssiObMasters   : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      rssiObSlaves    : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
       ---------------------
       --  Hardware Ports
       ---------------------    
@@ -75,10 +75,10 @@ architecture mapping of Hardware is
    signal macIbSlave  : AxiStreamSlaveType;
 
    signal linkUp    : slv(NUM_RSSI_C-1 downto 0);
-   signal ibMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal ibSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
-   signal obMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal obSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+   signal ibMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal ibSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal obMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal obSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
    signal extRst   : sl;
    signal phyReady : sl;
@@ -168,7 +168,7 @@ begin
    -----------------------------------------------------------------
    -- Adding Pipelining to help with making timing between SLR0/SLR1
    -----------------------------------------------------------------
-   GEN_VEC : for i in NUM_AXIS_C-1 downto 0 generate
+   GEN_VEC : for i in NUM_RSSI_C-1 downto 0 generate
 
       U_IbPipe : entity work.AxiStreamPipeline
          generic map (

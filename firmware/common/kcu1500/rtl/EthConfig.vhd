@@ -81,8 +81,8 @@ begin
       axiSlaveRegisterR(regCon, x"10", 0, phyReady);
 
       axiSlaveRegisterR(regCon, x"80", 0, toSlv(NUM_RSSI_C, 32));
-      axiSlaveRegisterR(regCon, x"84", 0, toSlv(NUM_AXIS_C, 32));
-      axiSlaveRegisterR(regCon, x"88", 0, toSlv(APP_STREAMS_C, 32));
+      axiSlaveRegisterR(regCon, x"84", 0, toSlv(NUM_RSSI_C, 32));
+      axiSlaveRegisterR(regCon, x"88", 0, toSlv(256, 32));
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);

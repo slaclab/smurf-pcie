@@ -26,64 +26,64 @@ entity EthTrafficSwitch is
       TPD_G : time := 1 ns);
    port (
       -- Clock and reset
-      axisClk         : in  sl;
-      axisRst         : in  sl;
+      axisClk        : in  sl;
+      axisRst        : in  sl;
       -- Controls Interface
-      rssiLinkUp      : in  sl;
-      bypRssi         : in  sl;
+      rssiLinkUp     : in  sl;
+      bypRssi        : in  sl;
       -- UDP Interface
-      sUdpMaster      : in  AxiStreamMasterType;
-      sUdpSlave       : out AxiStreamSlaveType;
-      mUdpMaster      : out AxiStreamMasterType;
-      mUdpSlave       : in  AxiStreamSlaveType;
+      sUdpMaster     : in  AxiStreamMasterType;
+      sUdpSlave      : out AxiStreamSlaveType;
+      mUdpMaster     : out AxiStreamMasterType;
+      mUdpSlave      : in  AxiStreamSlaveType;
       -- RSSI Transport Interface
-      sRssiTspMaster  : in  AxiStreamMasterType;
-      sRssiTspSlave   : out AxiStreamSlaveType;
-      mRssiTspMaster  : out AxiStreamMasterType;
-      mRssiTspSlave   : in  AxiStreamSlaveType;
+      sRssiTspMaster : in  AxiStreamMasterType;
+      sRssiTspSlave  : out AxiStreamSlaveType;
+      mRssiTspMaster : out AxiStreamMasterType;
+      mRssiTspSlave  : in  AxiStreamSlaveType;
       -- RSSI Application Interface
-      sRssiAppMasters : in  AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-      sRssiAppSlaves  : out AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
-      mRssiAppMasters : out AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-      mRssiAppSlaves  : in  AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
+      sRssiAppMaster : in  AxiStreamMasterType;
+      sRssiAppSlave  : out AxiStreamSlaveType;
+      mRssiAppMaster : out AxiStreamMasterType;
+      mRssiAppSlave  : in  AxiStreamSlaveType;
       -- DMA Interface
-      sDmaMasters     : in  AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-      sDmaSlaves      : out AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
-      mDmaMasters     : out AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-      mDmaSlaves      : in  AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0));
+      sDmaMaster     : in  AxiStreamMasterType;
+      sDmaSlave      : out AxiStreamSlaveType;
+      mDmaMaster     : out AxiStreamMasterType;
+      mDmaSlave      : in  AxiStreamSlaveType);
 end EthTrafficSwitch;
 
 architecture rtl of EthTrafficSwitch is
 
    type RegType is record
-      sUdpSlave       : AxiStreamSlaveType;
-      mUdpMaster      : AxiStreamMasterType;
-      sRssiTspSlave   : AxiStreamSlaveType;
-      mRssiTspMaster  : AxiStreamMasterType;
-      sRssiAppSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
-      mRssiAppMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
-      sDmaSlaves      : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
-      mDmaMasters     : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
+      sUdpSlave      : AxiStreamSlaveType;
+      mUdpMaster     : AxiStreamMasterType;
+      sRssiTspSlave  : AxiStreamSlaveType;
+      mRssiTspMaster : AxiStreamMasterType;
+      sRssiAppSlave  : AxiStreamSlaveType;
+      mRssiAppMaster : AxiStreamMasterType;
+      sDmaSlave      : AxiStreamSlaveType;
+      mDmaMaster     : AxiStreamMasterType;
 
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      sUdpSlave       => AXI_STREAM_SLAVE_INIT_C,
-      mUdpMaster      => AXI_STREAM_MASTER_INIT_C,
-      sRssiTspSlave   => AXI_STREAM_SLAVE_INIT_C,
-      mRssiTspMaster  => AXI_STREAM_MASTER_INIT_C,
-      sRssiAppSlaves  => (others => AXI_STREAM_SLAVE_INIT_C),
-      mRssiAppMasters => (others => AXI_STREAM_MASTER_INIT_C),
-      sDmaSlaves      => (others => AXI_STREAM_SLAVE_INIT_C),
-      mDmaMasters     => (others => AXI_STREAM_MASTER_INIT_C));
+      sUdpSlave      => AXI_STREAM_SLAVE_INIT_C,
+      mUdpMaster     => AXI_STREAM_MASTER_INIT_C,
+      sRssiTspSlave  => AXI_STREAM_SLAVE_INIT_C,
+      mRssiTspMaster => AXI_STREAM_MASTER_INIT_C,
+      sRssiAppSlave  => AXI_STREAM_SLAVE_INIT_C,
+      mRssiAppMaster => AXI_STREAM_MASTER_INIT_C,
+      sDmaSlave      => AXI_STREAM_SLAVE_INIT_C,
+      mDmaMaster     => AXI_STREAM_MASTER_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
 begin
 
-   comb : process (axisRst, bypRssi, mDmaSlaves, mRssiAppSlaves, mRssiTspSlave,
-                   mUdpSlave, r, rssiLinkUp, sDmaMasters, sRssiAppMasters,
+   comb : process (axisRst, bypRssi, mDmaSlave, mRssiAppSlave, mRssiTspSlave,
+                   mUdpSlave, r, rssiLinkUp, sDmaMaster, sRssiAppMaster,
                    sRssiTspMaster, sUdpMaster) is
       variable v : RegType;
       variable i : natural;
@@ -94,10 +94,8 @@ begin
       -- Reset strobing signals
       v.sUdpSlave.tReady     := '0';
       v.sRssiTspSlave.tReady := '0';
-      for i in APP_STREAMS_C-1 downto 0 loop
-         v.sRssiAppSlaves(i).tReady := '0';
-         v.sDmaSlaves(i).tReady     := '0';
-      end loop;
+      v.sRssiAppSlave.tReady := '0';
+      v.sDmaSlave.tReady     := '0';
 
       -- Update tValid variable
       if mUdpSlave.tReady = '1' then
@@ -109,55 +107,47 @@ begin
          v.mRssiTspMaster.tValid := '0';
       end if;
 
-      for i in APP_STREAMS_C-1 downto 0 loop
+      -- Update tValid variable
+      if mRssiAppSlave.tReady = '1' then
+         v.mRssiAppMaster.tValid := '0';
+      end if;
 
-         -- Update tValid variable
-         if mRssiAppSlaves(i).tReady = '1' then
-            v.mRssiAppMasters(i).tValid := '0';
-         end if;
-
-         -- Update tValid variable
-         if mDmaSlaves(i).tReady = '1' then
-            v.mDmaMasters(i).tValid := '0';
-         end if;
-
-      end loop;
+      -- Update tValid variable
+      if mDmaSlave.tReady = '1' then
+         v.mDmaMaster.tValid := '0';
+      end if;
 
       -- Check if we are bypassing the RSSI engine and sending RAW UPD to DMA for FSBL communication
       if (bypRssi = '1') then
 
          -- Connect sUdp -> mDma
-         if (v.mDmaMasters(0).tValid = '0') and (sUdpMaster.tValid = '1') then
+         if (v.mDmaMaster.tValid = '0') and (sUdpMaster.tValid = '1') then
             -- Accept the data
-            v.sUdpSlave.tReady     := '1';
+            v.sUdpSlave.tReady := '1';
             -- Move the data
-            v.mDmaMasters(0)       := sUdpMaster;
+            v.mDmaMaster       := sUdpMaster;
             -- Force the TDEST = 0x0
-            v.mDmaMasters(0).tDest := x"00";
+            v.mDmaMaster.tDest := x"00";
          end if;
 
          -- Connect sDma -> mUdp
-         if (v.mUdpMaster.tValid = '0') and (sDmaMasters(0).tValid = '1') then
+         if (v.mUdpMaster.tValid = '0') and (sDmaMaster.tValid = '1') then
             -- Accept the data
-            v.sDmaSlaves(0).tReady := '1';
+            v.sDmaSlave.tReady := '1';
             -- Move the data
-            v.mUdpMaster           := sDmaMasters(0);
+            v.mUdpMaster       := sDmaMaster;
          end if;
 
          -- Prevent DMA back pressure unused TDESTs
-         for i in APP_STREAMS_C-1 downto 1 loop
-            v.sDmaSlaves(i).tReady := '1';
-         end loop;
+         v.sDmaSlave.tReady := '1';
 
          -- Terminate the RSSI TSP interfaces
          v.sRssiTspSlave  := AXI_STREAM_SLAVE_FORCE_C;
          v.mRssiTspMaster := AXI_STREAM_MASTER_INIT_C;
 
          -- Terminate the RSSI TSP interfaces
-         for i in APP_STREAMS_C-1 downto 0 loop
-            v.sRssiAppSlaves(i)  := AXI_STREAM_SLAVE_FORCE_C;
-            v.mRssiAppMasters(i) := AXI_STREAM_MASTER_INIT_C;
-         end loop;
+         v.sRssiAppSlave  := AXI_STREAM_SLAVE_FORCE_C;
+         v.mRssiAppMaster := AXI_STREAM_MASTER_INIT_C;
 
       else
 
@@ -177,44 +167,40 @@ begin
             v.mUdpMaster           := sRssiTspMaster;
          end if;
 
-         for i in APP_STREAMS_C-1 downto 0 loop
+         -- Check if RSSI Link is up
+         if (rssiLinkUp = '1') then
 
-            -- Check if RSSI Link is up
-            if (rssiLinkUp = '1') then
-
-               -- Connect sRssiApp -> mDma
-               if (v.mDmaMasters(i).tValid = '0') and (sRssiAppMasters(i).tValid = '1') then
-                  -- Accept the data
-                  v.sRssiAppSlaves(i).tReady := '1';
-                  -- Move the data
-                  v.mDmaMasters(i)           := sRssiAppMasters(i);
-               end if;
-
-               -- Connect sDma -> mRssiApp
-               if (v.mRssiAppMasters(i).tValid = '0') and (sDmaMasters(i).tValid = '1') then
-                  -- Accept the data
-                  v.sDmaSlaves(i).tReady := '1';
-                  -- Move the data
-                  v.mRssiAppMasters(i)   := sDmaMasters(i);
-               end if;
-
-            else
-
-               -- Prevent DMA/RSSI back pressure
-               v.sRssiAppSlaves(i).tReady := '1';
-               v.sDmaSlaves(i).tReady     := '1';
-
+            -- Connect sRssiApp -> mDma
+            if (v.mDmaMaster.tValid = '0') and (sRssiAppMaster.tValid = '1') then
+               -- Accept the data
+               v.sRssiAppSlave.tReady := '1';
+               -- Move the data
+               v.mDmaMaster           := sRssiAppMaster;
             end if;
 
-         end loop;
+            -- Connect sDma -> mRssiApp
+            if (v.mRssiAppMaster.tValid = '0') and (sDmaMaster.tValid = '1') then
+               -- Accept the data
+               v.sDmaSlave.tReady := '1';
+               -- Move the data
+               v.mRssiAppMaster   := sDmaMaster;
+            end if;
+
+         else
+
+            -- Prevent DMA/RSSI back pressure
+            v.sRssiAppSlave.tReady := '1';
+            v.sDmaSlave.tReady     := '1';
+
+         end if;
 
       end if;
-      
+
       -- Combinatorial outputs before the reset
-      sUdpSlave      <= v.sUdpSlave;
-      sRssiTspSlave  <= v.sRssiTspSlave;
-      sRssiAppSlaves <= v.sRssiAppSlaves;
-      sDmaSlaves     <= v.sDmaSlaves;
+      sUdpSlave     <= v.sUdpSlave;
+      sRssiTspSlave <= v.sRssiTspSlave;
+      sRssiAppSlave <= v.sRssiAppSlave;
+      sDmaSlave     <= v.sDmaSlave;
 
       -- Reset
       if (axisRst = '1') then
@@ -225,10 +211,10 @@ begin
       rin <= v;
 
       -- Registered Outputs
-      mUdpMaster      <= r.mUdpMaster;
-      mRssiTspMaster  <= r.mRssiTspMaster;
-      mRssiAppMasters <= r.mRssiAppMasters;
-      mDmaMasters     <= r.mDmaMasters;
+      mUdpMaster     <= r.mUdpMaster;
+      mRssiTspMaster <= r.mRssiTspMaster;
+      mRssiAppMaster <= r.mRssiAppMaster;
+      mDmaMaster     <= r.mDmaMaster;
 
    end process comb;
 

@@ -77,13 +77,6 @@ end SmurfKcu1500RssiOffload10GbE;
 
 architecture top_level of SmurfKcu1500RssiOffload10GbE is
 
-   constant NUM_AXI_MASTERS_C : natural := 2;
-
-   constant HW_INDEX_C      : natural := 0;
-   constant OFFLOAD_INDEX_C : natural := 1;
-
-   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0080_0000", 23, 22);
-
    signal axilClk          : sl;
    signal axilRst          : sl;
    signal axilReset        : sl;
@@ -91,10 +84,6 @@ architecture top_level of SmurfKcu1500RssiOffload10GbE is
    signal axilReadSlave    : AxiLiteReadSlaveType;
    signal axilWriteMaster  : AxiLiteWriteMasterType;
    signal axilWriteSlave   : AxiLiteWriteSlaveType;
-   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    signal dmaClk       : sl;
    signal dmaRst       : sl;
@@ -104,10 +93,10 @@ architecture top_level of SmurfKcu1500RssiOffload10GbE is
    signal dmaIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
    signal rssiLinkUp    : slv(NUM_RSSI_C-1 downto 0);
-   signal rssiIbMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
 begin
 
@@ -118,7 +107,7 @@ begin
       generic map (
          TPD_G             => TPD_G,
          BUILD_INFO_G      => BUILD_INFO_G,
-         DMA_AXIS_CONFIG_G => DMA_AXIS_CONFIG_C,
+         DMA_AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
          DMA_SIZE_G        => NUM_RSSI_C)
       port map (
          ------------------------      
@@ -186,56 +175,58 @@ begin
          clk    => axilClk,
          rstIn  => axilReset,
          rstOut => axilRst);
+         
+   GEN_VEC : for i in NUM_RSSI_C-1 downto 0 generate
+   
+      U_OB_DMA : entity work.AxiStreamFifoV2
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            -- FIFO configurations
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => false,
+            FIFO_ADDR_WIDTH_G   => 9,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+         port map (
+            -- Slave Port
+            sAxisClk    => dmaClk,
+            sAxisRst    => dmaRst,
+            sAxisMaster => dmaObMasters(i),
+            sAxisSlave  => dmaObSlaves(i),
+            -- Master Port
+            mAxisClk    => axilClk,
+            mAxisRst    => axilRst,
+            mAxisMaster => rssiIbMasters(i),
+            mAxisSlave  => rssiIbSlaves(i));   
 
-   ---------------------
-   -- AXI-Lite Crossbar
-   ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
-         MASTERS_CONFIG_G   => AXIL_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
+      U_IB_DMA : entity work.AxiStreamFifoV2
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            -- FIFO configurations
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => false,
+            FIFO_ADDR_WIDTH_G   => 9,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+         port map (
+            -- Slave Port
+            sAxisClk    => axilClk,
+            sAxisRst    => axilRst,
+            sAxisMaster => rssiObMasters(i),
+            sAxisSlave  => rssiObSlaves(i),
+            -- Master Port
+            mAxisClk    => dmaClk,
+            mAxisRst    => dmaRst,
+            mAxisMaster => dmaIbMasters(i),
+            mAxisSlave  => dmaIbSlaves(i));
 
-   ---------------------
-   -- Application Module
-   ---------------------
-   U_Application : entity work.Application
-      generic map (
-         TPD_G           => TPD_G,
-         AXI_BASE_ADDR_G => AXIL_CONFIG_C(OFFLOAD_INDEX_C).baseAddr)
-      port map (
-         -- DMA Interface (dmaClk domain)
-         dmaClk          => dmaClk,
-         dmaRst          => dmaRst,
-         dmaObMasters    => dmaObMasters,
-         dmaObSlaves     => dmaObSlaves,
-         dmaIbMasters    => dmaIbMasters,
-         dmaIbSlaves     => dmaIbSlaves,
-         -- RSSI Interface (axilClk domain)
-         rssiLinkUp      => rssiLinkUp,
-         rssiIbMasters   => rssiIbMasters,
-         rssiIbSlaves    => rssiIbSlaves,
-         rssiObMasters   => rssiObMasters,
-         rssiObSlaves    => rssiObSlaves,
-         -- AXI-Lite Interface (axilClk domain)
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(OFFLOAD_INDEX_C),
-         axilReadSlave   => axilReadSlaves(OFFLOAD_INDEX_C),
-         axilWriteMaster => axilWriteMasters(OFFLOAD_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(OFFLOAD_INDEX_C));
+   end generate GEN_VEC;
 
    ------------------
    -- RSSI/ETH Module
@@ -244,7 +235,7 @@ begin
       generic map (
          TPD_G           => TPD_G,
          ETH_10G_G       => true,       -- true = 10 GbE
-         AXI_BASE_ADDR_G => AXIL_CONFIG_C(HW_INDEX_C).baseAddr)
+         AXI_BASE_ADDR_G => x"0080_0000")
       port map (
          ------------------------      
          --  Top Level Interfaces
@@ -252,10 +243,10 @@ begin
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(HW_INDEX_C),
-         axilReadSlave   => axilReadSlaves(HW_INDEX_C),
-         axilWriteMaster => axilWriteMasters(HW_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(HW_INDEX_C),
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave,
          -- RSSI Interface (axilClk domain)
          rssiLinkUp      => rssiLinkUp,
          rssiIbMasters   => rssiIbMasters,
