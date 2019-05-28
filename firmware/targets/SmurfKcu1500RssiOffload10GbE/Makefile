@@ -2,7 +2,7 @@
 export TIMING_EXT_PKG = 1
 
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000104
+export PRJ_VERSION = 0x00000106
 
 # Define target part
 export PRJ_PART = xcku115-flvb2104-2-e

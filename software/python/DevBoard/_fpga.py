@@ -32,8 +32,6 @@ import rogue.hardware.axi
 class Fpga(pr.Device):                         
     def __init__( self,       
         name        = 'Fpga',
-        fpgaType    = '',
-        commType    = 'eth',
         description = 'Fpga Container',
         **kwargs):
         
@@ -47,153 +45,30 @@ class Fpga(pr.Device):
             expand = False,
         ))
         
-        if(fpgaType=='7series'):
-            self.add(xil.Xadc(
-                offset = 0x00010000,
-                expand = False,
-            )) 
-
-        if(fpgaType=='ultrascale'):
-            self.add(xil.AxiSysMonUltraScale(
-                offset = 0x00020000,
-                expand = False,
-            ))
-        
-        self.add(MbSharedMem(
-            name   = 'MbSharedMem',
-            offset = 0x00030000,
-            size   = 0x10000,
-            expand = False,
-        ))
-        
         self.add(ssi.SsiPrbsTx(
             offset = 0x00040000,
-            expand = False,
+            expand = True,
         )) 
 
         self.add(ssi.SsiPrbsRx(
             offset = 0x00050000,
-            expand = False,
+            expand = True,
         ))         
         
-        if ( commType == 'eth' ):
-            self.add(rssi.RssiCore(
-                offset = 0x00070000,
-                expand = False,
-            ))                 
-            
-        self.add(MbSharedMem(
-            name   = 'TestEmptyMem',
-            offset = 0x80000000,
-            size   = 0x80000000,
-            expand = False,
-        ))            
-            
-    # Normal register rate tester
-    def varRateTest(self):
-        print("Running variable rate test")
-        cnt = 0
-        inc = 0
-        last = time.localtime()
-
-        try:
-            while True:
-                val = self.AxiVersion.ScratchPad.get()
-                curr = time.localtime()
-                cnt += 1
-                inc += 1
-
-                if curr != last:
-                    print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
-                    last = curr
-                    inc = 0
-
-        except KeyboardInterrupt:
-            return
-
-    # Raw register rate tester
-    def rawRateTest(self):
-        print("Running raw rate test")
-        cnt = 0
-        inc = 0
-        last = time.localtime()
-
-        try:
-            while True:
-                val = self.AxiVersion._rawRead(0x4)
-                curr = time.localtime()
-                cnt += 1
-                inc += 1
-
-                if curr != last:
-                    print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
-                    last = curr
-                    inc = 0
-
-        except KeyboardInterrupt:
-            return
-
-class MbSharedMem(pr.Device):                         
-    def __init__( self,       
-        name        = 'MbSharedMem',
-        description = 'MbSharedMem Container',
-        size        = 0x10000,
-        **kwargs):
+        self.add(rssi.RssiCore(
+            offset = 0x00070000,
+            expand = True,
+        ))                 
         
-        super().__init__(
-            name        = name, 
-            description = description, 
-            size        = size, 
-            **kwargs)        
-              
-        @self.command(description='rawBurstWriteTest')    
-        def rawBurstWriteTest(arg):
-            if ( arg<2 ):
-                smpl = 0x4000
-            else:
-                smpl = arg
-            
-            data = []
-            smpl &= 0xFFFFFFFFC
-            for i in range(smpl):
-                data.append(i)    
-
-            click.secho( 'MbSharedMem.rawBurstWriteTest(%d): %d' % (smpl,len(data)), fg='green')            
-            self._rawWrite(
-                offset      = 0x00000000,
-                data        = data,
-                base        = pr.Int,
-                stride      = 4,
-                wordBitSize = 32,
-            )
-            
-        @self.command(description='rawBurstReadTest')    
-        def rawBurstReadTest(arg):
-            if ( arg<2 ):
-                smpl = 0x4000
-            else:
-                smpl = arg
-                
-            data = []
-            smpl &= 0xFFFFFFFFC
-            for i in range(smpl):
-                data.append(i)    
-
-            click.secho( 'MbSharedMem.rawBurstReadTest(%d): %d' % (smpl,len(data)), fg='green')            
-            readBack = self._rawRead(
-                offset      = 0x00000000,
-                numWords    = smpl,
-                base        = pr.Int,
-                stride      = 4,
-                wordBitSize = 32,
-            )            
-            
 class TopLevel(pr.Root):
     def __init__(   self, 
-            name            = 'TopLevel',
-            description     = 'Container for FPGA Top-Level', 
-            dev             = '/dev/datadev_0',
-            lane            = 7,
+            name        = 'TopLevel',
+            description = 'Container for FPGA Top-Level', 
+            dev         = '/dev/datadev_0',
+            lane        = 7,
+            loopback    = False, 
+            swRx        = True, 
+            swTx        = True, 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -204,16 +79,23 @@ class TopLevel(pr.Root):
         self.srp = rogue.protocols.srp.SrpV3()
         pr.streamConnectBiDir(self.vc0Srp,self.srp)
         
-        # Connect VC1 to FW TX PRBS
-        self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
-        pr.streamConnect(self.vc1Prbs,self.prbsRx)
-        self.add(self.prbsRx)  
+        if (loopback):
+            # Loopback the PRBS data
+            pr.streamConnect(self.vc1Prbs,self.vc1Prbs)  
         
-        # Connect VC1 to FW RX PRBS
-        self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
-        pr.streamConnect(self.prbTx, self.vc1Prbs)
-        self.add(self.prbTx)          
+        else:
+            if (swRx):
+                # Connect VC1 to FW RX PRBS
+                self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+                pr.streamConnect(self.prbTx, self.vc1Prbs)
+                self.add(self.prbTx) 
                     
+            if (swTx):
+                # Connect VC1 to FW TX PRBS
+                self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
+                pr.streamConnect(self.vc1Prbs,self.prbsRx)
+                self.add(self.prbsRx)          
+
         # Add registers
         self.add(Fpga(
             memBase  = self.srp,
