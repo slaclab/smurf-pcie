@@ -30,6 +30,7 @@ entity Hardware is
    generic (
       TPD_G           : time    := 1 ns;
       ETH_10G_G       : boolean := true;
+      CLK_FREQUENCY_G : real    := 156.25E+6;  -- units of Hz
       AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
       ------------------------      
@@ -141,7 +142,7 @@ begin
    U_Lane : entity work.EthLane
       generic map (
          TPD_G           => TPD_G,
-         CLK_FREQUENCY_G => ite(ETH_10G_G, 156.25E+6, 125.0E+6),
+         CLK_FREQUENCY_G => CLK_FREQUENCY_G,
          AXI_BASE_ADDR_G => AXI_BASE_ADDR_G)
       port map (
          -- RSSI Interface (axilClk domain)

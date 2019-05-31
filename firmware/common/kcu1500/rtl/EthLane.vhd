@@ -55,8 +55,8 @@ end EthLane;
 architecture mapping of EthLane is
 
    constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
-   constant MAX_SEG_SIZE_C     : positive := 1024;  -- Standard frame chucking
-   -- constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
+   -- constant MAX_SEG_SIZE_C     : positive := 1024;  -- Standard frame chucking
+   constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
 
    constant NUM_AXI_MASTERS_C : natural := (2+NUM_RSSI_C);
 
@@ -271,12 +271,12 @@ begin
             WINDOW_ADDR_SIZE_G   => WINDOW_ADDR_SIZE_C,
             MAX_NUM_OUTS_SEG_G   => (2**WINDOW_ADDR_SIZE_C),
             MAX_RETRANS_CNT_G    => 16,
-            APP_AXIS_CONFIG_G    => APP_STREAM_CONFIG_C,
-            TSP_AXIS_CONFIG_G    => APP_AXIS_CONFIG_C)           
             -- RETRANS_TOUT_G       => 100,  -- unit depends on TIMEOUT_UNIT_G  
             -- ACK_TOUT_G           => 50,   -- unit depends on TIMEOUT_UNIT_G 
-            -- NULL_TOUT_G          => 400,  -- unit depends on TIMEOUT_UNIT_G 
-            -- MAX_CUM_ACK_CNT_G    => 1)  -- 0x1 for HW-to-HW communication         
+            -- NULL_TOUT_G          => 1000,  -- unit depends on TIMEOUT_UNIT_G 
+            -- MAX_CUM_ACK_CNT_G    => 1,  -- 0x1 for HW-to-HW communication
+            APP_AXIS_CONFIG_G    => APP_STREAM_CONFIG_C,
+            TSP_AXIS_CONFIG_G    => APP_AXIS_CONFIG_C)
          port map (
             clk_i             => axilClk,
             rst_i             => axilRst,

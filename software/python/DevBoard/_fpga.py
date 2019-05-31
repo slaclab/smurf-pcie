@@ -52,7 +52,7 @@ class Fpga(pr.Device):
 
         self.add(ssi.SsiPrbsRx(
             offset = 0x00050000,
-            expand = True,
+            expand = False,
         ))         
         
         self.add(rssi.RssiCore(
@@ -92,7 +92,7 @@ class TopLevel(pr.Root):
                     
             if (swTx):
                 # Connect VC1 to FW TX PRBS
-                self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
+                self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=True)
                 pr.streamConnect(self.vc1Prbs,self.prbsRx)
                 self.add(self.prbsRx)          
 

@@ -29,8 +29,9 @@ import rogue.hardware.axi
 import sys
 import argparse
 
-# rogue.Logging.setLevel(rogue.Logging.Warning)
+rogue.Logging.setLevel(rogue.Logging.Warning)
 #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
+rogue.Logging.setFilter("pyrogue.utilities.prbs.PrbsRx",rogue.Logging.Info)
 #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
@@ -60,12 +61,24 @@ parser.add_argument(
     help     = "Enable read all variables at start",
 )  
 
+parser.add_argument(
+    "--lane", 
+    type     = int,
+    required = False,
+    default  = 7,
+    help     = "DMA Lane",
+) 
+
 parser.add_argument('--html', help='Use html for tables', action="store_true")
 # Get the arguments
 args = parser.parse_args()
 
 # Set base
-rootTop = devBoard.TopLevel(name='System',description='Front End Board')
+rootTop = devBoard.TopLevel(
+    name        = 'System',
+    description = 'Front End Board',
+    lane        = args.lane,
+)
     
 #################################################################    
 
@@ -73,6 +86,7 @@ rootTop = devBoard.TopLevel(name='System',description='Front End Board')
 rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
+    timeout  = 2.0,
 )
 
 # Print the AxiVersion Summary

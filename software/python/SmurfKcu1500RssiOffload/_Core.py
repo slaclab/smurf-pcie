@@ -9,10 +9,12 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-import pyrogue as pr
 import rogue.hardware.axi
-import axipcie as pcie
-import SmurfKcu1500RssiOffload as smurf
+
+import pyrogue                  as pr
+import axipcie                  as pcie
+import surf.protocols.ssi       as ssi
+import SmurfKcu1500RssiOffload  as smurf
 
 class Core(pr.Device):
     def __init__(   self,       
@@ -29,6 +31,17 @@ class Core(pr.Device):
             useSpi       = True,
             expand       = False,
         ))  
+        
+        # DevBoard Receiver on DMA[7]
+        self.add(ssi.SsiPrbsTx(
+            offset = 0x00080000,
+            expand = False,
+        )) 
+        self.add(ssi.SsiPrbsRx(
+            offset = 0x00081000,
+            rxClkPeriod = 8.0e-9,
+            expand = False,
+        ))           
         
         # Add Ethernet Lane
         for i in range(numLink):

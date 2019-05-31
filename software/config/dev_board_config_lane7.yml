@@ -40,9 +40,9 @@ pcie:
         ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.108
       ############################
-      UdpClient[7]: # Reserved
-        ClientRemotePort: 0
-        ClientRemoteIp: 0.0.0.0
+      UdpClient[7]: # Development Board Example Testing
+        ClientRemotePort: 8192
+        ClientRemoteIp: 192.168.2.10     
       #####################################
       # Open the RSSI connections for links
       #####################################

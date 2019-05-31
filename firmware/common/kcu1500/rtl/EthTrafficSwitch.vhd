@@ -202,6 +202,12 @@ begin
       sRssiAppSlave <= v.sRssiAppSlave;
       sDmaSlave     <= v.sDmaSlave;
 
+      -- Registered Outputs
+      mUdpMaster     <= r.mUdpMaster;
+      mRssiTspMaster <= r.mRssiTspMaster;
+      mRssiAppMaster <= r.mRssiAppMaster;
+      mDmaMaster     <= r.mDmaMaster;
+
       -- Reset
       if (axisRst = '1') then
          v := REG_INIT_C;
@@ -209,12 +215,6 @@ begin
 
       -- Register the variable for next clock cycle
       rin <= v;
-
-      -- Registered Outputs
-      mUdpMaster     <= r.mUdpMaster;
-      mRssiTspMaster <= r.mRssiTspMaster;
-      mRssiAppMaster <= r.mRssiAppMaster;
-      mDmaMaster     <= r.mDmaMaster;
 
    end process comb;
 

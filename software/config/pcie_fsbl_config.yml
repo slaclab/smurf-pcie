@@ -10,7 +10,7 @@ pcie:
         # Set the local IP address
         LocalIp: 10.0.3.99          
         # Bypass all RSSI modules for RAW UDP traffic (except for UdpClient[7])
-        BypRssi: 0x7f                
+        BypRssi: 0xff                
       ############################
       UdpClient[0]: # Slot#2 Link
         ClientRemotePort: 8192
@@ -40,9 +40,9 @@ pcie:
         ClientRemotePort: 8192
         ClientRemoteIp: 10.0.3.108
       ############################
-      UdpClient[7]: # Development Board Example Testing
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.10         
+      UdpClient[7]: # Reserved
+        ClientRemotePort: 0
+        ClientRemoteIp: 0.0.0.0
       #####################################
       # Close the RSSI connections for links
       #####################################
@@ -50,11 +50,3 @@ pcie:
         OpenConn: 0x0
         CloseConn: 0x1
         HeaderChksumEn: 0x1
-      #####################################
-      # Open the RSSI[7] connection link
-      #####################################
-      RssiClient[7]:
-        OpenConn: 0x1
-        CloseConn: 0x0       
-        HeaderChksumEn: 0x1      
-     
