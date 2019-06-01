@@ -62,14 +62,38 @@ parser.add_argument(
 )  
 
 parser.add_argument(
+    "--loopback", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "SW loopback of PRBS stream",
+)  
+
+parser.add_argument(
+    "--swRx", 
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "SW loopback of PRBS stream",
+)  
+
+parser.add_argument(
+    "--swTx", 
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "SW loopback of PRBS stream",
+)  
+
+parser.add_argument(
     "--lane", 
     type     = int,
     required = False,
-    default  = 7,
+    default  = 6,
     help     = "DMA Lane",
 ) 
 
-parser.add_argument('--html', help='Use html for tables', action="store_true")
+parser.add_argument('--html', help='Use html for tables', action="store_true") 
 # Get the arguments
 args = parser.parse_args()
 
@@ -77,6 +101,9 @@ args = parser.parse_args()
 rootTop = devBoard.TopLevel(
     name        = 'System',
     description = 'Front End Board',
+    loopback    = args.loopback,
+    swRx        = args.swRx,
+    swTx        = args.swTx,
     lane        = args.lane,
 )
     

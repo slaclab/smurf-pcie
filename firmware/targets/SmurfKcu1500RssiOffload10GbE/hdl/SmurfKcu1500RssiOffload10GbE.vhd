@@ -319,9 +319,13 @@ begin
          axilReadSlave   => axilReadSlaves(4),
          axilWriteMaster => axilWriteMasters(4),
          axilWriteSlave  => axilWriteSlaves(4),
+         
+         
+         
+         
+         
 
          -- RSSI Interface (axilClk domain)
-         rssiLinkUp                           => rssiLinkUp,
          rssiIbMasters(NUM_RSSI_C-2 downto 0) => rssiIbMasters(NUM_RSSI_C-2 downto 0),
          rssiIbMasters(NUM_RSSI_C-1)          => devObMaster,
          rssiIbSlaves(NUM_RSSI_C-2 downto 0)  => rssiIbSlaves(NUM_RSSI_C-2 downto 0),
@@ -330,7 +334,17 @@ begin
          rssiObMasters(NUM_RSSI_C-1)          => devIbMaster,
          rssiObSlaves(NUM_RSSI_C-2 downto 0)  => rssiObSlaves(NUM_RSSI_C-2 downto 0),
          rssiObSlaves(NUM_RSSI_C-1)           => devIbSlave,
+         
+         -- -- RSSI Interface (axilClk domain)
+         -- rssiIbMasters => rssiIbMasters,
+         -- rssiIbSlaves  => rssiIbSlaves,
+         -- rssiObMasters => rssiObMasters,
+         -- rssiObSlaves  => rssiObSlaves,
+         
+         
+         
 
+         rssiLinkUp                           => rssiLinkUp,
          ------------------
          --  Hardware Ports
          ------------------       

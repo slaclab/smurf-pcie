@@ -122,7 +122,7 @@ begin
          GEN_SYNC_FIFO_G           => true,
          SLAVE_AXI_PIPE_STAGES_G   => 1,
          PRBS_SEED_SIZE_G          => 128,
-         SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(4))
+         SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8))
       port map (
          sAxisClk       => axilClk,
          sAxisRst       => axilRst,
@@ -141,7 +141,7 @@ begin
          TPD_G               => TPD_G,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4))
+         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
       port map (
          -- Clock and reset
          axisClk     => axilClk,
