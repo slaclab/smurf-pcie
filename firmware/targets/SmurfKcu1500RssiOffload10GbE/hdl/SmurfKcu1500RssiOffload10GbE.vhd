@@ -272,33 +272,6 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   -------------------------------------------------------
-   -- Bypass the DMA and add a PRBS TX/RX on TDEST=0x1 tap
-   -------------------------------------------------------
-   U_DevBoardApp : entity work.DevBoardApp
-      generic map (
-         TPD_G            => TPD_G,
-         CLK_FREQUENCY_G  => CLK_FREQUENCY_C,
-         AXIL_BASE_ADDR_G => AXIL_CONFIG_C(0).baseAddr)
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(0),
-         axilReadSlave   => axilReadSlaves(0),
-         axilWriteMaster => axilWriteMasters(0),
-         axilWriteSlave  => axilWriteSlaves(0),
-         -- DEV Board Interface (axilClk domain)
-         devIbMaster     => devIbMaster,
-         devIbSlave      => devIbSlave,
-         devObMaster     => devObMaster,
-         devObSlave      => devObSlave,
-         -- DMA Interface (axilClk domain)
-         dmaIbMaster     => rssiObMasters(NUM_RSSI_C-1),
-         dmaIbSlave      => rssiObSlaves(NUM_RSSI_C-1),
-         dmaObMaster     => rssiIbMasters(NUM_RSSI_C-1),
-         dmaObSlave      => rssiIbSlaves(NUM_RSSI_C-1));
-
    ------------------
    -- RSSI/ETH Module
    ------------------
@@ -319,48 +292,28 @@ begin
          axilReadSlave   => axilReadSlaves(4),
          axilWriteMaster => axilWriteMasters(4),
          axilWriteSlave  => axilWriteSlaves(4),
-         
-         
-         
-         
-         
-
          -- RSSI Interface (axilClk domain)
-         rssiIbMasters(NUM_RSSI_C-2 downto 0) => rssiIbMasters(NUM_RSSI_C-2 downto 0),
-         rssiIbMasters(NUM_RSSI_C-1)          => devObMaster,
-         rssiIbSlaves(NUM_RSSI_C-2 downto 0)  => rssiIbSlaves(NUM_RSSI_C-2 downto 0),
-         rssiIbSlaves(NUM_RSSI_C-1)           => devObSlave,
-         rssiObMasters(NUM_RSSI_C-2 downto 0) => rssiObMasters(NUM_RSSI_C-2 downto 0),
-         rssiObMasters(NUM_RSSI_C-1)          => devIbMaster,
-         rssiObSlaves(NUM_RSSI_C-2 downto 0)  => rssiObSlaves(NUM_RSSI_C-2 downto 0),
-         rssiObSlaves(NUM_RSSI_C-1)           => devIbSlave,
-         
-         -- -- RSSI Interface (axilClk domain)
-         -- rssiIbMasters => rssiIbMasters,
-         -- rssiIbSlaves  => rssiIbSlaves,
-         -- rssiObMasters => rssiObMasters,
-         -- rssiObSlaves  => rssiObSlaves,
-         
-         
-         
-
-         rssiLinkUp                           => rssiLinkUp,
+         rssiIbMasters   => rssiIbMasters,
+         rssiIbSlaves    => rssiIbSlaves,
+         rssiObMasters   => rssiObMasters,
+         rssiObSlaves    => rssiObSlaves,
+         rssiLinkUp      => rssiLinkUp,
          ------------------
          --  Hardware Ports
          ------------------       
          -- QSFP[0] Ports
-         qsfp0RefClkP => qsfp0RefClkP,
-         qsfp0RefClkN => qsfp0RefClkN,
-         qsfp0RxP     => qsfp0RxP,
-         qsfp0RxN     => qsfp0RxN,
-         qsfp0TxP     => qsfp0TxP,
-         qsfp0TxN     => qsfp0TxN,
+         qsfp0RefClkP    => qsfp0RefClkP,
+         qsfp0RefClkN    => qsfp0RefClkN,
+         qsfp0RxP        => qsfp0RxP,
+         qsfp0RxN        => qsfp0RxN,
+         qsfp0TxP        => qsfp0TxP,
+         qsfp0TxN        => qsfp0TxN,
          -- QSFP[1] Ports
-         qsfp1RefClkP => qsfp1RefClkP,
-         qsfp1RefClkN => qsfp1RefClkN,
-         qsfp1RxP     => qsfp1RxP,
-         qsfp1RxN     => qsfp1RxN,
-         qsfp1TxP     => qsfp1TxP,
-         qsfp1TxN     => qsfp1TxN);
+         qsfp1RefClkP    => qsfp1RefClkP,
+         qsfp1RefClkN    => qsfp1RefClkN,
+         qsfp1RxP        => qsfp1RxP,
+         qsfp1RxN        => qsfp1RxN,
+         qsfp1TxP        => qsfp1TxP,
+         qsfp1TxN        => qsfp1TxN);
 
 end top_level;

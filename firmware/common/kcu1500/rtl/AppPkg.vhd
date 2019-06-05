@@ -21,7 +21,7 @@ use work.AxiStreamPkg.all;
 
 package AppPkg is
 
-   constant NUM_RSSI_C : positive := 8;  -- 8 RSSI clients per ETH link (only 1 ETH per KCU1500)
+   constant NUM_RSSI_C : positive := 6;  -- 6 RSSI clients per ETH link (only 1 ETH per KCU1500)
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
