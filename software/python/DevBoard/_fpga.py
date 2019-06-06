@@ -65,7 +65,7 @@ class TopLevel(pr.Root):
             name        = 'TopLevel',
             description = 'Container for FPGA Top-Level', 
             dev         = '/dev/datadev_0',
-            lane        = 7,
+            lane        = 0,
             loopback    = False, 
             swRx        = True, 
             swTx        = True, 

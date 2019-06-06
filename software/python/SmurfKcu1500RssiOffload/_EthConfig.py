@@ -16,7 +16,7 @@ class EthConfig(pr.Device):
     def __init__(   self,       
             name        = "EthConfig",
             description = "Container for EthConfig",
-            rssiPerLink = 8,
+            rssiPerLink = 6,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         

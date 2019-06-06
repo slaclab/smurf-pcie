@@ -21,7 +21,7 @@ class Core(pr.Device):
             name        = "Core",
             description = "Container for SmurfKcu1500RssiOffload",
             numLink     = 1, # Same as AppPkg.vhd's NUM_LINKS_C constant
-            rssiPerLink = 8, # Same as AppPkg.vhd's RSSI_PER_LINK_C constant
+            rssiPerLink = 6, # Same as AppPkg.vhd's RSSI_PER_LINK_C constant
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         

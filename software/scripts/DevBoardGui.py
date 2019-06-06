@@ -89,7 +89,7 @@ parser.add_argument(
     "--lane", 
     type     = int,
     required = False,
-    default  = 6,
+    default  = 0,
     help     = "DMA Lane",
 ) 
 

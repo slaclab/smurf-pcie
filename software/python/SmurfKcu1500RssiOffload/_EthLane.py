@@ -18,7 +18,7 @@ class EthLane(pr.Device):
     def __init__(   self,       
             name        = "EthLane",
             description = "Container for EthLane",
-            rssiPerLink = 8,
+            rssiPerLink = 6,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         

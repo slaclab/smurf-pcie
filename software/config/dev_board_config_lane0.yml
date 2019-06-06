@@ -12,9 +12,10 @@ pcie:
         # Don't bypass any RSSI modules (only for FSBL)
         BypRssi: 0x0                
       ############################
-      UdpClient[0]: # Slot#2 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.102
+      UdpClient[0]: # Development Board Example Testing
+        ClientRemotePort: 8198 # 8198 for dev-board-cryo
+        # ClientRemotePort: 8192 # 8198 for dev-board-example
+        ClientRemoteIp: 192.168.2.10    
       ############################
       UdpClient[1]: # Slot#3 Link
         ClientRemotePort: 8198
@@ -35,14 +36,6 @@ pcie:
       UdpClient[5]: # Slot#7 Link
         ClientRemotePort: 8198
         ClientRemoteIp: 10.0.3.107
-      ############################
-      UdpClient[6]: # Development Board Example Testing
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.10     
-      ############################
-      UdpClient[7]: # Slot#9 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.109  
       #####################################
       # Open the RSSI connections for links
       #####################################
