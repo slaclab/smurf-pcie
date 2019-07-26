@@ -29,11 +29,11 @@ import rogue.hardware.axi
 import sys
 import argparse
 
-rogue.Logging.setLevel(rogue.Logging.Warning)
-#rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
-rogue.Logging.setFilter("pyrogue.utilities.prbs.PrbsRx",rogue.Logging.Info)
-#rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
-# # rogue.Logging.setLevel(rogue.Logging.Debug)
+# rogue.Logging.setLevel(rogue.Logging.Warning)
+# #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
+# rogue.Logging.setFilter("pyrogue.utilities.prbs.PrbsRx",rogue.Logging.Info)
+# #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
+# # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
 #################################################################
 
@@ -114,6 +114,7 @@ rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
     timeout  = 2.0,
+    zmqPort  = None,
 )
 
 # Print the AxiVersion Summary

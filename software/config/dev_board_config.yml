@@ -8,34 +8,33 @@ pcie:
         # Set the local MAC address
         LocalMac: 08:00:56:00:45:50 
         # Set the local IP address
-        LocalIp: 10.0.3.99          
+        LocalIp: 192.168.2.1  
         # Don't bypass any RSSI modules (only for FSBL)
         BypRssi: 0x0                
       ############################
-      UdpClient[0]: # Development Board Example Testing
-        ClientRemotePort: 8198 # 8198 for dev-board-cryo
-        # ClientRemotePort: 8192 # 8198 for dev-board-example
+      UdpClient[0]:
+        ClientRemotePort: 8192
         ClientRemoteIp: 192.168.2.10    
       ############################
       UdpClient[1]: # Slot#3 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.103
+        ClientRemotePort: 8192
+        ClientRemoteIp: 192.168.2.11
       ############################
       UdpClient[2]: # Slot#4 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.104
+        ClientRemotePort: 8192
+        ClientRemoteIp: 192.168.2.12 
       ############################
       UdpClient[3]: # Slot#5 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.105
+        ClientRemotePort: 8192
+        ClientRemoteIp: 192.168.2.13 
       ############################
       UdpClient[4]: # Slot#6 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.106
+        ClientRemotePort: 8192
+        ClientRemoteIp: 192.168.2.14 
       ############################
       UdpClient[5]: # Slot#7 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.107
+        ClientRemotePort: 8192
+        ClientRemoteIp: 192.168.2.15 
       #####################################
       # Open the RSSI connections for links
       #####################################
