@@ -6,9 +6,9 @@ pcie:
     EthLane[0]:
       EthConfig:
         # Set the local MAC address
-        LocalMac: 08:00:56:00:45:50 
+        LocalMac: FF:01:96:00:45:50 
         # Set the local IP address
-        LocalIp: 192.168.2.1  
+        LocalIp: 192.168.2.69
         # Don't bypass any RSSI modules (only for FSBL)
         BypRssi: 0x0                
       ############################
