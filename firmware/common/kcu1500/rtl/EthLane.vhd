@@ -73,11 +73,6 @@ architecture mapping of EthLane is
    signal ibUdpMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal ibUdpSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal obClientMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal obClientSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal ibClientMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal ibClientSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-
    signal obRssiTspMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal obRssiTspSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
    signal ibRssiTspMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
@@ -186,44 +181,6 @@ begin
 
    GEN_LANE : for i in NUM_RSSI_C-1 downto 0 generate
 
-      U_Resize_OB : entity work.AxiStreamResize
-         generic map (
-            -- General Configurations
-            TPD_G               => TPD_G,
-            READY_EN_G          => true,
-            -- AXI Stream Port Configurations
-            SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
-         port map (
-            -- Clock and reset
-            axisClk     => axilClk,
-            axisRst     => axilRst,
-            -- Slave Port
-            sAxisMaster => obUdpMasters(i),
-            sAxisSlave  => obUdpSlaves(i),
-            -- Master Port
-            mAxisMaster => obClientMasters(i),
-            mAxisSlave  => obClientSlaves(i));
-
-      U_Resize_IB : entity work.AxiStreamResize
-         generic map (
-            -- General Configurations
-            TPD_G               => TPD_G,
-            READY_EN_G          => true,
-            -- AXI Stream Port Configurations
-            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
-         port map (
-            -- Clock and reset
-            axisClk     => axilClk,
-            axisRst     => axilRst,
-            -- Slave Port
-            sAxisMaster => ibClientMasters(i),
-            sAxisSlave  => ibClientSlaves(i),
-            -- Master Port
-            mAxisMaster => ibUdpMasters(i),
-            mAxisSlave  => ibUdpSlaves(i));
-
       U_EthTrafficSwitch : entity work.EthTrafficSwitch
          generic map (
             TPD_G => TPD_G)
@@ -235,10 +192,10 @@ begin
             rssiLinkUp      => linkUp(i),
             bypRssi         => bypRssi(i),
             -- UDP Interface
-            sUdpMaster      => obClientMasters(i),
-            sUdpSlave       => obClientSlaves(i),
-            mUdpMaster      => ibClientMasters(i),
-            mUdpSlave       => ibClientSlaves(i),
+            sUdpMaster      => obUdpMasters(i),
+            sUdpSlave       => obUdpSlaves(i),
+            mUdpMaster      => ibUdpMasters(i),
+            mUdpSlave       => ibUdpSlaves(i),
             -- RSSI Transport Interface
             sRssiTspMaster  => obRssiTspMasters(i),
             sRssiTspSlave   => obRssiTspSlaves(i),
