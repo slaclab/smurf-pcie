@@ -25,7 +25,7 @@ package AppPkg is
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
-      TDATA_BYTES_C => 16,              -- 128-bit interface to match ETH MAC
+      TDATA_BYTES_C => 8,               -- 64-bit interface
       TDEST_BITS_C  => 8,               -- 256 TDEST
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_COMP_C,
