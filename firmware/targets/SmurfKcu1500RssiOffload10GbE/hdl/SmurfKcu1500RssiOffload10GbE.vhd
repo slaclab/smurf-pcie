@@ -77,7 +77,7 @@ end SmurfKcu1500RssiOffload10GbE;
 
 architecture top_level of SmurfKcu1500RssiOffload10GbE is
 
-   constant CLK_FREQUENCY_C : real := 156.25E+6;  -- units of Hz
+   constant CLK_FREQUENCY_C : real := 200.00E+6;  -- units of Hz
 
    constant NUM_AXIL_MASTERS_C : natural := 5;
 
@@ -151,7 +151,7 @@ begin
          -- MMCM attributes
          CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
          CLKFBOUT_MULT_G    => 8,       -- 1.25GHz = 8 x 156.25 MHz
-         CLKOUT0_DIVIDE_F_G => 8.0)    -- 156.25 MHz (must match CLK_FREQUENCY_C)
+         CLKOUT0_DIVIDE_F_G => 6.25)    -- 200 MHz (must match CLK_FREQUENCY_C)
       port map(
          -- Clock Input
          clkIn     => userClk156,
