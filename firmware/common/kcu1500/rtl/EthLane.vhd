@@ -54,8 +54,8 @@ end EthLane;
 
 architecture mapping of EthLane is
 
-   -- constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
-   constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
+   constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
+   -- constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
    
    -- constant MAX_SEG_SIZE_C     : positive := 1024;  -- Standard frame chucking
    constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
