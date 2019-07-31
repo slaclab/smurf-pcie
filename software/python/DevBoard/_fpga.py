@@ -69,35 +69,55 @@ class TopLevel(pr.Root):
             loopback    = False, 
             swRx        = True, 
             swTx        = True, 
+            allLane     = False, 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
-        self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
-        self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
+        self.vc0Srp  = [None for i in range(6)]
+        self.vc1Prbs = [None for i in range(6)]
+        self.srp     = [None for i in range(6)]
         
-        # TDEST 0 routed to stream 0 (SRPv3)
-        self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir(self.vc0Srp,self.srp)
-        
-        if (loopback):
-            # Loopback the PRBS data
-            pr.streamConnect(self.vc1Prbs,self.vc1Prbs)  
+        # Add registers
+        if allLane != 0:
+            for i in range(allLane):
+                self.vc0Srp[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0,True)
+                self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+1,True)
+            
+                self.srp[i] = rogue.protocols.srp.SrpV3()
+                pr.streamConnectBiDir(self.vc0Srp[i],self.srp[i])            
+                
+                self.add(Fpga(
+                    name     = f'Fpga[{i}]',
+                    memBase  = self.srp[i],
+                ))        
         
         else:
-            if (swTx):
-                # Connect VC1 to FW RX PRBS
-                self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
-                pr.streamConnect(self.prbTx, self.vc1Prbs)
-                self.add(self.prbTx) 
+            
+            self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
+            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
+            
+            # TDEST 0 routed to stream 0 (SRPv3)
+            self.srp = rogue.protocols.srp.SrpV3()
+            pr.streamConnectBiDir(self.vc0Srp,self.srp)
+            
+            if (loopback):
+                # Loopback the PRBS data
+                pr.streamConnect(self.vc1Prbs,self.vc1Prbs)  
+            
+            else:
+                if (swTx):
+                    # Connect VC1 to FW RX PRBS
+                    self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+                    pr.streamConnect(self.prbTx, self.vc1Prbs)
+                    self.add(self.prbTx) 
+                        
+                if (swRx):
+                    # Connect VC1 to FW TX PRBS
+                    self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=True)
+                    pr.streamConnect(self.vc1Prbs,self.prbsRx)
+                    self.add(self.prbsRx)       
                     
-            if (swRx):
-                # Connect VC1 to FW TX PRBS
-                self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=True)
-                pr.streamConnect(self.vc1Prbs,self.prbsRx)
-                self.add(self.prbsRx)          
-
-        # Add registers
-        self.add(Fpga(
-            memBase  = self.srp,
-        ))
+            self.add(Fpga(
+                memBase  = self.srp,
+            ))
         

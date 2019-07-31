@@ -12,34 +12,27 @@ pcie:
         # Don't bypass any RSSI modules (only for FSBL)
         BypRssi: 0x0                
       ############################
-      UdpClient[0]:
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.10    
-      ############################
-      UdpClient[1]: # Slot#3 Link
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.11
-      ############################
-      UdpClient[2]: # Slot#4 Link
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.12 
-      ############################
-      UdpClient[3]: # Slot#5 Link
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.13 
-      ############################
-      UdpClient[4]: # Slot#6 Link
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.14 
-      ############################
-      UdpClient[5]: # Slot#7 Link
-        ClientRemotePort: 8192
-        ClientRemoteIp: 192.168.2.15 
+      UdpEngine:
+        ClientRemotePort[:]: 8192
+        # # ClientRemotePort[:]: 8192
+        # ClientRemotePort[0]: 8192
+        # ClientRemotePort[1]: 8192
+        ClientRemoteIp[0]: 192.168.2.10 # Slot#2 Link    
+        ClientRemoteIp[1]: 192.168.2.11 # Slot#3 Link
+        ClientRemoteIp[2]: 192.168.2.12 # Slot#4 Link
+        ClientRemoteIp[3]: 192.168.2.13 # Slot#5 Link
+        ClientRemoteIp[4]: 192.168.2.14 # Slot#6 Link        
+        ClientRemoteIp[5]: 192.168.2.15 # Slot#7 Link
       #####################################
       # Open the RSSI connections for links
       #####################################
-      RssiClient[:]:
+      RssiClient[:]:   
         OpenConn: 0x1
         CloseConn: 0x0       
-        HeaderChksumEn: 0x1
+        # HeaderChksumEn: 0x1
+        # Mode: 0x0
+        # CumAckTimeout: 1 # ms
+        # RetransTimeout: 250 # ms
+        # NullSegTimeout: 1000 # ms
+        # MaxCumAck: 4
         

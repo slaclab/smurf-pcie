@@ -27,21 +27,11 @@ class Core(pr.Device):
         
         # Add axi-pcie-core 
         self.add(pcie.AxiPcieCore(            
-            offset       = 0x00000000, 
-            useSpi       = True,
-            expand       = False,
-        ))  
-        
-        # DevBoard Receiver on DMA[7]
-        self.add(ssi.SsiPrbsTx(
-            offset = 0x00080000,
-            expand = False,
-        )) 
-        self.add(ssi.SsiPrbsRx(
-            offset = 0x00081000,
-            rxClkPeriod = 8.0e-9,
-            expand = False,
-        ))           
+            offset      = 0x00000000, 
+            useSpi      = True,
+            expand      = False,
+            numDmaLanes = 6,
+        ))        
         
         # Add Ethernet Lane
         for i in range(numLink):

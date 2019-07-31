@@ -1,0 +1,10 @@
+System:
+  Fpga[:]:
+    SsiPrbsTx:
+      AxiEn: True
+      TxEn: True
+      FwCnt: False
+      PacketLength: 0x232 # 9008B
+      # TrigDly: 156250 # 1 kHz
+      TrigDly: 0xFFFF # 1 kHz
+      

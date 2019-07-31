@@ -153,15 +153,7 @@ begin
          -- UDP Client Generics
          CLIENT_EN_G    => true,
          CLIENT_SIZE_G  => NUM_RSSI_C,
-         CLIENT_PORTS_G => (
-            0           => 9000,
-            1           => 9001,
-            2           => 9002,
-            3           => 9003,
-            4           => 9004,
-            5           => 9005,
-            6           => 9006,
-            7           => 9007))
+         CLIENT_PORTS_G => CLIENT_PORTS_C)
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -281,7 +273,7 @@ begin
             WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
             MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
             MAX_RETRANS_CNT_G   => 16,
-            MAX_CUM_ACK_CNT_G   => 1,   -- 0x1 for HW-to-HW communication
+            MAX_CUM_ACK_CNT_G   => 2,
             APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
             TSP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C)
          port map (

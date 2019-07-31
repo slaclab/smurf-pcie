@@ -34,4 +34,12 @@ package AppPkg is
 
    constant APP_STREAM_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => APP_AXIS_CONFIG_C);
 
+   constant CLIENT_PORTS_C : PositiveArray(NUM_RSSI_C-1 downto 0) := (
+      0 => 9000,
+      1 => 9001,
+      2 => 9002,
+      3 => 9003,
+      4 => 9004,
+      5 => 9005);
+
 end package AppPkg;

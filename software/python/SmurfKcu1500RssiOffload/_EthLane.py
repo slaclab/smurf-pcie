@@ -27,14 +27,12 @@ class EthLane(pr.Device):
             expand = False,
         ))
         
-        for i in range(rssiPerLink):
-            self.add(udp.UdpEngineClient(
-                name         = "UdpClient[%i]" % (i),
-                offset       = (0x10000) + (i*8),
-                description  = "Udp Client: %i" % (i),
-                expand       =  False,
-            ))
-        
+        self.add(udp.UdpEngine(
+            offset = (0x10000), 
+            numClt = 6,
+            expand = False,
+        ))        
+                
         for i in range(rssiPerLink):
             self.add(rssi.RssiCore(
                 name         = "RssiClient[%i]" % (i),
@@ -42,3 +40,15 @@ class EthLane(pr.Device):
                 description  = "Rssi Client: %i" % (i),
                 expand       =  False,
             ))
+
+        @self.command(name="C_RestartConn", description="Restart connection request",)
+        def C_RestartConn():                        
+            for i in range(rssiPerLink):
+                self.RssiClient[i].C_RestartConn()
+
+    # Function calls after loading YAML configuration
+    def initialize(self):
+        super().initialize()  
+        for i in range(rssiPerLink):
+            self.C_RestartConn()
+            

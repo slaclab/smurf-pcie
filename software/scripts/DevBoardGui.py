@@ -73,7 +73,7 @@ parser.add_argument(
     "--swRx", 
     type     = argBool,
     required = False,
-    default  = True,
+    default  = False,
     help     = "SW loopback of PRBS stream",
 )  
 
@@ -81,7 +81,7 @@ parser.add_argument(
     "--swTx", 
     type     = argBool,
     required = False,
-    default  = True,
+    default  = False,
     help     = "SW loopback of PRBS stream",
 )  
 
@@ -91,6 +91,14 @@ parser.add_argument(
     required = False,
     default  = 0,
     help     = "DMA Lane",
+) 
+
+parser.add_argument(
+    "--allLane", 
+    type     = int,
+    required = False,
+    default  = 0,
+    help     = "load all the lanes",
 ) 
 
 parser.add_argument('--html', help='Use html for tables', action="store_true") 
@@ -105,6 +113,7 @@ rootTop = devBoard.TopLevel(
     swRx        = args.swRx,
     swTx        = args.swTx,
     lane        = args.lane,
+    allLane     = args.allLane,
 )
     
 #################################################################    
@@ -117,8 +126,8 @@ rootTop.start(
     zmqPort  = None,
 )
 
-# Print the AxiVersion Summary
-rootTop.Fpga.AxiVersion.printStatus()
+# # Print the AxiVersion Summary
+# rootTop.Fpga.AxiVersion.printStatus()
 
 # Create GUI
 appTop = pr.gui.application(sys.argv)
