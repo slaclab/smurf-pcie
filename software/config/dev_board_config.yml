@@ -14,8 +14,8 @@ pcie:
       ############################
       UdpEngine:
         ClientRemotePort[:]: 8192
-        # ClientRemotePort[:]: 0
-        ClientRemotePort[0]: 8192
+        # # ClientRemotePort[:]: 0
+        # ClientRemotePort[0]: 8192
         # ClientRemotePort[1]: 8192
         ClientRemoteIp[0]: 192.168.2.10 # Slot#2 Link    
         ClientRemoteIp[1]: 192.168.2.11 # Slot#3 Link
@@ -29,11 +29,11 @@ pcie:
       RssiClient[:]:   
         OpenConn: 0x1
         CloseConn: 0x0       
-        HeaderChksumEn: 0x1
-        Mode: 0x1
-        CumAckTimeout: 1 # ms
-        RetransTimeout: 250 # ms
-        NullSegTimeout: 1000 # ms
-        MaxCumAck: 4
+        # Mode: 0x1
+        # HeaderChksumEn: 0x1
+        # CumAckTimeout: 1 # ms
+        # RetransTimeout: 250 # ms
+        # NullSegTimeout: 1000 # ms
+        # MaxCumAck: 4
         
         
