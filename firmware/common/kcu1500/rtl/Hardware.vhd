@@ -70,6 +70,15 @@ end Hardware;
 
 architecture mapping of Hardware is
 
+   constant NUM_AXI_MASTERS_C : natural := 2;
+
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 19);
+
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
    signal macObMaster : AxiStreamMasterType;
    signal macObSlave  : AxiStreamSlaveType;
    signal macIbMaster : AxiStreamMasterType;
@@ -98,6 +107,27 @@ begin
          clk    => axilClk,
          rstOut => extRst);
 
+   ---------------------
+   -- AXI-Lite Crossbar
+   ---------------------
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+
    --------------------------------------------
    -- 10 GigE (or 1 GigE) Modules for QSFP[1:0]
    --------------------------------------------
@@ -107,34 +137,41 @@ begin
          ETH_10G_G => ETH_10G_G)
       port map (
          -- Local Configurations
-         localMac     => localMac,
+         localMac        => localMac,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(1),
+         axilReadSlave   => axilReadSlaves(1),
+         axilWriteMaster => axilWriteMasters(1),
+         axilWriteSlave  => axilWriteSlaves(1),
          -- Streaming DMA Interface 
-         dmaClk       => axilClk,
-         dmaRst       => axilRst,
-         dmaIbMaster  => macObMaster,
-         dmaIbSlave   => macObSlave,
-         dmaObMaster  => macIbMaster,
-         dmaObSlave   => macIbSlave,
+         dmaClk          => axilClk,
+         dmaRst          => axilRst,
+         dmaIbMaster     => macObMaster,
+         dmaIbSlave      => macObSlave,
+         dmaObMaster     => macIbMaster,
+         dmaObSlave      => macIbSlave,
          -- Misc. Signals
-         extRst       => extRst,
-         phyReady     => phyReady,
+         extRst          => extRst,
+         phyReady        => phyReady,
          ---------------------
          --  Hardware Ports
          ---------------------    
          -- QSFP[0] Ports
-         qsfp0RefClkP => qsfp0RefClkP,
-         qsfp0RefClkN => qsfp0RefClkN,
-         qsfp0RxP     => qsfp0RxP,
-         qsfp0RxN     => qsfp0RxN,
-         qsfp0TxP     => qsfp0TxP,
-         qsfp0TxN     => qsfp0TxN,
+         qsfp0RefClkP    => qsfp0RefClkP,
+         qsfp0RefClkN    => qsfp0RefClkN,
+         qsfp0RxP        => qsfp0RxP,
+         qsfp0RxN        => qsfp0RxN,
+         qsfp0TxP        => qsfp0TxP,
+         qsfp0TxN        => qsfp0TxN,
          -- QSFP[1] Ports
-         qsfp1RefClkP => qsfp1RefClkP,
-         qsfp1RefClkN => qsfp1RefClkN,
-         qsfp1RxP     => qsfp1RxP,
-         qsfp1RxN     => qsfp1RxN,
-         qsfp1TxN     => qsfp1TxN,
-         qsfp1TxP     => qsfp1TxP);
+         qsfp1RefClkP    => qsfp1RefClkP,
+         qsfp1RefClkN    => qsfp1RefClkN,
+         qsfp1RxP        => qsfp1RxP,
+         qsfp1RxN        => qsfp1RxN,
+         qsfp1TxN        => qsfp1TxN,
+         qsfp1TxP        => qsfp1TxP);
 
    ------------
    -- ETH Lanes
@@ -143,7 +180,7 @@ begin
       generic map (
          TPD_G           => TPD_G,
          CLK_FREQUENCY_G => CLK_FREQUENCY_G,
-         AXI_BASE_ADDR_G => AXI_BASE_ADDR_G)
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(0).baseAddr)
       port map (
          -- RSSI Interface (axilClk domain)
          rssiLinkUp      => linkUp,
@@ -161,10 +198,10 @@ begin
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave);
+         axilReadMaster  => axilReadMasters(0),
+         axilReadSlave   => axilReadSlaves(0),
+         axilWriteMaster => axilWriteMasters(0),
+         axilWriteSlave  => axilWriteSlaves(0));
 
    -----------------------------------------------------------------
    -- Adding Pipelining to help with making timing between SLR0/SLR1

@@ -47,7 +47,7 @@ class Fpga(pr.Device):
         
         self.add(ssi.SsiPrbsTx(
             offset = 0x00040000,
-            expand = True,
+            expand = False,
         )) 
 
         self.add(ssi.SsiPrbsRx(

@@ -14,8 +14,8 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_env_var.tcl
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
-# Bypass the debug chipscope generation
-return
+# # Bypass the debug chipscope generation
+# return
 
 ############################
 ## Open the synthesis design
@@ -40,45 +40,70 @@ set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 #################################
 ## Set the clock for the ILA core
 #################################
-SetDebugCoreClk ${ilaName} {axilClk}
+SetDebugCoreClk ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/ethClk}
 
 #######################
 ## Set the debug Probes
 #######################
 
-# ConfigProbe ${ilaName} {axilRst}
-# ConfigProbe ${ilaName} {dmaRst}
+# Flow Control
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/ethStatus[rxCrcErrorCnt]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/ethStatus[rxOverFlow]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/ethStatus[rxPauseCnt]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/ethStatus[txPauseCnt]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/flowCtrl[pause]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/mDropWrite}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/mTermFrame}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/overflow}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/sAxisCtrl[overflow]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/sAxisCtrl[pause]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/sTermFrame}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/sAxisRst}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_RxFifo/U_Fifo/sAxisReset}
 
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tDest][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObMaster[tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaObSlave[tReady]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcDataValid}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcGood}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcInit}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcReset}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcShift0}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcShift1}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/endDetect}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/endShift0}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/endShift1}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/frameShift0}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/frameShift1}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/frameShift2}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/frameShift3}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/frameShift4}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/frameShift5}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/intAdvance}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/intFirstLine}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/intLastLine}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/lastSOF}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/nxtCrcValid}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/rxCountEn}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/rxCrcError}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/rxdAlign}
 
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tUser][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tDest][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appIbSlave[tReady]}
 
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tDest][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbMasters[*][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiIbSlaves[*][tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tDest][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObMasters[*][tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/rssiObSlaves[*][tReady]}
-
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tData][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tUser][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tDest][*]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObMaster[tValid]}
-ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/appObSlave[tReady]}
-
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tDest][*]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbMaster[tValid]}
-# ConfigProbe ${ilaName} {U_Application/GEN_VEC[0].U_Lane/dmaIbSlave[tReady]}
-
+#ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcDataWidth[*]}
+#ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcFifoIn[*]}
+#ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcFifoOut[*]}
+#ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcIn[*]}
+#ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcOut[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcWidthDly0[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcWidthDly1[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcWidthDly2[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/crcWidthDly3[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/dlyRxd[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/macData[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/macSize[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/nxtCrcWidth[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/phyRxc[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/phyRxcDly[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/phyRxd[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/phyRxdata[*]}
+ConfigProbe ${ilaName} {U_Hardware/U_EthPhyMac/GEN_LANE[0].GEN_10G.U_ETH/U_MAC/U_Rx/U_Import/U_10G.U_XGMII/phyRxChar[*]}
 
 ##########################
 ## Write the port map file

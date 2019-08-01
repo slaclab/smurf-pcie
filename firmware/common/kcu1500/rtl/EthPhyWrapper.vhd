@@ -32,34 +32,41 @@ entity EthPhyWrapper is
       ETH_10G_G : boolean := true);
    port (
       -- Local Configurations
-      localMac     : in  slv(47 downto 0);
+      localMac        : in  slv(47 downto 0);
       -- Streaming DMA Interface 
-      dmaClk       : in  sl;
-      dmaRst       : in  sl;
-      dmaIbMaster  : out AxiStreamMasterType;
-      dmaIbSlave   : in  AxiStreamSlaveType;
-      dmaObMaster  : in  AxiStreamMasterType;
-      dmaObSlave   : out AxiStreamSlaveType;
+      dmaClk          : in  sl;
+      dmaRst          : in  sl;
+      dmaIbMaster     : out AxiStreamMasterType;
+      dmaIbSlave      : in  AxiStreamSlaveType;
+      dmaObMaster     : in  AxiStreamMasterType;
+      dmaObSlave      : out AxiStreamSlaveType;
+      -- Slave AXI-Lite Interface 
+      axilClk         : in  sl;
+      axilRst         : in  sl;
+      axilReadMaster  : in  AxiLiteReadMasterType;
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster : in  AxiLiteWriteMasterType;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- Misc. Signals
-      extRst       : in  sl;
-      phyReady     : out sl;
+      extRst          : in  sl;
+      phyReady        : out sl;
       ---------------------
       --  Hardware Ports
       ---------------------    
       -- QSFP[0] Ports
-      qsfp0RefClkP : in  slv(1 downto 0);
-      qsfp0RefClkN : in  slv(1 downto 0);
-      qsfp0RxP     : in  slv(3 downto 0);
-      qsfp0RxN     : in  slv(3 downto 0);
-      qsfp0TxP     : out slv(3 downto 0);
-      qsfp0TxN     : out slv(3 downto 0);
+      qsfp0RefClkP    : in  slv(1 downto 0);
+      qsfp0RefClkN    : in  slv(1 downto 0);
+      qsfp0RxP        : in  slv(3 downto 0);
+      qsfp0RxN        : in  slv(3 downto 0);
+      qsfp0TxP        : out slv(3 downto 0);
+      qsfp0TxN        : out slv(3 downto 0);
       -- QSFP[1] Ports
-      qsfp1RefClkP : in  slv(1 downto 0);
-      qsfp1RefClkN : in  slv(1 downto 0);
-      qsfp1RxP     : in  slv(3 downto 0);
-      qsfp1RxN     : in  slv(3 downto 0);
-      qsfp1TxP     : out slv(3 downto 0);
-      qsfp1TxN     : out slv(3 downto 0));
+      qsfp1RefClkP    : in  slv(1 downto 0);
+      qsfp1RefClkN    : in  slv(1 downto 0);
+      qsfp1RxP        : in  slv(3 downto 0);
+      qsfp1RxN        : in  slv(3 downto 0);
+      qsfp1TxP        : out slv(3 downto 0);
+      qsfp1TxN        : out slv(3 downto 0));
 end EthPhyWrapper;
 
 architecture mapping of EthPhyWrapper is
@@ -238,32 +245,39 @@ begin
             generic map (
                TPD_G         => TPD_G,
                -- AXI-Lite Configurations
-               EN_AXI_REG_G  => false,
+               EN_AXI_REG_G  => true,
                -- AXI Streaming Configurations
                AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
             port map (
                -- Local Configurations
-               localMac      => localMac,
+               localMac           => localMac,
+               -- Slave AXI-Lite Interface 
+               axiLiteClk         => axilClk,
+               axiLiteRst         => axilRst,
+               axiLiteReadMaster  => axilReadMaster,
+               axiLiteReadSlave   => axilReadSlave,
+               axiLiteWriteMaster => axilWriteMaster,
+               axiLiteWriteSlave  => axilWriteSlave,
                -- Streaming DMA Interface 
-               dmaClk        => dmaClk,
-               dmaRst        => dmaRst,
-               dmaIbMaster   => dmaIbMaster,
-               dmaIbSlave    => dmaIbSlave,
-               dmaObMaster   => dmaObMaster,
-               dmaObSlave    => dmaObSlave,
+               dmaClk             => dmaClk,
+               dmaRst             => dmaRst,
+               dmaIbMaster        => dmaIbMaster,
+               dmaIbSlave         => dmaIbSlave,
+               dmaObMaster        => dmaObMaster,
+               dmaObSlave         => dmaObSlave,
                -- Misc. Signals
-               coreClk       => coreClkVec(i),
-               extRst        => coreRstVec(i),
-               phyReady      => phyReady,
+               coreClk            => coreClkVec(i),
+               extRst             => coreRstVec(i),
+               phyReady           => phyReady,
                -- Quad PLL Ports
-               qplllock      => qplllockVec(i),
-               qplloutclk    => qplloutclkVec(i),
-               qplloutrefclk => qplloutrefclkVec(i),
+               qplllock           => qplllockVec(i),
+               qplloutclk         => qplloutclkVec(i),
+               qplloutrefclk      => qplloutrefclkVec(i),
                -- MGT Ports
-               gtTxP         => ethTxP(i),
-               gtTxN         => ethTxN(i),
-               gtRxP         => ethRxP(i),
-               gtRxN         => ethRxN(i));
+               gtTxP              => ethTxP(i),
+               gtTxN              => ethTxN(i),
+               gtRxP              => ethRxP(i),
+               gtRxN              => ethRxN(i));
       end generate;
 
       GEN_1G : if (ETH_10G_G = false) generate
@@ -271,30 +285,37 @@ begin
             generic map (
                TPD_G         => TPD_G,
                -- AXI-Lite Configurations
-               EN_AXI_REG_G  => false,
+               EN_AXI_REG_G  => true,
                -- AXI Streaming Configurations
                AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
             port map (
                -- Local Configurations
-               localMac    => localMac,
+               localMac           => localMac,
+               -- Slave AXI-Lite Interface 
+               axiLiteClk         => axilClk,
+               axiLiteRst         => axilRst,
+               axiLiteReadMaster  => axilReadMaster,
+               axiLiteReadSlave   => axilReadSlave,
+               axiLiteWriteMaster => axilWriteMaster,
+               axiLiteWriteSlave  => axilWriteSlave,
                -- Streaming DMA Interface 
-               dmaClk      => dmaClk,
-               dmaRst      => dmaRst,
-               dmaIbMaster => dmaIbMaster,
-               dmaIbSlave  => dmaIbSlave,
-               dmaObMaster => dmaObMaster,
-               dmaObSlave  => dmaObSlave,
+               dmaClk             => dmaClk,
+               dmaRst             => dmaRst,
+               dmaIbMaster        => dmaIbMaster,
+               dmaIbSlave         => dmaIbSlave,
+               dmaObMaster        => dmaObMaster,
+               dmaObSlave         => dmaObSlave,
                -- PHY + MAC signals
-               sysClk62    => sysClk62,
-               sysClk125   => sysClk125,
-               sysRst125   => sysRst125,
-               extRst      => coreRst(0),
-               phyReady    => phyReady,
+               sysClk62           => sysClk62,
+               sysClk125          => sysClk125,
+               sysRst125          => sysRst125,
+               extRst             => coreRst(0),
+               phyReady           => phyReady,
                -- MGT Ports
-               gtTxP       => ethTxP(i),
-               gtTxN       => ethTxN(i),
-               gtRxP       => ethRxP(i),
-               gtRxN       => ethRxN(i));
+               gtTxP              => ethTxP(i),
+               gtTxN              => ethTxN(i),
+               gtRxP              => ethRxP(i),
+               gtRxN              => ethRxN(i));
       end generate;
 
    end generate GEN_LANE;

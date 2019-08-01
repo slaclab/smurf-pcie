@@ -14,6 +14,7 @@ import rogue.hardware.axi
 import pyrogue                  as pr
 import axipcie                  as pcie
 import surf.protocols.ssi       as ssi
+import surf.ethernet.ten_gig    as ethPhy     
 import SmurfKcu1500RssiOffload  as smurf
 
 class Core(pr.Device):
@@ -28,10 +29,15 @@ class Core(pr.Device):
         # Add axi-pcie-core 
         self.add(pcie.AxiPcieCore(            
             offset      = 0x00000000, 
-            useSpi      = True,
-            expand      = False,
+            expand      = True,
             numDmaLanes = 6,
-        ))        
+        ))   
+
+        self.add(ethPhy.TenGigEthReg(            
+            offset      = 0x00880000, 
+            writeEn     = True,
+            expand      = False,
+        ))           
         
         # Add Ethernet Lane
         for i in range(numLink):
