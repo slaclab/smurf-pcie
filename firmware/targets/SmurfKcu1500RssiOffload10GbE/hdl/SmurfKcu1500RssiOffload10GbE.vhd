@@ -278,7 +278,6 @@ begin
    U_Hardware : entity work.Hardware
       generic map (
          TPD_G           => TPD_G,
-         ETH_10G_G       => true,       -- true = 10 GbE
          CLK_FREQUENCY_G => CLK_FREQUENCY_C,
          AXI_BASE_ADDR_G => AXIL_CONFIG_C(4).baseAddr)
       port map (

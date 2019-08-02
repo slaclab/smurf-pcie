@@ -21,8 +21,6 @@ class Core(pr.Device):
     def __init__(   self,       
             name        = "Core",
             description = "Container for SmurfKcu1500RssiOffload",
-            numLink     = 1, # Same as AppPkg.vhd's NUM_LINKS_C constant
-            rssiPerLink = 6, # Same as AppPkg.vhd's RSSI_PER_LINK_C constant
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -32,18 +30,26 @@ class Core(pr.Device):
             expand      = True,
             numDmaLanes = 6,
         ))   
-
-        self.add(ethPhy.TenGigEthReg(            
-            offset      = 0x00880000, 
-            writeEn     = True,
-            expand      = False,
-        ))           
         
         # Add Ethernet Lane
-        for i in range(numLink):
+        for i in range(6):        
+            self.add(ethPhy.TenGigEthReg(            
+                name        = f'EthPhy[{i}]',
+                offset      = 0x00870000 + i*0x1000, 
+                writeEn     = True,
+                expand      = False,
+            ))               
+            
+        # Add Ethernet Lane
+        for i in range(6):
             self.add(smurf.EthLane(            
-                name        = ('EthLane[%d]' % i),
-                offset      = (0x00800000 + i*0x80000), 
-                rssiPerLink = rssiPerLink,
+                name        = f'EthLane[{i}]',
+                offset      = (0x00800000 + i*0x10000), 
                 expand      = True,
             )) 
+
+        @self.command(name="C_RestartConn", description="Restart connection request",)
+        def C_RestartConn():                        
+            for i in range(6):
+                self.EthLane[i].RssiClient.C_RestartConn()
+                

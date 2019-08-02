@@ -30,12 +30,11 @@ entity EthTrafficSwitch is
       axisRst        : in  sl;
       -- Controls Interface
       rssiLinkUp     : in  sl;
-      bypRssi        : in  sl;
       -- UDP Interface
-      sUdpMaster     : in  AxiStreamMasterType;
-      sUdpSlave      : out AxiStreamSlaveType;
-      mUdpMaster     : out AxiStreamMasterType;
-      mUdpSlave      : in  AxiStreamSlaveType;
+      sUdpMasters    : in  AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+      sUdpSlaves     : out AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+      mUdpMasters    : out AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+      mUdpSlaves     : in  AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
       -- RSSI Transport Interface
       sRssiTspMaster : in  AxiStreamMasterType;
       sRssiTspSlave  : out AxiStreamSlaveType;
@@ -55,36 +54,66 @@ end EthTrafficSwitch;
 
 architecture rtl of EthTrafficSwitch is
 
+   constant DEMUX_ROUTES_C : Slv8Array(CLIENT_SIZE_C-1 downto 0) := (
+      0 => "--------",
+      1 => x"C0");
+
+   constant MUX_ROUTES_C : Slv8Array(CLIENT_SIZE_C-1 downto 0) := (
+      0 => "--------",
+      1 => "--------");
+
    type RegType is record
-      sUdpSlave      : AxiStreamSlaveType;
-      mUdpMaster     : AxiStreamMasterType;
+      sUdpSlaves     : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+      mUdpMasters    : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
       sRssiTspSlave  : AxiStreamSlaveType;
       mRssiTspMaster : AxiStreamMasterType;
       sRssiAppSlave  : AxiStreamSlaveType;
       mRssiAppMaster : AxiStreamMasterType;
-      sDmaSlave      : AxiStreamSlaveType;
-      mDmaMaster     : AxiStreamMasterType;
-
+      sDmaSlaves     : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+      mDmaMasters    : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      sUdpSlave      => AXI_STREAM_SLAVE_INIT_C,
-      mUdpMaster     => AXI_STREAM_MASTER_INIT_C,
+      sUdpSlaves     => (others => AXI_STREAM_SLAVE_INIT_C),
+      mUdpMasters    => (others => AXI_STREAM_MASTER_INIT_C),
       sRssiTspSlave  => AXI_STREAM_SLAVE_INIT_C,
       mRssiTspMaster => AXI_STREAM_MASTER_INIT_C,
       sRssiAppSlave  => AXI_STREAM_SLAVE_INIT_C,
       mRssiAppMaster => AXI_STREAM_MASTER_INIT_C,
-      sDmaSlave      => AXI_STREAM_SLAVE_INIT_C,
-      mDmaMaster     => AXI_STREAM_MASTER_INIT_C);
+      sDmaSlaves     => (others => AXI_STREAM_SLAVE_INIT_C),
+      mDmaMasters    => (others => AXI_STREAM_MASTER_INIT_C));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal sDmaMasters : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+   signal sDmaSlaves  : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+   signal mDmaMasters : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+   signal mDmaSlaves  : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+
 begin
 
-   comb : process (axisRst, bypRssi, mDmaSlave, mRssiAppSlave, mRssiTspSlave,
-                   mUdpSlave, r, rssiLinkUp, sDmaMaster, sRssiAppMaster,
-                   sRssiTspMaster, sUdpMaster) is
+   U_AxiStreamDeMux : entity work.AxiStreamDeMux
+      generic map (
+         TPD_G          => TPD_G,
+         PIPE_STAGES_G  => 1,
+         NUM_MASTERS_G  => CLIENT_SIZE_C,
+         MODE_G         => "ROUTED",
+         TDEST_ROUTES_G => DEMUX_ROUTES_C)
+      port map (
+         -- Clock and reset
+         axisClk      => axisClk,
+         axisRst      => axisRst,
+         -- Slaves
+         sAxisMaster  => sDmaMaster,
+         sAxisSlave   => sDmaSlave,
+         -- Master
+         mAxisMasters => sDmaMasters,
+         mAxisSlaves  => sDmaSlaves);
+
+   comb : process (axisRst, mDmaSlaves, mRssiAppSlave, mRssiTspSlave,
+                   mUdpSlaves, r, rssiLinkUp, sDmaMasters, sRssiAppMaster,
+                   sRssiTspMaster, sUdpMasters) is
       variable v : RegType;
       variable i : natural;
    begin
@@ -92,15 +121,25 @@ begin
       v := r;
 
       -- Reset strobing signals
-      v.sUdpSlave.tReady     := '0';
+      for i in CLIENT_SIZE_C-1 downto 0 loop
+         v.sUdpSlaves(i).tReady := '0';
+         v.sDmaSlaves(i).tReady := '0';
+      end loop;
       v.sRssiTspSlave.tReady := '0';
       v.sRssiAppSlave.tReady := '0';
-      v.sDmaSlave.tReady     := '0';
 
       -- Update tValid variable
-      if mUdpSlave.tReady = '1' then
-         v.mUdpMaster.tValid := '0';
-      end if;
+      for i in CLIENT_SIZE_C-1 downto 0 loop
+
+         if mUdpSlaves(i).tReady = '1' then
+            v.mUdpMasters(i).tValid := '0';
+         end if;
+
+         if mDmaSlaves(i).tReady = '1' then
+            v.mDmaMasters(i).tValid := '0';
+         end if;
+
+      end loop;
 
       -- Update tValid variable
       if mRssiTspSlave.tReady = '1' then
@@ -112,101 +151,78 @@ begin
          v.mRssiAppMaster.tValid := '0';
       end if;
 
-      -- Update tValid variable
-      if mDmaSlave.tReady = '1' then
-         v.mDmaMaster.tValid := '0';
+      -- Connect sUdp(1) -> mDma(1)
+      if (v.mDmaMasters(1).tValid = '0') and (sUdpMasters(1).tValid = '1') then
+         -- Accept the data
+         v.sUdpSlaves(1).tReady := '1';
+         -- Move the data
+         v.mDmaMasters(1)       := sUdpMasters(1);
+         -- Force the TDEST = 0xC0
+         v.mDmaMasters(1).tDest := x"C0";
       end if;
 
-      -- Check if we are bypassing the RSSI engine and sending RAW UPD to DMA for FSBL communication
-      if (bypRssi = '1') then
+      -- Connect sDma(1) -> mUdp(1)
+      if (v.mUdpMasters(1).tValid = '0') and (sDmaMasters(1).tValid = '1') then
+         -- Accept the data
+         v.sDmaSlaves(1).tReady := '1';
+         -- Move the data
+         v.mUdpMasters(1)       := sDmaMasters(1);
+      end if;
 
-         -- Connect sUdp -> mDma
-         if (v.mDmaMaster.tValid = '0') and (sUdpMaster.tValid = '1') then
+      -- Connect sUdp(0) -> mRssiTsp
+      if (v.mRssiTspMaster.tValid = '0') and (sUdpMasters(0).tValid = '1') then
+         -- Accept the data
+         v.sUdpSlaves(0).tReady := '1';
+         -- Move the data
+         v.mRssiTspMaster       := sUdpMasters(0);
+      end if;
+
+      -- Connect sRssiTsp -> mUdp(0)
+      if (v.mUdpMasters(0).tValid = '0') and (sRssiTspMaster.tValid = '1') then
+         -- Accept the data
+         v.sRssiTspSlave.tReady := '1';
+         -- Move the data
+         v.mUdpMasters(0)       := sRssiTspMaster;
+      end if;
+
+      -- Check if RSSI Link is up
+      if (rssiLinkUp = '1') then
+
+         -- Connect sRssiApp -> mDma(0)
+         if (v.mDmaMasters(0).tValid = '0') and (sRssiAppMaster.tValid = '1') then
             -- Accept the data
-            v.sUdpSlave.tReady := '1';
+            v.sRssiAppSlave.tReady := '1';
             -- Move the data
-            v.mDmaMaster       := sUdpMaster;
-            -- Force the TDEST = 0x0
-            v.mDmaMaster.tDest := x"00";
+            v.mDmaMasters(0)       := sRssiAppMaster;
          end if;
 
-         -- Connect sDma -> mUdp
-         if (v.mUdpMaster.tValid = '0') and (sDmaMaster.tValid = '1') then
+         -- Connect sDma(0) -> mRssiApp
+         if (v.mRssiAppMaster.tValid = '0') and (sDmaMasters(0).tValid = '1') then
             -- Accept the data
-            v.sDmaSlave.tReady := '1';
+            v.sDmaSlaves(0).tReady := '1';
             -- Move the data
-            v.mUdpMaster       := sDmaMaster;
+            v.mRssiAppMaster       := sDmaMasters(0);
          end if;
-
-         -- Prevent DMA back pressure unused TDESTs
-         v.sDmaSlave.tReady := '1';
-
-         -- Terminate the RSSI TSP interfaces
-         v.sRssiTspSlave  := AXI_STREAM_SLAVE_FORCE_C;
-         v.mRssiTspMaster := AXI_STREAM_MASTER_INIT_C;
-
-         -- Terminate the RSSI TSP interfaces
-         v.sRssiAppSlave  := AXI_STREAM_SLAVE_FORCE_C;
-         v.mRssiAppMaster := AXI_STREAM_MASTER_INIT_C;
 
       else
 
-         -- Connect sUdp -> mRssiTsp
-         if (v.mRssiTspMaster.tValid = '0') and (sUdpMaster.tValid = '1') then
-            -- Accept the data
-            v.sUdpSlave.tReady := '1';
-            -- Move the data
-            v.mRssiTspMaster   := sUdpMaster;
-         end if;
-
-         -- Connect sRssiTsp -> mUdp
-         if (v.mUdpMaster.tValid = '0') and (sRssiTspMaster.tValid = '1') then
-            -- Accept the data
-            v.sRssiTspSlave.tReady := '1';
-            -- Move the data
-            v.mUdpMaster           := sRssiTspMaster;
-         end if;
-
-         -- Check if RSSI Link is up
-         if (rssiLinkUp = '1') then
-
-            -- Connect sRssiApp -> mDma
-            if (v.mDmaMaster.tValid = '0') and (sRssiAppMaster.tValid = '1') then
-               -- Accept the data
-               v.sRssiAppSlave.tReady := '1';
-               -- Move the data
-               v.mDmaMaster           := sRssiAppMaster;
-            end if;
-
-            -- Connect sDma -> mRssiApp
-            if (v.mRssiAppMaster.tValid = '0') and (sDmaMaster.tValid = '1') then
-               -- Accept the data
-               v.sDmaSlave.tReady := '1';
-               -- Move the data
-               v.mRssiAppMaster   := sDmaMaster;
-            end if;
-
-         else
-
-            -- Prevent DMA/RSSI back pressure
-            v.sRssiAppSlave.tReady := '1';
-            v.sDmaSlave.tReady     := '1';
-
-         end if;
+         -- Prevent DMA/RSSI back pressure
+         v.sRssiAppSlave.tReady := '1';
+         v.sDmaSlaves(0).tReady := '1';
 
       end if;
 
       -- Combinatorial outputs before the reset
-      sUdpSlave     <= v.sUdpSlave;
+      sUdpSlaves    <= v.sUdpSlaves;
       sRssiTspSlave <= v.sRssiTspSlave;
       sRssiAppSlave <= v.sRssiAppSlave;
-      sDmaSlave     <= v.sDmaSlave;
+      sDmaSlaves    <= v.sDmaSlaves;
 
       -- Registered Outputs
-      mUdpMaster     <= r.mUdpMaster;
+      mUdpMasters    <= r.mUdpMasters;
       mRssiTspMaster <= r.mRssiTspMaster;
       mRssiAppMaster <= r.mRssiAppMaster;
-      mDmaMaster     <= r.mDmaMaster;
+      mDmaMasters    <= r.mDmaMasters;
 
       -- Reset
       if (axisRst = '1') then
@@ -224,5 +240,26 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   U_AxiStreamMux : entity work.AxiStreamMux
+      generic map (
+         TPD_G                => TPD_G,
+         PIPE_STAGES_G        => 1,
+         NUM_SLAVES_G         => CLIENT_SIZE_C,
+         MODE_G               => "ROUTED",
+         TDEST_ROUTES_G       => MUX_ROUTES_C,
+         ILEAVE_EN_G          => true,
+         ILEAVE_ON_NOTVALID_G => true,
+         ILEAVE_REARB_G       => 128)
+      port map (
+         -- Clock and reset
+         axisClk      => axisClk,
+         axisRst      => axisRst,
+         -- Slaves
+         sAxisMasters => mDmaMasters,
+         sAxisSlaves  => mDmaSlaves,
+         -- Master
+         mAxisMaster  => mDmaMaster,
+         mAxisSlave   => mDmaSlave);
 
 end rtl;

@@ -31,11 +31,11 @@ entity EthLane is
       AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
       -- RSSI Interface (axilClk domain)
-      rssiLinkUp      : out slv(NUM_RSSI_C-1 downto 0);
-      rssiIbMasters   : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      rssiIbSlaves    : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      rssiObMasters   : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      rssiObSlaves    : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      rssiLinkUp      : out sl;
+      rssiIbMaster    : in  AxiStreamMasterType;
+      rssiIbSlave     : out AxiStreamSlaveType;
+      rssiObMaster    : out AxiStreamMasterType;
+      rssiObSlave     : in  AxiStreamSlaveType;
       -- PHY/MAC Interface (axilClk domain)
       macObMaster     : in  AxiStreamMasterType;
       macObSlave      : out AxiStreamSlaveType;
@@ -54,47 +54,42 @@ end EthLane;
 
 architecture mapping of EthLane is
 
-   constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
-   -- constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
-   
-   -- constant MAX_SEG_SIZE_C     : positive := 1024;  -- Standard frame chucking
    constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
+   constant WINDOW_ADDR_SIZE_C : positive := 3;  -- 8 buffers (2^3)
+   constant NUM_AXI_MASTERS_C : natural := 3;
 
-   constant NUM_AXI_MASTERS_C : natural := (2+NUM_RSSI_C);
-
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 19, 16);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 16, 12);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal obUdpMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal obUdpSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal ibUdpMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal ibUdpSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal obUdpMasters : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+   signal obUdpSlaves  : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+   signal ibUdpMasters : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+   signal ibUdpSlaves  : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
 
-   signal obClientMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal obClientSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal ibClientMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal ibClientSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal obClientMasters : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+   signal obClientSlaves  : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
+   signal ibClientMasters : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0);
+   signal ibClientSlaves  : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0);
 
-   signal obRssiTspMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal obRssiTspSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal ibRssiTspMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal ibRssiTspSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal obRssiTspMaster : AxiStreamMasterType;
+   signal obRssiTspSlave  : AxiStreamSlaveType;
+   signal ibRssiTspMaster : AxiStreamMasterType;
+   signal ibRssiTspSlave  : AxiStreamSlaveType;
 
-   signal obRssiAppMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal obRssiAppSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal ibRssiAppMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal ibRssiAppSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal obRssiAppMaster : AxiStreamMasterType;
+   signal obRssiAppSlave  : AxiStreamSlaveType;
+   signal ibRssiAppMaster : AxiStreamMasterType;
+   signal ibRssiAppSlave  : AxiStreamSlaveType;
 
    signal localIp  : slv(31 downto 0);
    signal localMac : slv(47 downto 0);
-   signal bypRssi  : slv(NUM_RSSI_C-1 downto 0);
 
-   signal statusReg : Slv7Array(NUM_RSSI_C-1 downto 0);
-   signal linkUp    : slv(NUM_RSSI_C-1 downto 0);
+   signal statusReg : slv(6 downto 0);
+   signal linkUp    : sl;
 
 begin
 
@@ -132,7 +127,6 @@ begin
          phyReady        => phyReady,
          localIp         => localIp,
          localMac        => localMac,
-         bypRssi         => bypRssi,
          -- AXI-Lite Register Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -152,164 +146,155 @@ begin
          SERVER_EN_G    => false,
          -- UDP Client Generics
          CLIENT_EN_G    => true,
-         CLIENT_SIZE_G  => NUM_RSSI_C,
+         CLIENT_SIZE_G  => CLIENT_SIZE_C,
          CLIENT_PORTS_G => CLIENT_PORTS_C)
       port map (
          -- Local Configurations
-         localMac        => localMac,
-         localIp         => localIp,
+         localMac           => localMac,
+         localIp            => localIp,
          -- Interface to Ethernet Media Access Controller (MAC)
-         obMacMaster     => macObMaster,
-         obMacSlave      => macObSlave,
-         ibMacMaster     => macIbMaster,
-         ibMacSlave      => macIbSlave,
+         obMacMaster        => macObMaster,
+         obMacSlave         => macObSlave,
+         ibMacMaster        => macIbMaster,
+         ibMacSlave         => macIbSlave,
          -- Interface to UDP Client engine(s)
-         obClientMasters => obUdpMasters,
-         obClientSlaves  => obUdpSlaves,
-         ibClientMasters => ibUdpMasters,
-         ibClientSlaves  => ibUdpSlaves,
+         obClientMasters    => obUdpMasters,
+         obClientSlaves     => obUdpSlaves,
+         ibClientMasters    => ibUdpMasters,
+         ibClientSlaves     => ibUdpSlaves,
          -- AXI-Lite Interface
-         axilReadMaster  => axilReadMasters(1),
-         axilReadSlave   => axilReadSlaves(1),
-         axilWriteMaster => axilWriteMasters(1),
-         axilWriteSlave  => axilWriteSlaves(1),
+         axilReadMaster     => axilReadMasters(1),
+         axilReadSlave      => axilReadSlaves(1),
+         axilWriteMaster    => axilWriteMasters(1),
+         axilWriteSlave     => axilWriteSlaves(1),
          -- Clock and Reset
-         clk             => axilClk,
-         rst             => axilRst);
-
-   GEN_LANE : for i in NUM_RSSI_C-1 downto 0 generate
-
-      U_OB_FIFO : entity work.AxiStreamFifoV2
+         clk                => axilClk,
+         rst                => axilRst);
+         
+   GEN_VEC : for i in CLIENT_SIZE_C-1 downto 0 generate
+   
+      U_Resize_OB : entity work.AxiStreamResize
          generic map (
             -- General Configurations
             TPD_G               => TPD_G,
-            -- FIFO configurations
-            BRAM_EN_G           => true,
-            GEN_SYNC_FIFO_G     => true,
-            FIFO_ADDR_WIDTH_G   => 9,
+            READY_EN_G          => true,
             -- AXI Stream Port Configurations
             SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
          port map (
+            -- Clock and reset
+            axisClk     => axilClk,
+            axisRst     => axilRst,
             -- Slave Port
-            sAxisClk    => axilClk,
-            sAxisRst    => axilRst,
             sAxisMaster => obUdpMasters(i),
             sAxisSlave  => obUdpSlaves(i),
             -- Master Port
-            mAxisClk    => axilClk,
-            mAxisRst    => axilRst,
             mAxisMaster => obClientMasters(i),
             mAxisSlave  => obClientSlaves(i));
 
-      U_IB_FIFO : entity work.AxiStreamFifoV2
+      U_Resize_IB : entity work.AxiStreamResize
          generic map (
             -- General Configurations
             TPD_G               => TPD_G,
-            -- FIFO configurations
-            BRAM_EN_G           => true,
-            GEN_SYNC_FIFO_G     => true,
-            FIFO_ADDR_WIDTH_G   => 9,
+            READY_EN_G          => true,
             -- AXI Stream Port Configurations
             SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
          port map (
+            -- Clock and reset
+            axisClk     => axilClk,
+            axisRst     => axilRst,
             -- Slave Port
-            sAxisClk    => axilClk,
-            sAxisRst    => axilRst,
             sAxisMaster => ibClientMasters(i),
             sAxisSlave  => ibClientSlaves(i),
             -- Master Port
-            mAxisClk    => axilClk,
-            mAxisRst    => axilRst,
             mAxisMaster => ibUdpMasters(i),
             mAxisSlave  => ibUdpSlaves(i));
 
-      U_EthTrafficSwitch : entity work.EthTrafficSwitch
-         generic map (
-            TPD_G => TPD_G)
-         port map(
-            -- Clock and reset
-            axisClk        => axilClk,
-            axisRst        => axilRst,
-            -- Controls Interface
-            rssiLinkUp     => linkUp(i),
-            bypRssi        => bypRssi(i),
-            -- UDP Interface
-            sUdpMaster     => obClientMasters(i),
-            sUdpSlave      => obClientSlaves(i),
-            mUdpMaster     => ibClientMasters(i),
-            mUdpSlave      => ibClientSlaves(i),
-            -- RSSI Transport Interface
-            sRssiTspMaster => obRssiTspMasters(i),
-            sRssiTspSlave  => obRssiTspSlaves(i),
-            mRssiTspMaster => ibRssiTspMasters(i),
-            mRssiTspSlave  => ibRssiTspSlaves(i),
-            -- RSSI Application Interface
-            sRssiAppMaster => obRssiAppMasters(i),
-            sRssiAppSlave  => obRssiAppSlaves(i),
-            mRssiAppMaster => ibRssiAppMasters(i),
-            mRssiAppSlave  => ibRssiAppSlaves(i),
-            -- DMA Interface
-            sDmaMaster     => rssiIbMasters(i),
-            sDmaSlave      => rssiIbSlaves(i),
-            mDmaMaster     => rssiObMasters(i),
-            mDmaSlave      => rssiObSlaves(i));
+   end generate GEN_VEC;
 
-      --------------------------
-      -- Software's RSSI Clients
-      --------------------------
-      U_RssiClient : entity work.RssiCoreWrapperInterleaved
-         generic map (
-            TPD_G               => TPD_G,
-            PIPE_STAGES_G       => 1,
-            APP_ILEAVE_EN_G     => true,
-            MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
-            SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
-            CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
-            TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds 
-            SERVER_G            => false,           -- false = Client mode
-            RETRANSMIT_ENABLE_G => true,
-            WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
-            MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
-            MAX_RETRANS_CNT_G   => 16,
-            MAX_CUM_ACK_CNT_G   => 2,
-            APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
-            TSP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C)
-         port map (
-            clk_i            => axilClk,
-            rst_i            => axilRst,
-            -- Transport Layer Interface
-            sTspAxisMaster_i => ibRssiTspMasters(i),
-            sTspAxisSlave_o  => ibRssiTspSlaves(i),
-            mTspAxisMaster_o => obRssiTspMasters(i),
-            mTspAxisSlave_i  => obRssiTspSlaves(i),
-            -- Application Layer Interface
-            sAppAxisMaster_i => ibRssiAppMasters(i),
-            sAppAxisSlave_o  => ibRssiAppSlaves(i),
-            mAppAxisMaster_o => obRssiAppMasters(i),
-            mAppAxisSlave_i  => obRssiAppSlaves(i),
-            -- High level  Application side interface
-            openRq_i         => '0',    -- Enabled via software
-            closeRq_i        => bypRssi(i),
-            inject_i         => '0',
-            -- AXI-Lite Interface
-            axiClk_i         => axilClk,
-            axiRst_i         => axilRst,
-            axilReadMaster   => axilReadMasters(i+2),
-            axilReadSlave    => axilReadSlaves(i+2),
-            axilWriteMaster  => axilWriteMasters(i+2),
-            axilWriteSlave   => axilWriteSlaves(i+2),
-            -- Internal statuses
-            statusReg_o      => statusReg(i));
+   U_EthTrafficSwitch : entity work.EthTrafficSwitch
+      generic map (
+         TPD_G => TPD_G)
+      port map(
+         -- Clock and reset
+         axisClk        => axilClk,
+         axisRst        => axilRst,
+         -- Controls Interface
+         rssiLinkUp     => linkUp,
+         -- UDP Interface
+         sUdpMasters    => obClientMasters,
+         sUdpSlaves     => obClientSlaves,
+         mUdpMasters    => ibClientMasters,
+         mUdpSlaves     => ibClientSlaves,
+         -- RSSI Transport Interface
+         sRssiTspMaster => obRssiTspMaster,
+         sRssiTspSlave  => obRssiTspSlave,
+         mRssiTspMaster => ibRssiTspMaster,
+         mRssiTspSlave  => ibRssiTspSlave,
+         -- RSSI Application Interface
+         sRssiAppMaster => obRssiAppMaster,
+         sRssiAppSlave  => obRssiAppSlave,
+         mRssiAppMaster => ibRssiAppMaster,
+         mRssiAppSlave  => ibRssiAppSlave,
+         -- DMA Interface
+         sDmaMaster     => rssiIbMaster,
+         sDmaSlave      => rssiIbSlave,
+         mDmaMaster     => rssiObMaster,
+         mDmaSlave      => rssiObSlave);
 
-      process(axilClk)
-      begin
-         if rising_edge(axilClk) then
-            linkUp(i) <= statusReg(i)(0) after TPD_G;
-         end if;
-      end process;
+   --------------------------
+   -- Software's RSSI Clients
+   --------------------------
+   U_RssiClient : entity work.RssiCoreWrapperInterleaved
+      generic map (
+         TPD_G               => TPD_G,
+         PIPE_STAGES_G       => 1,
+         APP_ILEAVE_EN_G     => true,
+         MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
+         SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
+         CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
+         TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds 
+         SERVER_G            => false,           -- false = Client mode
+         RETRANSMIT_ENABLE_G => true,
+         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
+         MAX_RETRANS_CNT_G   => 16,
+         MAX_CUM_ACK_CNT_G   => 2,
+         APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
+         TSP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C)
+      port map (
+         clk_i            => axilClk,
+         rst_i            => axilRst,
+         -- Transport Layer Interface
+         sTspAxisMaster_i => ibRssiTspMaster,
+         sTspAxisSlave_o  => ibRssiTspSlave,
+         mTspAxisMaster_o => obRssiTspMaster,
+         mTspAxisSlave_i  => obRssiTspSlave,
+         -- Application Layer Interface
+         sAppAxisMaster_i => ibRssiAppMaster,
+         sAppAxisSlave_o  => ibRssiAppSlave,
+         mAppAxisMaster_o => obRssiAppMaster,
+         mAppAxisSlave_i  => obRssiAppSlave,
+         -- High level  Application side interface
+         openRq_i         => '0',                -- Enabled via software
+         closeRq_i        => '0',
+         inject_i         => '0',
+         -- AXI-Lite Interface
+         axiClk_i         => axilClk,
+         axiRst_i         => axilRst,
+         axilReadMaster   => axilReadMasters(2),
+         axilReadSlave    => axilReadSlaves(2),
+         axilWriteMaster  => axilWriteMasters(2),
+         axilWriteSlave   => axilWriteSlaves(2),
+         -- Internal statuses
+         statusReg_o      => statusReg);
 
-   end generate GEN_LANE;
+   process(axilClk)
+   begin
+      if rising_edge(axilClk) then
+         linkUp <= statusReg(0) after TPD_G;
+      end if;
+   end process;
 
 end mapping;

@@ -28,18 +28,16 @@ use unisim.vcomponents.all;
 
 entity EthPhyWrapper is
    generic (
-      TPD_G     : time    := 1 ns;
-      ETH_10G_G : boolean := true);
+      TPD_G           : time := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
       -- Local Configurations
-      localMac        : in  slv(47 downto 0);
+      localMac        : in  Slv48Array(NUM_RSSI_C-1 downto 0);
       -- Streaming DMA Interface 
-      dmaClk          : in  sl;
-      dmaRst          : in  sl;
-      dmaIbMaster     : out AxiStreamMasterType;
-      dmaIbSlave      : in  AxiStreamSlaveType;
-      dmaObMaster     : in  AxiStreamMasterType;
-      dmaObSlave      : out AxiStreamSlaveType;
+      dmaIbMasters    : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      dmaIbSlaves     : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      dmaObMasters    : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      dmaObSlaves     : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
       -- Slave AXI-Lite Interface 
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -48,8 +46,7 @@ entity EthPhyWrapper is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- Misc. Signals
-      extRst          : in  sl;
-      phyReady        : out sl;
+      phyReady        : out slv(NUM_RSSI_C-1 downto 0);
       ---------------------
       --  Hardware Ports
       ---------------------    
@@ -71,39 +68,125 @@ end EthPhyWrapper;
 
 architecture mapping of EthPhyWrapper is
 
-   signal qplllock      : slv(1 downto 0);
-   signal qplloutclk    : slv(1 downto 0);
-   signal qplloutrefclk : slv(1 downto 0);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_RSSI_C-1 downto 0) := genAxiLiteConfig(NUM_RSSI_C, AXI_BASE_ADDR_G, 16, 12);
 
-   signal qplllockVec      : slv(7 downto 0);
-   signal qplloutclkVec    : slv(7 downto 0);
-   signal qplloutrefclkVec : slv(7 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_RSSI_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_RSSI_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal qpllRst    : slv(1 downto 0);
-   signal qpllRstVec : slv(7 downto 0) := (others => '0');
-
-   signal coreClk : slv(1 downto 0);
-   signal coreRst : slv(1 downto 0);
-
-   signal coreClkVec : slv(7 downto 0);
-   signal coreRstVec : slv(7 downto 0);
-
-   signal refClk : slv(1 downto 0);
-
-   signal ethRxP : slv(7 downto 0);
-   signal ethRxN : slv(7 downto 0);
-   signal ethTxP : slv(7 downto 0);
-   signal ethTxN : slv(7 downto 0);
-
-   signal sysClk125 : sl;
-   signal sysRst125 : sl;
-   signal sysClk62  : sl;
-   signal sysRst62  : sl;
-
+   signal refClk                  : slv(1 downto 0);
    attribute dont_touch           : string;
    attribute dont_touch of refClk : signal is "TRUE";
 
 begin
+
+   ---------------------
+   -- AXI-Lite Crossbar
+   ---------------------
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_RSSI_C,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+
+   ----------------
+   -- 10GigE Module 
+   ----------------
+   U_QSFP0 : entity work.TenGigEthGthUltraScaleWrapper
+      generic map (
+         TPD_G         => TPD_G,
+         NUM_LANE_G    => 4,
+         EN_AXI_REG_G  => true,
+         -- AXI Streaming Configurations
+         AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
+      port map (
+         -- Local Configurations
+         localMac            => localMac(3 downto 0),
+         -- Streaming DMA Interface 
+         dmaClk              => (others => axilClk),
+         dmaRst              => (others => axilRst),
+         dmaIbMasters        => dmaIbMasters(3 downto 0),
+         dmaIbSlaves         => dmaIbSlaves(3 downto 0),
+         dmaObMasters        => dmaObMasters(3 downto 0),
+         dmaObSlaves         => dmaObSlaves(3 downto 0),
+         -- Slave AXI-Lite Interface 
+         axiLiteClk          => (others => axilClk),
+         axiLiteRst          => (others => axilRst),
+         axiLiteReadMasters  => axilReadMasters(3 downto 0),
+         axiLiteReadSlaves   => axilReadSlaves(3 downto 0),
+         axiLiteWriteMasters => axilWriteMasters(3 downto 0),
+         axiLiteWriteSlaves  => axilWriteSlaves(3 downto 0),
+         -- Misc. Signals
+         extRst              => axilRst,
+         phyReady            => phyReady(3 downto 0),
+         -- MGT Clock Port
+         gtClkP              => qsfp0RefClkP(0),
+         gtClkN              => qsfp0RefClkN(0),
+         -- MGT Ports
+         gtTxP               => qsfp0TxP,
+         gtTxN               => qsfp0TxN,
+         gtRxP               => qsfp0RxP,
+         gtRxN               => qsfp0RxN);
+
+   U_QSFP1 : entity work.TenGigEthGthUltraScaleWrapper
+      generic map (
+         TPD_G         => TPD_G,
+         NUM_LANE_G    => 2,
+         EN_AXI_REG_G  => true,
+         -- AXI Streaming Configurations
+         AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
+      port map (
+         -- Local Configurations
+         localMac            => localMac(5 downto 4),
+         -- Streaming DMA Interface 
+         dmaClk              => (others => axilClk),
+         dmaRst              => (others => axilRst),
+         dmaIbMasters        => dmaIbMasters(5 downto 4),
+         dmaIbSlaves         => dmaIbSlaves(5 downto 4),
+         dmaObMasters        => dmaObMasters(5 downto 4),
+         dmaObSlaves         => dmaObSlaves(5 downto 4),
+         -- Slave AXI-Lite Interface 
+         axiLiteClk          => (others => axilClk),
+         axiLiteRst          => (others => axilRst),
+         axiLiteReadMasters  => axilReadMasters(5 downto 4),
+         axiLiteReadSlaves   => axilReadSlaves(5 downto 4),
+         axiLiteWriteMasters => axilWriteMasters(5 downto 4),
+         axiLiteWriteSlaves  => axilWriteSlaves(5 downto 4),
+         -- Misc. Signals
+         extRst              => axilRst,
+         phyReady            => phyReady(5 downto 4),
+         -- MGT Clock Port
+         gtClkP              => qsfp1RefClkP(0),
+         gtClkN              => qsfp1RefClkN(0),
+         -- MGT Ports
+         gtTxP               => qsfp1TxP(1 downto 0),
+         gtTxN               => qsfp1TxN(1 downto 0),
+         gtRxP               => qsfp1RxP(1 downto 0),
+         gtRxN               => qsfp1RxN(1 downto 0));
+
+   U_GTH_TERM : entity work.Gthe3ChannelDummy
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         refClk => axilRst,
+         gtTxP  => qsfp1TxP(3 downto 2),
+         gtTxN  => qsfp1TxN(3 downto 2),
+         gtRxP  => qsfp1RxP(3 downto 2),
+         gtRxN  => qsfp1RxN(3 downto 2));
 
    --------------------
    -- Unused GTH Clocks
@@ -121,214 +204,5 @@ begin
          IB  => qsfp1RefClkN(1),
          CEB => '0',
          O   => refClk(1));
-
-   -----------------
-   -- Power Up Reset
-   -----------------
-   U_PwrUpRst0 : entity work.PwrUpRst
-      generic map (
-         TPD_G      => TPD_G,
-         DURATION_G => 15625000)        -- 100 ms
-      port map (
-         arst   => extRst,
-         clk    => coreClk(0),
-         rstOut => coreRst(0));
-
-   U_PwrUpRst1 : entity work.PwrUpRst
-      generic map (
-         TPD_G      => TPD_G,
-         DURATION_G => 15625000)        -- 100 ms
-      port map (
-         arst   => extRst,
-         clk    => coreClk(1),
-         rstOut => coreRst(1));
-
-   ----------------------
-   -- Common Clock Module 
-   ----------------------
-   U_QPLL0 : entity work.TenGigEthGthUltraScaleClk
-      generic map (
-         TPD_G             => TPD_G,
-         QPLL_REFCLK_SEL_G => "001")
-      port map (
-         -- MGT Clock Port (156.25 MHz)
-         gtClkP        => qsfp0RefClkP(0),
-         gtClkN        => qsfp0RefClkN(0),
-         coreClk       => coreClk(0),
-         coreRst       => coreRst(0),
-         -- Quad PLL Ports
-         qplllock      => qplllock(0),
-         qplloutclk    => qplloutclk(0),
-         qplloutrefclk => qplloutrefclk(0),
-         qpllRst       => qpllRst(0));
-
-   qpllRst(0) <= uOr(qpllRstVec(3 downto 0)) and not(qPllLock(0));
-
-   U_QPLL1 : entity work.TenGigEthGthUltraScaleClk
-      generic map (
-         TPD_G             => TPD_G,
-         QPLL_REFCLK_SEL_G => "001")
-      port map (
-         -- MGT Clock Port (156.25 MHz)
-         gtClkP        => qsfp1RefClkP(0),
-         gtClkN        => qsfp1RefClkN(0),
-         coreClk       => coreClk(1),
-         coreRst       => coreRst(1),
-         -- Quad PLL Ports
-         qplllock      => qplllock(1),
-         qplloutclk    => qplloutclk(1),
-         qplloutrefclk => qplloutrefclk(1),
-         qpllRst       => qpllRst(1));
-
-   qpllRst(1) <= uOr(qpllRstVec(7 downto 4)) and not(qPllLock(1));
-
-   --------------------------------
-   -- Mapping QSFP[1:0] to ETH[7:0]
-   --------------------------------
-   MAP_QSFP : for i in 3 downto 0 generate
-      -- QSFP[0] to ETH[3:0]
-      coreClkVec(i+0)       <= coreClk(0);
-      coreRstVec(i+0)       <= coreRst(0);
-      qplllockVec(i+0)      <= qplllock(0);
-      qplloutclkVec(i+0)    <= qplloutclk(0);
-      qplloutrefclkVec(i+0) <= qplloutrefclk(0);
-      ethRxP(i+0)           <= qsfp0RxP(i);
-      ethRxN(i+0)           <= qsfp0RxN(i);
-      qsfp0TxP(i)           <= ethTxP(i+0);
-      qsfp0TxN(i)           <= ethTxN(i+0);
-      -- QSFP[1] to ETH[7:4]
-      coreClkVec(i+4)       <= coreClk(1);
-      coreRstVec(i+4)       <= coreRst(1);
-      qplllockVec(i+4)      <= qplllock(1);
-      qplloutclkVec(i+4)    <= qplloutclk(1);
-      qplloutrefclkVec(i+4) <= qplloutrefclk(1);
-      ethRxP(i+4)           <= qsfp1RxP(i);
-      ethRxN(i+4)           <= qsfp1RxN(i);
-      qsfp1TxP(i)           <= ethTxP(i+4);
-      qsfp1TxN(i)           <= ethTxN(i+4);
-   end generate MAP_QSFP;
-
-   ----------------
-   -- Clock Manager
-   ----------------
-   U_MMCM : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 2,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
-         DIVCLK_DIVIDE_G    => 5,       -- 31.25 MHz = (156.25 MHz/5)
-         CLKFBOUT_MULT_F_G  => 32.0,    -- 1 GHz = (32 x 31.25 MHz)
-         CLKOUT0_DIVIDE_F_G => 8.0,     -- 125 MHz = (1.0 GHz/8)
-         CLKOUT1_DIVIDE_G   => 16)      -- 62.5 MHz = (1.0 GHz/16)
-      port map(
-         clkIn     => coreClk(0),
-         rstIn     => coreRst(0),
-         clkOut(0) => sysClk125,
-         clkOut(1) => sysClk62,
-         rstOut(0) => sysRst125,
-         rstOut(1) => sysRst62);
-
-   ----------------
-   -- 10GigE Module 
-   ----------------
-   GEN_LANE :
-   for i in 0 to 0 generate
-
-      GEN_10G : if (ETH_10G_G = true) generate
-         U_ETH : entity work.TenGigEthGthUltraScale
-            generic map (
-               TPD_G         => TPD_G,
-               -- AXI-Lite Configurations
-               EN_AXI_REG_G  => true,
-               -- AXI Streaming Configurations
-               AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
-            port map (
-               -- Local Configurations
-               localMac           => localMac,
-               -- Slave AXI-Lite Interface 
-               axiLiteClk         => axilClk,
-               axiLiteRst         => axilRst,
-               axiLiteReadMaster  => axilReadMaster,
-               axiLiteReadSlave   => axilReadSlave,
-               axiLiteWriteMaster => axilWriteMaster,
-               axiLiteWriteSlave  => axilWriteSlave,
-               -- Streaming DMA Interface 
-               dmaClk             => dmaClk,
-               dmaRst             => dmaRst,
-               dmaIbMaster        => dmaIbMaster,
-               dmaIbSlave         => dmaIbSlave,
-               dmaObMaster        => dmaObMaster,
-               dmaObSlave         => dmaObSlave,
-               -- Misc. Signals
-               coreClk            => coreClkVec(i),
-               extRst             => coreRstVec(i),
-               phyReady           => phyReady,
-               -- Quad PLL Ports
-               qplllock           => qplllockVec(i),
-               qplloutclk         => qplloutclkVec(i),
-               qplloutrefclk      => qplloutrefclkVec(i),
-               -- MGT Ports
-               gtTxP              => ethTxP(i),
-               gtTxN              => ethTxN(i),
-               gtRxP              => ethRxP(i),
-               gtRxN              => ethRxN(i));
-      end generate;
-
-      GEN_1G : if (ETH_10G_G = false) generate
-         U_ETH : entity work.GigEthGthUltraScale
-            generic map (
-               TPD_G         => TPD_G,
-               -- AXI-Lite Configurations
-               EN_AXI_REG_G  => true,
-               -- AXI Streaming Configurations
-               AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
-            port map (
-               -- Local Configurations
-               localMac           => localMac,
-               -- Slave AXI-Lite Interface 
-               axiLiteClk         => axilClk,
-               axiLiteRst         => axilRst,
-               axiLiteReadMaster  => axilReadMaster,
-               axiLiteReadSlave   => axilReadSlave,
-               axiLiteWriteMaster => axilWriteMaster,
-               axiLiteWriteSlave  => axilWriteSlave,
-               -- Streaming DMA Interface 
-               dmaClk             => dmaClk,
-               dmaRst             => dmaRst,
-               dmaIbMaster        => dmaIbMaster,
-               dmaIbSlave         => dmaIbSlave,
-               dmaObMaster        => dmaObMaster,
-               dmaObSlave         => dmaObSlave,
-               -- PHY + MAC signals
-               sysClk62           => sysClk62,
-               sysClk125          => sysClk125,
-               sysRst125          => sysRst125,
-               extRst             => coreRst(0),
-               phyReady           => phyReady,
-               -- MGT Ports
-               gtTxP              => ethTxP(i),
-               gtTxN              => ethTxN(i),
-               gtRxP              => ethRxP(i),
-               gtRxN              => ethRxN(i));
-      end generate;
-
-   end generate GEN_LANE;
-
-   U_GTH : entity work.Gthe3ChannelDummy
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 7)
-      port map (
-         refClk => dmaClk,
-         gtTxP  => ethTxP(7 downto 1),
-         gtTxN  => ethTxN(7 downto 1),
-         gtRxP  => ethRxP(7 downto 1),
-         gtRxN  => ethRxN(7 downto 1));
 
 end mapping;

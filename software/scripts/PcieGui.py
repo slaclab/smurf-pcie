@@ -61,7 +61,7 @@ base = pr.Root(name='pcie',description='')
 memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 
 # Add Base Device
-base.add(smurf.Core(memBase=memMap))
+base.add(smurf.Core(memBase=memMap,expand=True))
 
 # Start the system
 base.start(pollEn=args.pollEn,initRead=args.initRead,zmqPort=None)

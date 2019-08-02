@@ -101,6 +101,14 @@ parser.add_argument(
     help     = "load all the lanes",
 ) 
 
+parser.add_argument(
+    "--ip", 
+    type     = str,
+    required = False,
+    default  = '',
+    help     = '',
+)
+
 parser.add_argument('--html', help='Use html for tables', action="store_true") 
 # Get the arguments
 args = parser.parse_args()
@@ -109,6 +117,7 @@ args = parser.parse_args()
 rootTop = devBoard.TopLevel(
     name        = 'System',
     description = 'Front End Board',
+    ip          = args.ip if args.ip != "" else None,
     loopback    = args.loopback,
     swRx        = args.swRx,
     swTx        = args.swTx,
@@ -131,7 +140,7 @@ rootTop.start(
 
 # Create GUI
 appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop(group='PyRogueGui')
+guiTop = pr.gui.GuiTop()
 guiTop.addTree(rootTop)
 guiTop.resize(800, 1200)
 

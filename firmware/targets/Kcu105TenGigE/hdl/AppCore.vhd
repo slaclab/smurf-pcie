@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2019-07-30
+-- Last update: 2019-08-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -35,20 +35,24 @@ entity AppCore is
       JUMBO_G         : boolean  := false);
    port (
       -- Clock and Reset
-      clk       : in  sl;
-      rst       : in  sl;
+      clk            : in  sl;
+      rst            : in  sl;
       -- ETH Configurations
-      ethMac    : in  slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
-      ethIp     : in  slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)     
+      ethMac         : in  slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
+      ethIp          : in  slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)     
+      phyWriteMaster : out AxiLiteWriteMasterType;
+      phyWriteSlave  : in  AxiLiteWriteSlaveType;
+      phyReadMaster  : out AxiLiteReadMasterType;
+      phyReadSlave   : in  AxiLiteReadSlaveType;
       -- AXIS interface
-      txMasters : out AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
-      txSlaves  : in  AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
-      rxMasters : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
-      rxSlaves  : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
-      rxCtrl    : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
+      txMasters      : out AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
+      txSlaves       : in  AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
+      rxMasters      : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
+      rxSlaves       : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
+      rxCtrl         : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
       -- ADC Ports
-      vPIn      : in  sl;
-      vNIn      : in  sl);
+      vPIn           : in  sl;
+      vNIn           : in  sl);
 end AppCore;
 
 architecture mapping of AppCore is
@@ -196,6 +200,11 @@ begin
          commWriteSlave  => commWriteSlave,
          commReadMaster  => commReadMaster,
          commReadSlave   => commReadSlave,
+         -- ETH PHY AXI-Lite Interface
+         phyWriteMaster  => phyWriteMaster,
+         phyWriteSlave   => phyWriteSlave,
+         phyReadMaster   => phyReadMaster,
+         phyReadSlave    => phyReadSlave,
          -- PBRS Interface
          pbrsTxMaster    => pbrsTxMaster,
          pbrsTxSlave     => pbrsTxSlave,

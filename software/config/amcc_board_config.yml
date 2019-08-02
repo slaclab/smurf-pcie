@@ -7,8 +7,8 @@ pcie:
         CloseConn: 0x0      
       ############################    
       UdpEngine:
-        ClientRemotePort[0]: 8192      
-        ClientRemotePort[1]: 8193      
+        ClientRemotePort[0]: 8198 # UDP_SRV_RSSI_ILEAVE_IDX_C = Interleaved RSSI UDP server on AMC carrier
+        ClientRemotePort[1]: 8195 # UDP_SRV_BP_MGS_IDX_C = UDP server for Backplane Messaging on AMC carrier
 ########################################################    
     EthLane[0]:
 ########################################################     
@@ -16,10 +16,10 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:50
         # Set the local IP address
-        LocalIp: 192.168.2.50  
+        LocalIp: 10.0.3.202  
       ############################    
       UdpEngine:
-         ClientRemoteIp[:]: 192.168.2.10 # Slot#2 Link 
+         ClientRemoteIp[:]: 10.0.3.102 # Slot#2 Link 
 ########################################################    
     EthLane[1]:
 ######################################################## 
@@ -27,10 +27,10 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:51
         # Set the local IP address
-        LocalIp: 192.168.2.51
+        LocalIp: 10.0.3.203
       ############################    
       UdpEngine:
-         ClientRemoteIp[:]: 192.168.2.11 # Slot#3 Link 
+         ClientRemoteIp[:]: 10.0.3.103 # Slot#3 Link 
 ########################################################    
     EthLane[2]:
 ######################################################## 
@@ -38,10 +38,10 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:52
         # Set the local IP address
-        LocalIp: 192.168.2.52
+        LocalIp: 10.0.3.204
       ############################    
       UdpEngine:
-         ClientRemoteIp[:]: 192.168.2.12 # Slot#4 Link    
+         ClientRemoteIp[:]: 10.0.3.104 # Slot#4 Link    
 ########################################################    
     EthLane[3]:
 ######################################################## 
@@ -49,10 +49,10 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:53
         # Set the local IP address
-        LocalIp: 192.168.2.53
+        LocalIp: 10.0.3.205
       ############################    
       UdpEngine:
-         ClientRemoteIp[:]: 192.168.2.13 # Slot#5 Link  
+         ClientRemoteIp[:]: 10.0.3.105 # Slot#5 Link  
 ########################################################    
     EthLane[4]:
 ######################################################## 
@@ -60,10 +60,10 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:54
         # Set the local IP address
-        LocalIp: 192.168.2.54
+        LocalIp: 10.0.3.206
       ############################    
       UdpEngine:
-         ClientRemoteIp[:]: 192.168.2.14 # Slot#6 Link   
+         ClientRemoteIp[:]: 10.0.3.106 # Slot#6 Link   
 ########################################################    
     EthLane[5]:
 ######################################################## 
@@ -71,8 +71,8 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:55
         # Set the local IP address
-        LocalIp: 192.168.2.55
+        LocalIp: 10.0.3.207
       ############################    
       UdpEngine:
-         ClientRemoteIp[:]: 192.168.2.15 # Slot#7 Link            
+         ClientRemoteIp[:]: 10.0.3.107 # Slot#7 Link            
 ######################################################## 

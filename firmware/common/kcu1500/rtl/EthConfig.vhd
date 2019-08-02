@@ -24,12 +24,11 @@ use work.AppPkg.all;
 
 entity EthConfig is
    generic (
-      TPD_G            : time            := 1 ns);
+      TPD_G : time := 1 ns);
    port (
       phyReady        : in  sl;
       localIp         : out slv(31 downto 0);  -- big endianness
       localMac        : out slv(47 downto 0);  -- big endianness
-      bypRssi         : out slv(NUM_RSSI_C-1 downto 0);
       -- AXI-Lite Register Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -44,7 +43,6 @@ architecture rtl of EthConfig is
    type RegType is record
       localIp        : slv(31 downto 0);
       localMac       : slv(47 downto 0);
-      bypRssi        : slv(NUM_RSSI_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -52,7 +50,6 @@ architecture rtl of EthConfig is
    constant REG_INIT_C : RegType := (
       localIp        => (others => '0'),  -- big endianness
       localMac       => (others => '0'),  -- big endianness
-      bypRssi        => (others => '1'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -77,12 +74,12 @@ begin
       -- Map the read registers
       axiSlaveRegister(regCon, x"00", 0, v.localMac);
       axiSlaveRegister(regCon, x"08", 0, v.localIp);
-      axiSlaveRegister(regCon, x"0C", 0, v.bypRssi);
       axiSlaveRegisterR(regCon, x"10", 0, phyReady);
 
       axiSlaveRegisterR(regCon, x"80", 0, toSlv(NUM_RSSI_C, 32));
-      axiSlaveRegisterR(regCon, x"84", 0, toSlv(NUM_RSSI_C, 32));
-      axiSlaveRegisterR(regCon, x"88", 0, toSlv(256, 32));
+      axiSlaveRegisterR(regCon, x"84", 0, toSlv(CLIENT_SIZE_C, 32));
+      axiSlaveRegisterR(regCon, x"88", 0, toSlv(CLIENT_PORTS_C(0), 32));
+      axiSlaveRegisterR(regCon, x"8C", 0, toSlv(CLIENT_PORTS_C(1), 32));
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
@@ -100,7 +97,6 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       localIp        <= r.localIp;
       localMac       <= r.localMac;
-      bypRssi        <= r.bypRssi;
 
    end process comb;
 

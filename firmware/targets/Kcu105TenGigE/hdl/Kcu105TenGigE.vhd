@@ -2,7 +2,7 @@
 -- File       : Kcu105TenGigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-08
--- Last update: 2019-07-30
+-- Last update: 2019-08-01
 -------------------------------------------------------------------------------
 -- Description: Example using 10G-BASER Protocol
 -------------------------------------------------------------------------------
@@ -61,19 +61,24 @@ architecture top_level of Kcu105TenGigE is
 
    constant AXIS_SIZE_C : positive := 6;
 
-   signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
-   signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+   signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+
+   signal phyWriteMasters : AxiLiteWriteMasterArray(AXIS_SIZE_C-1 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
+   signal phyWriteSlaves  : AxiLiteWriteSlaveArray(AXIS_SIZE_C-1 downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
+   signal phyReadMasters  : AxiLiteReadMasterArray(AXIS_SIZE_C-1 downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
+   signal phyReadSlaves   : AxiLiteReadSlaveArray(AXIS_SIZE_C-1 downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
    signal gtRefClk     : sl;
    signal gtRefClkBufg : sl;
    signal clk          : sl;
    signal rst          : sl;
    signal reset        : sl;
-   signal phyReady     : slv(AXIS_SIZE_C-1 downto 0);
-   signal dmaClk       : slv(AXIS_SIZE_C-1 downto 0);
-   signal dmaRst       : slv(AXIS_SIZE_C-1 downto 0);
+   signal phyReady     : slv(AXIS_SIZE_C-1 downto 0) := (others => '0');
+   signal dmaClk       : slv(AXIS_SIZE_C-1 downto 0) := (others => '0');
+   signal dmaRst       : slv(AXIS_SIZE_C-1 downto 0) := (others => '0');
 
    signal ethMac : Slv48Array(AXIS_SIZE_C-1 downto 0) := (others => x"000000564400");  -- 00:44:56:00:00:XX
    signal ethIp  : Slv32Array(AXIS_SIZE_C-1 downto 0) := (others => x"0002A8C0");  -- 192.168.2.XX
@@ -103,69 +108,86 @@ begin
          TPD_G         => TPD_G,
          NUM_LANE_G    => 2,
          EXT_REF_G     => false,
+         EN_AXI_REG_G  => true,
          -- AXI Streaming Configurations
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
-         localMac     => ethMac(1 downto 0),
+         localMac            => ethMac(1 downto 0),
          -- Streaming DMA Interface 
-         dmaClk       => dmaClk(1 downto 0),
-         dmaRst       => dmaRst(1 downto 0),
-         dmaIbMasters => rxMasters(1 downto 0),
-         dmaIbSlaves  => rxSlaves(1 downto 0),
-         dmaObMasters => txMasters(1 downto 0),
-         dmaObSlaves  => txSlaves(1 downto 0),
+         dmaClk              => dmaClk(1 downto 0),
+         dmaRst              => dmaRst(1 downto 0),
+         dmaIbMasters        => rxMasters(1 downto 0),
+         dmaIbSlaves         => rxSlaves(1 downto 0),
+         dmaObMasters        => txMasters(1 downto 0),
+         dmaObSlaves         => txSlaves(1 downto 0),
+         -- Slave AXI-Lite Interface 
+         axiLiteClk          => dmaClk(1 downto 0),
+         axiLiteRst          => dmaRst(1 downto 0),
+         axiLiteReadMasters  => phyReadMasters(1 downto 0),
+         axiLiteReadSlaves   => phyReadSlaves(1 downto 0),
+         axiLiteWriteMasters => phyWriteMasters(1 downto 0),
+         axiLiteWriteSlaves  => phyWriteSlaves(1 downto 0),
          -- Misc. Signals
-         extRst       => reset,
-         coreClk      => clk,
-         coreRst      => rst,
-         phyReady     => phyReady(1 downto 0),
-         gtClk        => gtRefClk,
+         extRst              => reset,
+         coreClk             => clk,
+         coreRst             => rst,
+         phyReady            => phyReady(1 downto 0),
+         gtClk               => gtRefClk,
          -- MGT Clock Port
-         gtClkP       => sfpClkP,
-         gtClkN       => sfpClkN,
+         gtClkP              => sfpClkP,
+         gtClkN              => sfpClkN,
          -- MGT Ports
-         gtTxP        => sfpTxP,
-         gtTxN        => sfpTxN,
-         gtRxP        => sfpRxP,
-         gtRxN        => sfpRxN);
+         gtTxP               => sfpTxP,
+         gtTxN               => sfpTxN,
+         gtRxP               => sfpRxP,
+         gtRxN               => sfpRxN);
 
    U_FMC : entity work.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
          NUM_LANE_G    => 4,
          EXT_REF_G     => true,
+         EN_AXI_REG_G  => true,
          -- AXI Streaming Configurations
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
-         localMac     => ethMac(5 downto 2),
+         localMac            => ethMac(5 downto 2),
          -- Streaming DMA Interface 
-         dmaClk       => dmaClk(5 downto 2),
-         dmaRst       => dmaRst(5 downto 2),
-         dmaIbMasters => rxMasters(5 downto 2),
-         dmaIbSlaves  => rxSlaves(5 downto 2),
-         dmaObMasters => txMasters(5 downto 2),
-         dmaObSlaves  => txSlaves(5 downto 2),
+         dmaClk              => dmaClk(5 downto 2),
+         dmaRst              => dmaRst(5 downto 2),
+         dmaIbMasters        => rxMasters(5 downto 2),
+         dmaIbSlaves         => rxSlaves(5 downto 2),
+         dmaObMasters        => txMasters(5 downto 2),
+         dmaObSlaves         => txSlaves(5 downto 2),
+         -- Slave AXI-Lite Interface 
+         axiLiteClk          => dmaClk(5 downto 2),
+         axiLiteRst          => dmaRst(5 downto 2),
+         axiLiteReadMasters  => phyReadMasters(5 downto 2),
+         axiLiteReadSlaves   => phyReadSlaves(5 downto 2),
+         axiLiteWriteMasters => phyWriteMasters(5 downto 2),
+         axiLiteWriteSlaves  => phyWriteSlaves(5 downto 2),
          -- Misc. Signals
-         extRst       => rst,
-         coreClk      => open,
-         coreRst      => open,
-         phyReady     => phyReady(5 downto 2),
+         extRst              => rst,
+         coreClk             => open,
+         coreRst             => open,
+         phyReady            => phyReady(5 downto 2),
          -- MGT Clock Port
-         gtRefClk     => gtRefClk,
-         gtRefClkBufg => clk,
+         gtRefClk            => gtRefClk,
+         gtRefClkBufg        => clk,
          -- MGT Ports
-         gtTxP        => fmcTxP,
-         gtTxN        => fmcTxN,
-         gtRxP        => fmcRxP,
-         gtRxN        => fmcRxN);
+         gtTxP               => fmcTxP,
+         gtTxN               => fmcTxN,
+         gtRxP               => fmcRxP,
+         gtRxN               => fmcRxN);
 
    -------------------
    -- Application Core
    -------------------
    GEN_VEC :
    for i in (AXIS_SIZE_C-1) downto 0 generate
+   -- for i in 0 downto 0 generate -- quick build for lane0 only
 
       U_App : entity work.AppCore
          generic map (
@@ -179,19 +201,23 @@ begin
             DHCP_G          => false)
          port map (
             -- Clock and Reset
-            clk          => dmaClk(i),
-            rst          => dmaRst(i),
+            clk            => dmaClk(i),
+            rst            => dmaRst(i),
             -- ETH Configurations
-            ethMac       => ethMac(i),
-            ethIp        => ethIp(i),
+            ethMac         => ethMac(i),
+            ethIp          => ethIp(i),
+            phyWriteMaster => phyWriteMasters(i),
+            phyWriteSlave  => phyWriteSlaves(i),
+            phyReadMaster  => phyReadMasters(i),
+            phyReadSlave   => phyReadSlaves(i),
             -- AXIS interface
-            txMasters(0) => txMasters(i),
-            txSlaves(0)  => txSlaves(i),
-            rxMasters(0) => rxMasters(i),
-            rxSlaves(0)  => rxSlaves(i),
+            txMasters(0)   => txMasters(i),
+            txSlaves(0)    => txSlaves(i),
+            rxMasters(0)   => rxMasters(i),
+            rxSlaves(0)    => rxSlaves(i),
             -- ADC Ports
-            vPIn         => '0',
-            vNIn         => '0');
+            vPIn           => '0',
+            vNIn           => '0');
 
       ethMac(i)(47 downto 40) <= toSlv(10+i, 8);
       ethIp(i)(31 downto 24)  <= toSlv(10+i, 8);

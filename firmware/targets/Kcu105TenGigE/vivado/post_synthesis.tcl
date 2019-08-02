@@ -35,97 +35,59 @@ CreateDebugCore ${ilaName}
 #######################
 ## Set the record depth
 #######################
-set_property C_DATA_DEPTH 4096 [get_debug_cores ${ilaName}]
+set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 
 #################################
 ## Set the clock for the ILA core
 #################################
-SetDebugCoreClk ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/clk}
+SetDebugCoreClk ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/ethClk}
 
 #######################
 ## Set the debug Probes
 #######################
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisSlave[tReady]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/flowCtrl[pause]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/ethStatus[txPauseCnt]}
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxSlave[tReady]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macMaster[tData][*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macMaster[tUser][*]}
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tData][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxSlave[tReady]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxTLastTUser[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/curState[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/exportWordCnt[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intData[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intLastValidByte[*]}
+# ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macAddress[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/nxtMaskIn[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/phyTxc[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/phyTxd[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/stateCount[*]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/crcDataValid}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/crcInit}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/crcReset}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/frameShift0}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/frameShift1}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intAdvance}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intDump}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intError}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intLastLine}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intPad}
+# ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/intRunt}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macMaster[tLast]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macMaster[tValid]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/macSlave[tReady]}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/nxtEOF}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/nxtError}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/nxtState}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/stateCountRst}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txCountEn}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txEnable0}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txEnable1}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txEnable2}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txEnable3}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txLinkNotReady}
+ConfigProbe ${ilaName} {U_SFP/GEN_LANE[0].TenGigEthGthUltraScale_Inst/U_MAC/U_Tx/U_Export/U_10G.U_XGMII/txUnderRun}
 
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxCtrl[idle]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxCtrl[pause]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxCtrl[overflow]}
-
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[state][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[hdrCnt][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[opCode][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[remVer][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[addr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[memResp][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[reqSize][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[tid][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[tidDly][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[eofe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[frameError]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[verMismatch]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[timeout]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[reqSizeError]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[skip]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[rxRst]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiMaster_i[eof]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiMaster_i[eofe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiMaster_i[packed]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiMaster_i[sof]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiMaster_i[valid]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiSlave_o[ready]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[ackErr]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[appDrop]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[bufferFull]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[bufferEmpty]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[lenErr]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[tspSsiMaster][eofe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[tspSsiSlave][overflow]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/tspSsiSlave_i[overflow]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[pending][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/lastAckN_i[*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[appState][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxAckN][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxLastSeqN][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[inOrderSeqN][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxSeqN][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[tspState][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/appSsiSlave_i[overflow]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[appSsiMaster][eofe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][ack]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][busy]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][data]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][eack]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][eofe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][nul]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][rst]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][syn]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[segDrop]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[segValid]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[tspSsiMaster][eofe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/rxBuffBusy_o}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/chksumValid_i}
 
 ##########################
 ## Write the port map file

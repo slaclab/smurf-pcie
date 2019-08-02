@@ -21,7 +21,8 @@ use work.AxiStreamPkg.all;
 
 package AppPkg is
 
-   constant NUM_RSSI_C : positive := 6;  -- 6 RSSI clients per ETH link (only 1 ETH per KCU1500)
+   constant NUM_RSSI_C    : positive := 6;  -- 6 RSSI clients (1 RSSI per link)
+   constant CLIENT_SIZE_C : positive := 2;  -- 2 clients per link
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
@@ -34,12 +35,8 @@ package AppPkg is
 
    constant APP_STREAM_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => APP_AXIS_CONFIG_C);
 
-   constant CLIENT_PORTS_C : PositiveArray(NUM_RSSI_C-1 downto 0) := (
+   constant CLIENT_PORTS_C : PositiveArray(CLIENT_SIZE_C-1 downto 0) := (
       0 => 9000,
-      1 => 9001,
-      2 => 9002,
-      3 => 9003,
-      4 => 9004,
-      5 => 9005);
+      1 => 9001);
 
 end package AppPkg;

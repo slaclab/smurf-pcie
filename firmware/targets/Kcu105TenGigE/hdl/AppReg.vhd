@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2019-07-30
+-- Last update: 2019-08-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -46,6 +46,11 @@ entity AppReg is
       commWriteSlave  : in  AxiLiteWriteSlaveType;
       commReadMaster  : out AxiLiteReadMasterType;
       commReadSlave   : in  AxiLiteReadSlaveType;
+      -- ETH PHY AXI-Lite Interface
+      phyWriteMaster  : out AxiLiteWriteMasterType;
+      phyWriteSlave   : in  AxiLiteWriteSlaveType;
+      phyReadMaster   : out AxiLiteReadMasterType;
+      phyReadSlave    : in  AxiLiteReadSlaveType;
       -- PBRS Interface
       pbrsTxMaster    : out AxiStreamMasterType;
       pbrsTxSlave     : in  AxiStreamSlaveType;
@@ -55,7 +60,7 @@ entity AppReg is
       hlsTxMaster     : out AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
       hlsTxSlave      : in  AxiStreamSlaveType;
       hlsRxMaster     : in  AxiStreamMasterType;
-      hlsRxSlave      : out AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
+      hlsRxSlave      : out AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
       -- MB Interface
       mbTxMaster      : out AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
       mbTxSlave       : in  AxiStreamSlaveType;
@@ -66,65 +71,35 @@ end AppReg;
 
 architecture mapping of AppReg is
 
-   constant TRIG_RATE_C        : positive                           := getTimeRatio(CLK_FREQUENCY_G, 10.0E+3);  -- 10kHz
-   constant SHARED_MEM_WIDTH_C : positive                           := 13;
-   constant IRQ_ADDR_C         : slv(SHARED_MEM_WIDTH_C-1 downto 0) := (others => '1');
+   constant NUM_AXI_MASTERS_C : natural := 5;
 
-   constant NUM_AXI_MASTERS_C : natural := 10;
+   constant VERSION_INDEX_C : natural := 0;
+   constant PRBS_TX_INDEX_C : natural := 1;
+   constant PRBS_RX_INDEX_C : natural := 2;
+   constant COMM_INDEX_C    : natural := 3;
+   constant PHY_INDEX_C     : natural := 4;
 
-   constant VERSION_INDEX_C  : natural := 0;
-   constant XADC_INDEX_C     : natural := 1;
-   constant SYS_MON_INDEX_C  : natural := 2;
-   constant MEM_INDEX_C      : natural := 3;
-   constant PRBS_TX_INDEX_C  : natural := 4;
-   constant PRBS_RX_INDEX_C  : natural := 5;
-   constant HLS_INDEX_C      : natural := 6;
-   constant COMM_INDEX_C     : natural := 7;
-   constant AXIS_MON_INDEX_C : natural := 8;
-   constant TEST_INDEX_C     : natural := 9;
-
-   -- constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0000_0000", 20, 16);
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      VERSION_INDEX_C  => (
-         baseAddr      => x"0000_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      XADC_INDEX_C     => (
-         baseAddr      => x"0001_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      SYS_MON_INDEX_C  => (
-         baseAddr      => x"0002_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      MEM_INDEX_C      => (
-         baseAddr      => x"0003_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      PRBS_TX_INDEX_C  => (
-         baseAddr      => x"0004_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      PRBS_RX_INDEX_C  => (
-         baseAddr      => x"0005_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      HLS_INDEX_C      => (
-         baseAddr      => x"0006_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      COMM_INDEX_C     => (
-         baseAddr      => x"0007_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      AXIS_MON_INDEX_C => (
-         baseAddr      => x"0008_0000",
-         addrBits      => 16,
-         connectivity  => x"FFFF"),
-      TEST_INDEX_C     => (
-         baseAddr      => x"8000_0000",
-         addrBits      => 31,
-         connectivity  => x"FFFF"));
+      VERSION_INDEX_C => (
+         baseAddr     => x"0000_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      PRBS_TX_INDEX_C => (
+         baseAddr     => x"0004_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      PRBS_RX_INDEX_C => (
+         baseAddr     => x"0005_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      COMM_INDEX_C    => (
+         baseAddr     => x"0007_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      PHY_INDEX_C     => (
+         baseAddr     => x"8000_0000",
+         addrBits     => 31,
+         connectivity => x"FFFF"));
 
    signal mAxilWriteMaster : AxiLiteWriteMasterType;
    signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
@@ -234,5 +209,13 @@ begin
    mAxilReadSlaves(COMM_INDEX_C)  <= commReadSlave;
    commWriteMaster                <= mAxilWriteMasters(COMM_INDEX_C);
    mAxilWriteSlaves(COMM_INDEX_C) <= commWriteSlave;
+
+   -----------------------------------------------
+   -- Map the AXI-Lite to Ethernet PHY Monitoring
+   -----------------------------------------------
+   phyReadMaster                 <= mAxilReadMasters(PHY_INDEX_C);
+   mAxilReadSlaves(PHY_INDEX_C)  <= phyReadSlave;
+   phyWriteMaster                <= mAxilWriteMasters(PHY_INDEX_C);
+   mAxilWriteSlaves(PHY_INDEX_C) <= phyWriteSlave;
 
 end mapping;
