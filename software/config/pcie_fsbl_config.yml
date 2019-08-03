@@ -2,6 +2,9 @@ pcie:
   Core:
     EthLane[:]:
       ############################    
+      EthConfig:
+        EnKeepAlive: 0x0
+      ############################    
       RssiClient:   
         OpenConn: 0x0
         CloseConn: 0x1      

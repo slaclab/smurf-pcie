@@ -20,10 +20,11 @@
 
 import pyrogue               as pr
 import surf.axi              as axi
+import surf.ethernet.ten_gig as ethPhy   
+import surf.ethernet.udp     as udp
 import surf.protocols.ssi    as ssi
 import surf.protocols.rssi   as rssi
 import surf.xilinx           as xil
-import surf.ethernet.ten_gig as ethPhy   
 import time
 import click 
 
@@ -57,6 +58,12 @@ class Fpga(pr.Device):
             offset = 0x00070000,
         ))                 
         
+        self.add(udp.UdpEngine(
+            offset = 0x00078000,
+            numSrv = 2,
+            expand = False,
+        ))
+
         self.add(ethPhy.TenGigEthReg(            
             offset  = 0x80000000, 
             writeEn = True,

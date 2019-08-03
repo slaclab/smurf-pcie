@@ -24,6 +24,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+use work.EthMacPkg.all;
 
 entity AppReg is
    generic (
@@ -162,9 +163,11 @@ begin
    U_SsiPrbsTx : entity work.SsiPrbsTx
       generic map (
          TPD_G                      => TPD_G,
+         AXI_DEFAULT_PKT_LEN_G      => X"000000FF"
          MASTER_AXI_PIPE_STAGES_G   => 1,
          PRBS_SEED_SIZE_G           => 128,
-         MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
+         -- MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
+         MASTER_AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          mAxisClk        => clk,
          mAxisRst        => rst,
@@ -172,10 +175,6 @@ begin
          mAxisSlave      => pbrsTxSlave,
          locClk          => clk,
          locRst          => rst,
-         trig            => '0',
-         packetLength    => X"00000232",  -- 9008B
-         tDest           => X"00",
-         tId             => X"00",
          axilReadMaster  => mAxilReadMasters(PRBS_TX_INDEX_C),
          axilReadSlave   => mAxilReadSlaves(PRBS_TX_INDEX_C),
          axilWriteMaster => mAxilWriteMasters(PRBS_TX_INDEX_C),
@@ -189,7 +188,8 @@ begin
          TPD_G                     => TPD_G,
          SLAVE_AXI_PIPE_STAGES_G   => 1,
          PRBS_SEED_SIZE_G          => 128,
-         SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
+         -- SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
+         SLAVE_AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          sAxisClk       => clk,
          sAxisRst       => rst,

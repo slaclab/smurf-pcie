@@ -4,6 +4,6 @@ System:
       AxiEn: True
       TxEn: True
       FwCnt: False
-      PacketLength: 0x232 # 9008B
+      PacketLength: 530 # 8500
       TrigDly: 0x3d09 # 10 kHz
       

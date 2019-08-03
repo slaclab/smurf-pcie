@@ -14,87 +14,82 @@ from surf.ethernet import udp
 
 class EthConfig(pr.Device):
     def __init__(   self,       
-            name        = "EthConfig",
-            description = "Container for EthConfig",
-            rssiPerLink = 6,
+            name        = 'EthConfig',
+            description = 'Container for EthConfig',
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
         self.add(pr.RemoteVariable(   
-            name         = "LocalMacRaw",
-            description  = "Local MAC Address",
+            name         = 'LocalMacRaw',
+            description  = 'Local MAC Address',
             offset       = 0x00,
             bitSize      = 48,
-            base         = pr.UInt,
-            mode         = "RW",
+            mode         = 'RW',
             hidden       = True,     
         ))      
         
         self.add(pr.LinkVariable(
-            name         = "LocalMac", 
-            description  = "Local MAC (human readable & little-Endian configuration)",
+            name         = 'LocalMac', 
+            description  = 'Local MAC (human readable & little-Endian configuration)',
             mode         = 'RW', 
             linkedGet    = udp.getMacValue,
             linkedSet    = udp.setMacValue,
-            dependencies = [self.variables["LocalMacRaw"]],
+            dependencies = [self.variables['LocalMacRaw']],
         ))          
         
         self.add(pr.RemoteVariable(   
-            name         = "LocalIpRaw",
-            description  = "Local IP Address",
+            name         = 'LocalIpRaw',
+            description  = 'Local IP Address',
             offset       = 0x08,
             bitSize      = 32,
-            base         = pr.UInt,
-            mode         = "RW",
+            mode         = 'RW',
             hidden       = True,     
         ))  
 
         self.add(pr.LinkVariable(
-            name         = "LocalIp", 
-            description  = "Local Ip Address (human readable string)",
+            name         = 'LocalIp', 
+            description  = 'Local Ip Address (human readable string)',
             mode         = 'RW', 
             linkedGet    = udp.getIpValue,
             linkedSet    = udp.setIpValue,
-            dependencies = [self.variables["LocalIpRaw"]],
+            dependencies = [self.variables['LocalIpRaw']],
         ))          
         
         self.add(pr.RemoteVariable(   
-            name         = "BypRssi",
-            description  = "Bypass RSSI for FSBL",
+            name         = 'EnKeepAlive',
             offset       = 0x0C,
-            bitSize      = rssiPerLink,
-            base         = pr.UInt,
-            mode         = "RW",
+            bitSize      = 1,
+            mode         = 'RW',
         ))  
-        
-        self.add(pr.RemoteVariable(   
-            name         = "PhyReady",
-            description  = "ETH Phy Ready",
-            offset       =  0x10,
-            bitSize      =  1,
-            base         = pr.UInt,
-            mode         = "RO",
-            pollInterval = 1,
-        ))        
 
         self.add(pr.RemoteVariable(   
-            name         = "NUM_RSSI_C",
-            description  = "Defined in AppPkg.vhd",
+            name         = 'KeepAliveConfig',
+            offset       = 0x10,
+            bitSize      = 32,
+            mode         = 'RW',
+        ))  
+       
+        self.add(pr.RemoteVariable(   
+            name         = 'NUM_RSSI_C',
             offset       =  0x80,
-            mode         = "RO",
+            mode         = 'RO',
         ))            
         
         self.add(pr.RemoteVariable(   
-            name         = "NUM_AXIS_C",
-            description  = "Defined in AppPkg.vhd",
+            name         = 'CLIENT_SIZE_C',
             offset       =  0x84,
-            mode         = "RO",
+            mode         = 'RO',
         ))    
         
         self.add(pr.RemoteVariable(   
-            name         = "RSSI_STREAMS_C",
-            description  = "Defined in AppPkg.vhd",
+            name         = 'CLIENT_PORTS_C[0]',
             offset       =  0x88,
-            mode         = "RO",
+            mode         = 'RO',
+        ))
+
+        self.add(pr.RemoteVariable(   
+            name         = 'CLIENT_PORTS_C[1]',
+            offset       =  0x8C,
+            mode         = 'RO',
         ))
         

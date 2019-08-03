@@ -55,8 +55,8 @@ end EthLane;
 architecture mapping of EthLane is
 
    constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
-   constant WINDOW_ADDR_SIZE_C : positive := 3;  -- 8 buffers (2^3)
-   constant NUM_AXI_MASTERS_C : natural := 3;
+   constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
+   constant NUM_AXI_MASTERS_C  : natural  := 3;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 16, 12);
 
@@ -84,6 +84,12 @@ architecture mapping of EthLane is
    signal obRssiAppSlave  : AxiStreamSlaveType;
    signal ibRssiAppMaster : AxiStreamMasterType;
    signal ibRssiAppSlave  : AxiStreamSlaveType;
+
+   signal keepAliveMaster : AxiStreamMasterType;
+   signal keepAliveSlave  : AxiStreamSlaveType;
+
+   signal ibUdpMasterMask : AxiStreamMasterType;
+   signal ibUdpSlaveMask  : AxiStreamSlaveType;
 
    signal localIp  : slv(31 downto 0);
    signal localMac : slv(47 downto 0);
@@ -124,9 +130,10 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         phyReady        => phyReady,
          localIp         => localIp,
          localMac        => localMac,
+         keepAliveMaster => keepAliveMaster,
+         keepAliveSlave  => keepAliveSlave,
          -- AXI-Lite Register Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -160,8 +167,10 @@ begin
          -- Interface to UDP Client engine(s)
          obClientMasters    => obUdpMasters,
          obClientSlaves     => obUdpSlaves,
-         ibClientMasters    => ibUdpMasters,
-         ibClientSlaves     => ibUdpSlaves,
+         ibClientMasters(0) => ibUdpMasters(0),
+         ibClientMasters(1) => ibUdpMasterMask,
+         ibClientSlaves(0)  => ibUdpSlaves(0),
+         ibClientSlaves(1)  => ibUdpSlaveMask,
          -- AXI-Lite Interface
          axilReadMaster     => axilReadMasters(1),
          axilReadSlave      => axilReadSlaves(1),
@@ -170,9 +179,26 @@ begin
          -- Clock and Reset
          clk                => axilClk,
          rst                => axilRst);
-         
+
+   U_AxiStreamMux : entity work.AxiStreamMux
+      generic map (
+         TPD_G        => TPD_G,
+         NUM_SLAVES_G => 2)
+      port map (
+         -- Clock and reset
+         axisClk         => axilClk,
+         axisRst         => axilRst,
+         -- Slaves
+         sAxisMasters(0) => ibUdpMasters(1),
+         sAxisMasters(1) => keepAliveMaster,
+         sAxisSlaves(0)  => ibUdpSlaves(1),
+         sAxisSlaves(1)  => keepAliveSlave,
+         -- Master
+         mAxisMaster     => ibUdpMasterMask,
+         mAxisSlave      => ibUdpSlaveMask);
+
    GEN_VEC : for i in CLIENT_SIZE_C-1 downto 0 generate
-   
+
       U_Resize_OB : entity work.AxiStreamResize
          generic map (
             -- General Configurations

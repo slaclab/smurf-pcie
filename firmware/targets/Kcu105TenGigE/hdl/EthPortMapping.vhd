@@ -95,8 +95,8 @@ architecture mapping of EthPortMapping is
       TUSER_BITS_C  => 4,
       TUSER_MODE_C  => TUSER_LAST_C);
 
-   constant NUM_SERVERS_C  : integer                                 := 1;
-   constant SERVER_PORTS_C : PositiveArray(NUM_SERVERS_C-1 downto 0) := (0 => 8192);
+   constant NUM_SERVERS_C  : integer                                 := 2;
+   constant SERVER_PORTS_C : PositiveArray(NUM_SERVERS_C-1 downto 0) := (0 => 8192,1 => 8193);
 
    constant RSSI_SIZE_C : positive := 4;
    constant AXIS_CONFIG_C : AxiStreamConfigArray(RSSI_SIZE_C-1 downto 0) := (
@@ -257,13 +257,21 @@ begin
          mAxilWriteMaster => mAxilWriteMaster,
          mAxilWriteSlave  => mAxilWriteSlave);
 
-   --------------------------
-   -- TDEST = 0x1: TX/RX PBRS
-   --------------------------
-   rssiIbMasters(1) <= pbrsTxMaster;
-   pbrsTxSlave      <= rssiIbSlaves(1);
-   pbrsRxMaster     <= rssiObMasters(1);
-   rssiObSlaves(1)  <= pbrsRxSlave;
+   -- --------------------------
+   -- -- TDEST = 0x1: TX/RX PBRS
+   -- --------------------------
+   -- rssiIbMasters(1) <= pbrsTxMaster;
+   -- pbrsTxSlave      <= rssiIbSlaves(1);
+   -- pbrsRxMaster     <= rssiObMasters(1);
+   -- rssiObSlaves(1)  <= pbrsRxSlave;
+
+   rssiIbMasters(1) <= AXI_STREAM_MASTER_INIT_C;
+   rssiObSlaves(1)  <= AXI_STREAM_SLAVE_FORCE_C;
+
+   ibServerMasters(1) <= pbrsTxMaster;
+   pbrsTxSlave        <= ibServerSlaves(1);
+   pbrsRxMaster       <= obServerMasters(1);
+   obServerSlaves(1)  <= pbrsRxSlave;
 
    ------------------------
    -- TDEST = 0x2: HLS AXIS
