@@ -35,7 +35,7 @@ class Core(pr.Device):
         for i in range(6):        
             self.add(ethPhy.TenGigEthReg(            
                 name        = f'EthPhy[{i}]',
-                offset      = 0x00870000 + i*0x1000, 
+                offset      = 0x00860000 + i*0x1000, 
                 writeEn     = True,
                 expand      = False,
             ))               

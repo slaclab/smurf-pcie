@@ -4,7 +4,7 @@ System:
   Fpga[:]:
     SsiPrbsTx:
       PacketLength: 530 # 8500
-      TrigDly: 0x3d09 # 10 kHz
+      TrigDly: 0x7A1 # 80 kHz
       AxiEn: True
       TxEn: True
       FwCnt: False
