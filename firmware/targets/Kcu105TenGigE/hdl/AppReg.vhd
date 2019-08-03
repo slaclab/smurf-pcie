@@ -163,7 +163,7 @@ begin
    U_SsiPrbsTx : entity work.SsiPrbsTx
       generic map (
          TPD_G                      => TPD_G,
-         AXI_DEFAULT_PKT_LEN_G      => X"000000FF"
+         AXI_DEFAULT_PKT_LEN_G      => X"000000FF",
          MASTER_AXI_PIPE_STAGES_G   => 1,
          PRBS_SEED_SIZE_G           => 128,
          -- MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
