@@ -11,8 +11,8 @@ pcie:
         CloseConn: 0x0      
       ############################    
       UdpEngine:
-        ClientRemotePort[0]: 8192      
-        ClientRemotePort[1]: 8193      
+        ClientRemotePort[0]: 8198      
+        ClientRemotePort[1]: 8195      
 ########################################################    
     EthLane[0]:
 ########################################################     
