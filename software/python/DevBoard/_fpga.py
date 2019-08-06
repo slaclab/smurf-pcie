@@ -89,7 +89,7 @@ class TopLevel(pr.Root):
         
             self.rudp = pr.protocols.UdpRssiPack(
                 host    = ip,
-                port    = 8192,
+                port    = 8198,
                 packVer = 2,
                 jumbo   = True,
                 expand  = False,
