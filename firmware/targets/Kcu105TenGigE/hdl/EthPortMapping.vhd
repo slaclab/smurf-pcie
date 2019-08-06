@@ -96,7 +96,7 @@ architecture mapping of EthPortMapping is
       TUSER_MODE_C  => TUSER_LAST_C);
 
    constant NUM_SERVERS_C  : integer                                 := 2;
-   constant SERVER_PORTS_C : PositiveArray(NUM_SERVERS_C-1 downto 0) := (0 => 8192,1 => 8193);
+   constant SERVER_PORTS_C : PositiveArray(NUM_SERVERS_C-1 downto 0) := (0 => 8198,1 => 8195);
 
    constant RSSI_SIZE_C : positive := 4;
    constant AXIS_CONFIG_C : AxiStreamConfigArray(RSSI_SIZE_C-1 downto 0) := (
