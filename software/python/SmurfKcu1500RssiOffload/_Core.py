@@ -28,20 +28,20 @@ class Core(pr.Device):
         self.add(pcie.AxiPcieCore(            
             offset      = 0x00000000, 
             expand      = True,
-            numDmaLanes = 6,
+            numDmaLanes = 8,
         ))   
         
         # Add Ethernet Lane
-        for i in range(6):        
+        for i in range(8):        
             self.add(ethPhy.TenGigEthReg(            
                 name        = f'EthPhy[{i}]',
-                offset      = 0x00860000 + i*0x1000, 
+                offset      = 0x00880000 + i*0x1000, 
                 writeEn     = True,
                 expand      = False,
             ))               
             
         # Add Ethernet Lane
-        for i in range(6):
+        for i in range(8):
             self.add(smurf.EthLane(            
                 name        = f'EthLane[{i}]',
                 offset      = (0x00800000 + i*0x10000), 
@@ -50,6 +50,6 @@ class Core(pr.Device):
 
         @self.command(name="C_RestartConn", description="Restart connection request",)
         def C_RestartConn():                        
-            for i in range(6):
+            for i in range(8):
                 self.EthLane[i].RssiClient.C_RestartConn()
                 

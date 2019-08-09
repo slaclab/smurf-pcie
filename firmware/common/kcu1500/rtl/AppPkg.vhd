@@ -21,7 +21,7 @@ use work.AxiStreamPkg.all;
 
 package AppPkg is
 
-   constant NUM_RSSI_C    : positive := 6;  -- 6 RSSI clients (1 RSSI per link)
+   constant NUM_RSSI_C    : positive := 8;  -- 8 RSSI clients (1 RSSI per link)
    constant CLIENT_SIZE_C : positive := 2;  -- 2 clients per link
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigType := (
