@@ -39,3 +39,4 @@ build*
 *.r2015b
 *.autosave
 *slprj/
+*__pycache__/

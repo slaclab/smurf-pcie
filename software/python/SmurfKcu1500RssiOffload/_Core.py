@@ -9,42 +9,47 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-import pyrogue as pr
 import rogue.hardware.axi
-import axipcie as pcie
-import SmurfKcu1500RssiOffload as smurf
+
+import pyrogue                  as pr
+import axipcie                  as pcie
+import surf.protocols.ssi       as ssi
+import surf.ethernet.ten_gig    as ethPhy     
+import SmurfKcu1500RssiOffload  as smurf
 
 class Core(pr.Device):
     def __init__(   self,       
             name        = "Core",
             description = "Container for SmurfKcu1500RssiOffload",
-            numLink     = 1, # Same as AppPkg.vhd's NUM_LINKS_C constant
-            rssiPerLink = 6, # Same as AppPkg.vhd's RSSI_PER_LINK_C constant
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
         # Add axi-pcie-core 
         self.add(pcie.AxiPcieCore(            
-            offset       = 0x00000000, 
-            useSpi       = True,
-            expand       = False,
-        ))  
+            offset      = 0x00000000, 
+            expand      = True,
+            numDmaLanes = 6,
+        ))   
         
         # Add Ethernet Lane
-        for i in range(numLink):
+        for i in range(6):        
+            self.add(ethPhy.TenGigEthReg(            
+                name        = f'EthPhy[{i}]',
+                offset      = 0x00860000 + i*0x1000, 
+                writeEn     = True,
+                expand      = False,
+            ))               
+            
+        # Add Ethernet Lane
+        for i in range(6):
             self.add(smurf.EthLane(            
-                name        = ('EthLane[%d]' % i),
-                offset      = (0x00800000 + i*0x80000), 
-                rssiPerLink = rssiPerLink,
+                name        = f'EthLane[{i}]',
+                offset      = (0x00800000 + i*0x10000), 
                 expand      = True,
             )) 
 
-        # Add Application Processing Lane
-        for i in range(numLink):
-            self.add(smurf.AppLane(            
-                name        = ('AppLane[%d]' % i),
-                offset      = (0x00C00000 + i*0x80000), 
-                rssiPerLink = rssiPerLink,
-                expand      = False,
-            ))
-            
+        @self.command(name="C_RestartConn", description="Restart connection request",)
+        def C_RestartConn():                        
+            for i in range(6):
+                self.EthLane[i].RssiClient.C_RestartConn()
+                

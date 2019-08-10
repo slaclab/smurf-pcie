@@ -1,0 +1,82 @@
+pcie:
+  Core:
+    EthLane[:]:
+      ############################    
+      EthConfig:
+        EnKeepAlive: 0x1
+        KeepAliveConfig: 0x2E90EDD0 # 5 seconds
+      ############################    
+      RssiClient:   
+        OpenConn: 0x1
+        CloseConn: 0x0      
+      ############################    
+      UdpEngine:
+        ClientRemotePort[0]: 8198      
+        ClientRemotePort[1]: 8195      
+########################################################    
+    EthLane[0]:
+########################################################     
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:50
+        # Set the local IP address
+        LocalIp: 192.168.2.50  
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 192.168.2.10 # Slot#2 Link 
+########################################################    
+    EthLane[1]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:51
+        # Set the local IP address
+        LocalIp: 192.168.2.51
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 192.168.2.11 # Slot#3 Link 
+########################################################    
+    EthLane[2]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:52
+        # Set the local IP address
+        LocalIp: 192.168.2.52
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 192.168.2.12 # Slot#4 Link    
+########################################################    
+    EthLane[3]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:53
+        # Set the local IP address
+        LocalIp: 192.168.2.53
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 192.168.2.13 # Slot#5 Link  
+########################################################    
+    EthLane[4]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:54
+        # Set the local IP address
+        LocalIp: 192.168.2.54
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 192.168.2.14 # Slot#6 Link   
+########################################################    
+    EthLane[5]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:55
+        # Set the local IP address
+        LocalIp: 192.168.2.55
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 192.168.2.15 # Slot#7 Link            
+######################################################## 

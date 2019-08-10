@@ -30,9 +30,10 @@ import sys
 import argparse
 
 # rogue.Logging.setLevel(rogue.Logging.Warning)
-#rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
-#rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
-# # rogue.Logging.setLevel(rogue.Logging.Debug)
+# #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
+# rogue.Logging.setFilter("pyrogue.utilities.prbs.PrbsRx",rogue.Logging.Info)
+# #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
+# # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
 #################################################################
 
@@ -60,12 +61,69 @@ parser.add_argument(
     help     = "Enable read all variables at start",
 )  
 
-parser.add_argument('--html', help='Use html for tables', action="store_true")
+parser.add_argument(
+    "--loopback", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "SW loopback of PRBS stream",
+)  
+
+parser.add_argument(
+    "--swRx", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "SW loopback of PRBS stream",
+)  
+
+parser.add_argument(
+    "--swTx", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "SW loopback of PRBS stream",
+)  
+
+parser.add_argument(
+    "--lane", 
+    type     = int,
+    required = False,
+    default  = 0,
+    help     = "DMA Lane",
+) 
+
+parser.add_argument(
+    "--allLane", 
+    type     = int,
+    required = False,
+    default  = 0,
+    help     = "load all the lanes",
+) 
+
+parser.add_argument(
+    "--ip", 
+    type     = str,
+    required = False,
+    default  = '',
+    help     = '',
+)
+
+parser.add_argument('--html', help='Use html for tables', action="store_true") 
 # Get the arguments
 args = parser.parse_args()
 
 # Set base
-rootTop = devBoard.TopLevel(name='System',description='Front End Board')
+rootTop = devBoard.TopLevel(
+    name        = 'System',
+    description = 'Front End Board',
+    ip          = args.ip if args.ip != "" else None,
+    loopback    = args.loopback,
+    swRx        = args.swRx,
+    swTx        = args.swTx,
+    lane        = args.lane,
+    allLane     = args.allLane,
+)
     
 #################################################################    
 
@@ -73,14 +131,16 @@ rootTop = devBoard.TopLevel(name='System',description='Front End Board')
 rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
+    timeout  = 2.0,
+    zmqPort  = None,
 )
 
-# Print the AxiVersion Summary
-rootTop.Fpga.AxiVersion.printStatus()
+# # Print the AxiVersion Summary
+# rootTop.Fpga.AxiVersion.printStatus()
 
 # Create GUI
 appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop(group='PyRogueGui')
+guiTop = pr.gui.GuiTop()
 guiTop.addTree(rootTop)
 guiTop.resize(800, 1200)
 

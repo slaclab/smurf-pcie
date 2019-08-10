@@ -77,24 +77,45 @@ end SmurfKcu1500RssiOffload10GbE;
 
 architecture top_level of SmurfKcu1500RssiOffload10GbE is
 
-   constant NUM_AXI_MASTERS_C : natural := 2;
+   constant CLK_FREQUENCY_C : real := 156.25E+6;  -- units of Hz
 
-   constant HW_INDEX_C      : natural := 0;
-   constant OFFLOAD_INDEX_C : natural := 1;
+   constant NUM_AXIL_MASTERS_C : natural := 5;
 
-   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0080_0000", 23, 22);
+   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := (
+      0               => (
+         baseAddr     => x"0008_0000",
+         addrBits     => 19,
+         connectivity => x"FFFF"),
+      1               => (
+         baseAddr     => x"0010_0000",
+         addrBits     => 20,
+         connectivity => x"FFFF"),
+      2               => (
+         baseAddr     => x"0020_0000",
+         addrBits     => 21,
+         connectivity => x"FFFF"),
+      3               => (
+         baseAddr     => x"0040_0000",
+         addrBits     => 22,
+         connectivity => x"FFFF"),
+      4               => (
+         baseAddr     => x"0080_0000",
+         addrBits     => 23,
+         connectivity => x"FFFF"));
 
-   signal axilClk          : sl;
-   signal axilRst          : sl;
-   signal axilReset        : sl;
-   signal axilReadMaster   : AxiLiteReadMasterType;
-   signal axilReadSlave    : AxiLiteReadSlaveType;
-   signal axilWriteMaster  : AxiLiteWriteMasterType;
-   signal axilWriteSlave   : AxiLiteWriteSlaveType;
-   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+
+   signal userClk156      : sl;
+   signal axilClk         : sl;
+   signal axilRst         : sl;
+   signal axilReset       : sl;
+   signal axilReadMaster  : AxiLiteReadMasterType;
+   signal axilReadSlave   : AxiLiteReadSlaveType;
+   signal axilWriteMaster : AxiLiteWriteMasterType;
+   signal axilWriteSlave  : AxiLiteWriteSlaveType;
 
    signal dmaClk       : sl;
    signal dmaRst       : sl;
@@ -104,12 +125,49 @@ architecture top_level of SmurfKcu1500RssiOffload10GbE is
    signal dmaIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
    signal rssiLinkUp    : slv(NUM_RSSI_C-1 downto 0);
-   signal rssiIbMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(NUM_AXIS_C-1 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(NUM_AXIS_C-1 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+
+   signal devIbMaster : AxiStreamMasterType;
+   signal devIbSlave  : AxiStreamSlaveType;
+   signal devObMaster : AxiStreamMasterType;
+   signal devObSlave  : AxiStreamSlaveType;
 
 begin
+
+   -----------------------
+   -- AXI-Lite Clock/Reset
+   -----------------------
+   U_axilClk : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G              => TPD_G,
+         TYPE_G             => "MMCM",
+         INPUT_BUFG_G       => true,
+         FB_BUFG_G          => true,
+         RST_IN_POLARITY_G  => '1',
+         NUM_CLOCKS_G       => 1,
+         -- MMCM attributes
+         CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
+         CLKFBOUT_MULT_G    => 8,       -- 1.25GHz = 8 x 156.25 MHz
+         CLKOUT0_DIVIDE_F_G => 8.0)    -- 156.25 MHz (must match CLK_FREQUENCY_C)
+      port map(
+         -- Clock Input
+         clkIn     => userClk156,
+         rstIn     => dmaRst,
+         -- Clock Outputs
+         clkOut(0) => axilClk,
+         -- Reset Outputs
+         rstOut(0) => axilReset);
+
+   U_axilRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axilClk,
+         rstIn  => axilReset,
+         rstOut => axilRst);
 
    ---------------------
    -- PCIE/DMA Interface
@@ -118,13 +176,13 @@ begin
       generic map (
          TPD_G             => TPD_G,
          BUILD_INFO_G      => BUILD_INFO_G,
-         DMA_AXIS_CONFIG_G => DMA_AXIS_CONFIG_C,
+         DMA_AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
          DMA_SIZE_G        => NUM_RSSI_C)
       port map (
          ------------------------      
          --  Top Level Interfaces
          ------------------------        
-         userClk156     => axilClk,
+         userClk156     => userClk156,
          -- DMA Interfaces  (dmaClk domain)
          dmaClk         => dmaClk,
          dmaRst         => dmaRst,
@@ -171,30 +229,36 @@ begin
          pciTxP         => pciTxP,
          pciTxN         => pciTxN);
 
-   U_axilReset : entity work.RstSync
+   --------------------------------
+   -- dmaClk<-->axilClk ASYNC FIFOs
+   --------------------------------
+   U_DmaAsyncFifo : entity work.DmaAsyncFifo
       generic map (
          TPD_G => TPD_G)
       port map (
-         clk      => axilClk,
-         asyncRst => dmaRst,
-         syncRst  => axilReset);
+         -- DMA Interface (dmaClk domain)
+         dmaClk        => dmaClk,
+         dmaRst        => dmaRst,
+         dmaObMasters  => dmaObMasters,
+         dmaObSlaves   => dmaObSlaves,
+         dmaIbMasters  => dmaIbMasters,
+         dmaIbSlaves   => dmaIbSlaves,
+         -- DMA Interface (axilClk domain)
+         axilClk       => axilClk,
+         axilRst       => axilRst,
+         rssiIbMasters => rssiIbMasters,
+         rssiIbSlaves  => rssiIbSlaves,
+         rssiObMasters => rssiObMasters,
+         rssiObSlaves  => rssiObSlaves);
 
-   U_axilRst : entity work.RstPipeline
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk    => axilClk,
-         rstIn  => axilReset,
-         rstOut => axilRst);
-
-   ---------------------
-   -- AXI-Lite Crossbar
-   ---------------------
+   ----------------
+   -- AXI-Lite XBAR
+   ----------------
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+         NUM_MASTER_SLOTS_G => NUM_AXIL_MASTERS_C,
          MASTERS_CONFIG_G   => AXIL_CONFIG_C)
       port map (
          axiClk              => axilClk,
@@ -208,43 +272,14 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   ---------------------
-   -- Application Module
-   ---------------------
-   U_Application : entity work.Application
-      generic map (
-         TPD_G           => TPD_G,
-         AXI_BASE_ADDR_G => AXIL_CONFIG_C(OFFLOAD_INDEX_C).baseAddr)
-      port map (
-         -- DMA Interface (dmaClk domain)
-         dmaClk          => dmaClk,
-         dmaRst          => dmaRst,
-         dmaObMasters    => dmaObMasters,
-         dmaObSlaves     => dmaObSlaves,
-         dmaIbMasters    => dmaIbMasters,
-         dmaIbSlaves     => dmaIbSlaves,
-         -- RSSI Interface (axilClk domain)
-         rssiLinkUp      => rssiLinkUp,
-         rssiIbMasters   => rssiIbMasters,
-         rssiIbSlaves    => rssiIbSlaves,
-         rssiObMasters   => rssiObMasters,
-         rssiObSlaves    => rssiObSlaves,
-         -- AXI-Lite Interface (axilClk domain)
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(OFFLOAD_INDEX_C),
-         axilReadSlave   => axilReadSlaves(OFFLOAD_INDEX_C),
-         axilWriteMaster => axilWriteMasters(OFFLOAD_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(OFFLOAD_INDEX_C));
-
    ------------------
    -- RSSI/ETH Module
    ------------------
    U_Hardware : entity work.Hardware
       generic map (
          TPD_G           => TPD_G,
-         ETH_10G_G       => true,       -- true = 10 GbE
-         AXI_BASE_ADDR_G => AXIL_CONFIG_C(HW_INDEX_C).baseAddr)
+         CLK_FREQUENCY_G => CLK_FREQUENCY_C,
+         AXI_BASE_ADDR_G => AXIL_CONFIG_C(4).baseAddr)
       port map (
          ------------------------      
          --  Top Level Interfaces
@@ -252,16 +287,16 @@ begin
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(HW_INDEX_C),
-         axilReadSlave   => axilReadSlaves(HW_INDEX_C),
-         axilWriteMaster => axilWriteMasters(HW_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(HW_INDEX_C),
+         axilReadMaster  => axilReadMasters(4),
+         axilReadSlave   => axilReadSlaves(4),
+         axilWriteMaster => axilWriteMasters(4),
+         axilWriteSlave  => axilWriteSlaves(4),
          -- RSSI Interface (axilClk domain)
-         rssiLinkUp      => rssiLinkUp,
          rssiIbMasters   => rssiIbMasters,
          rssiIbSlaves    => rssiIbSlaves,
          rssiObMasters   => rssiObMasters,
          rssiObSlaves    => rssiObSlaves,
+         rssiLinkUp      => rssiLinkUp,
          ------------------
          --  Hardware Ports
          ------------------       

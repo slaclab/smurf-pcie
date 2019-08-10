@@ -1,45 +1,82 @@
 pcie:
   Core:
-    #####################################
-    # Configure Link[0] (QSFP[0].lane[0])
-    #####################################
+    EthLane[:]:
+      ############################    
+      EthConfig:
+        EnKeepAlive: 0x1
+        KeepAliveConfig: 0x2E90EDD0 # 5 seconds
+      ############################    
+      RssiClient:   
+        OpenConn: 0x1
+        CloseConn: 0x0      
+      ############################    
+      UdpEngine:
+        ClientRemotePort[0]: 8198 # UDP_SRV_RSSI_ILEAVE_IDX_C = Interleaved RSSI UDP server on AMC carrier
+        ClientRemotePort[1]: 8195 # UDP_SRV_BP_MGS_IDX_C = UDP server for Backplane Messaging on AMC carrier
+########################################################    
     EthLane[0]:
+########################################################     
       EthConfig:
         # Set the local MAC address
-        LocalMac: 08:00:56:00:45:50 
+        LocalMac: 00:44:56:FF:00:50
         # Set the local IP address
-        LocalIp: 10.0.3.99          
-        # Don't bypass any RSSI modules (only for FSBL)
-        BypRssi: 0x0                
-      ############################
-      UdpClient[0]: # Slot#2 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.102
-      ############################
-      UdpClient[1]: # Slot#3 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.103
-      ############################
-      UdpClient[2]: # Slot#4 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.104
-      ############################
-      UdpClient[3]: # Slot#5 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.105
-      ############################
-      UdpClient[4]: # Slot#6 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.106
-      ############################
-      UdpClient[5]: # Slot#7 Link
-        ClientRemotePort: 8198
-        ClientRemoteIp: 10.0.3.107
-      #####################################
-      # Open the RSSI connections for links
-      #####################################
-      RssiClient[:]:
-        OpenConn: 0x1
-        CloseConn: 0x0       
-        HeaderChksumEn: 0x1
-        
+        LocalIp: 10.0.3.202  
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 10.0.3.102 # Slot#2 Link 
+########################################################    
+    EthLane[1]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:51
+        # Set the local IP address
+        LocalIp: 10.0.3.203
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 10.0.3.103 # Slot#3 Link 
+########################################################    
+    EthLane[2]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:52
+        # Set the local IP address
+        LocalIp: 10.0.3.204
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 10.0.3.104 # Slot#4 Link    
+########################################################    
+    EthLane[3]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:53
+        # Set the local IP address
+        LocalIp: 10.0.3.205
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 10.0.3.105 # Slot#5 Link  
+########################################################    
+    EthLane[4]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:54
+        # Set the local IP address
+        LocalIp: 10.0.3.206
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 10.0.3.106 # Slot#6 Link   
+########################################################    
+    EthLane[5]:
+######################################################## 
+      EthConfig:
+        # Set the local MAC address
+        LocalMac: 00:44:56:FF:00:55
+        # Set the local IP address
+        LocalIp: 10.0.3.207
+      ############################    
+      UdpEngine:
+         ClientRemoteIp[:]: 10.0.3.107 # Slot#7 Link            
+######################################################## 

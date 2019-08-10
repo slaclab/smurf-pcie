@@ -18,21 +18,22 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue             as pr
-import surf.axi            as axi
-import surf.protocols.ssi  as ssi
-import surf.protocols.rssi as rssi
-import surf.xilinx         as xil
+import pyrogue               as pr
+import surf.axi              as axi
+import surf.ethernet.ten_gig as ethPhy   
+import surf.ethernet.udp     as udp
+import surf.protocols.ssi    as ssi
+import surf.protocols.rssi   as rssi
+import surf.xilinx           as xil
 import time
 import click 
 
+import rogue
 import rogue.hardware.axi
 
 class Fpga(pr.Device):                         
     def __init__( self,       
         name        = 'Fpga',
-        fpgaType    = '',
-        commType    = '',
         description = 'Fpga Container',
         **kwargs):
         
@@ -43,183 +44,157 @@ class Fpga(pr.Device):
         #############
         self.add(axi.AxiVersion(
             offset = 0x00000000,
-            expand = False,
-        ))
-        
-        if(fpgaType=='7series'):
-            self.add(xil.Xadc(
-                offset = 0x00010000,
-                expand = False,
-            )) 
-
-        if(fpgaType=='ultrascale'):
-            self.add(xil.AxiSysMonUltraScale(
-                offset = 0x00020000,
-                expand = False,
-            ))
-        
-        self.add(MbSharedMem(
-            name   = 'MbSharedMem',
-            offset = 0x00030000,
-            size   = 0x10000,
-            expand = False,
         ))
         
         self.add(ssi.SsiPrbsTx(
             offset = 0x00040000,
-            expand = False,
         )) 
 
         self.add(ssi.SsiPrbsRx(
             offset = 0x00050000,
-            expand = False,
         ))         
         
-        if ( commType == 'eth' ):
-            self.add(rssi.RssiCore(
-                offset = 0x00070000,
-                expand = False,
-            ))                 
-            
-        self.add(MbSharedMem(
-            name   = 'TestEmptyMem',
-            offset = 0x80000000,
-            size   = 0x80000000,
-            expand = False,
-        ))            
-            
-    # Normal register rate tester
-    def varRateTest(self):
-        print("Running variable rate test")
-        cnt = 0
-        inc = 0
-        last = time.localtime()
-
-        try:
-            while True:
-                val = self.AxiVersion.ScratchPad.get()
-                curr = time.localtime()
-                cnt += 1
-                inc += 1
-
-                if curr != last:
-                    print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
-                    last = curr
-                    inc = 0
-
-        except KeyboardInterrupt:
-            return
-
-    # Raw register rate tester
-    def rawRateTest(self):
-        print("Running raw rate test")
-        cnt = 0
-        inc = 0
-        last = time.localtime()
-
-        try:
-            while True:
-                val = self.AxiVersion._rawRead(0x4)
-                curr = time.localtime()
-                cnt += 1
-                inc += 1
-
-                if curr != last:
-                    print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
-                    last = curr
-                    inc = 0
-
-        except KeyboardInterrupt:
-            return
-
-class MbSharedMem(pr.Device):                         
-    def __init__( self,       
-        name        = 'MbSharedMem',
-        description = 'MbSharedMem Container',
-        size        = 0x10000,
-        **kwargs):
+        self.add(rssi.RssiCore(
+            offset = 0x00070000,
+        ))                 
         
-        super().__init__(
-            name        = name, 
-            description = description, 
-            size        = size, 
-            **kwargs)        
-              
-        @self.command(description='rawBurstWriteTest')    
-        def rawBurstWriteTest(arg):
-            if ( arg<2 ):
-                smpl = 0x4000
-            else:
-                smpl = arg
-            
-            data = []
-            smpl &= 0xFFFFFFFFC
-            for i in range(smpl):
-                data.append(i)    
+        self.add(udp.UdpEngine(
+            offset = 0x00078000,
+            numSrv = 2,
+            expand = False,
+        ))
 
-            click.secho( 'MbSharedMem.rawBurstWriteTest(%d): %d' % (smpl,len(data)), fg='green')            
-            self._rawWrite(
-                offset      = 0x00000000,
-                data        = data,
-                base        = pr.Int,
-                stride      = 4,
-                wordBitSize = 32,
-            )
-            
-        @self.command(description='rawBurstReadTest')    
-        def rawBurstReadTest(arg):
-            if ( arg<2 ):
-                smpl = 0x4000
-            else:
-                smpl = arg
-                
-            data = []
-            smpl &= 0xFFFFFFFFC
-            for i in range(smpl):
-                data.append(i)    
-
-            click.secho( 'MbSharedMem.rawBurstReadTest(%d): %d' % (smpl,len(data)), fg='green')            
-            readBack = self._rawRead(
-                offset      = 0x00000000,
-                numWords    = smpl,
-                base        = pr.Int,
-                stride      = 4,
-                wordBitSize = 32,
-            )            
-            
+        self.add(ethPhy.TenGigEthReg(            
+            offset  = 0x80000000, 
+            writeEn = True,
+            expand  = True,
+        ))           
+        
 class TopLevel(pr.Root):
     def __init__(   self, 
-            name            = 'TopLevel',
-            description     = 'Container for FPGA Top-Level', 
+            name        = 'TopLevel',
+            description = 'Container for FPGA Top-Level', 
+            dev         = '/dev/datadev_0',
+            lane        = 0,
+            ip          = None,
+            loopback    = False, 
+            swRx        = True, 
+            swTx        = True, 
+            allLane     = False, 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
-        # Using PackVer2 after the DMA in firmware
-        self.dma  = rogue.hardware.axi.AxiStreamDma('/dev/datadev_0',0,True)
-        self.dma.setZeroCopyEn(False)
         
-        self.pack = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
-        pr.streamConnectBiDir( self.pack.transport(), self.dma )
+        if ip is not None:
         
-        # TDEST 0 routed to stream 0 (SRPv3)
-        self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir( self.srp, self.pack.application(0x0) ) 
+            self.rudp = pr.protocols.UdpRssiPack(
+                host    = ip,
+                port    = 8198,
+                packVer = 2,
+                jumbo   = True,
+                expand  = False,
+                )    
+            # self.add(self.rudp)         
         
-        # Connect VC1 to FW TX PRBS
-        self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx')
-        pr.streamConnect(self.pack.application(0x1),self.prbsRx)
-        self.add(self.prbsRx)  
-        # self.prbsRx.checkPayload.set(0x0)
-        
-        # Connect VC1 to FW RX PRBS
-        self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx")
-        pr.streamConnect(self.prbTx, self.pack.application(0x1))
-        self.add(self.prbTx)          
-
-        # Loopback the PRBS data
-        #pr.streamConnect(self.pack.application(0x1),self.pack.application(0x1))            
+            self.vc0Srp  = self.rudp.application(0); # AxiStream.tDest = 0x0
+            self.vc1Prbs = self.rudp.application(1); # AxiStream.tDest = 0x1     
             
+            # TDEST 0 routed to stream 0 (SRPv3)
+            self.srp = rogue.protocols.srp.SrpV3()
+            pr.streamConnectBiDir(self.vc0Srp,self.srp)
+            
+            if (loopback):
+                # Loopback the PRBS data
+                pr.streamConnect(self.vc1Prbs,self.vc1Prbs)  
+            
+            else:
+                if (swTx):
+                    # Connect VC1 to FW RX PRBS
+                    self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+                    pr.streamConnect(self.prbTx, self.vc1Prbs)
+                    self.add(self.prbTx) 
+                        
+                if (swRx):
+                    # Connect VC1 to FW TX PRBS
+                    self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=True)
+                    pr.streamConnect(self.vc1Prbs,self.prbsRx)
+                    self.add(self.prbsRx)       
+                    
+            self.add(Fpga(
+                memBase = self.srp,
+                expand  = True,
+            ))        
+        
+        
         # Add registers
-        self.add(Fpga(
-            memBase  = self.srp,
-        ))            
+        elif allLane != 0:
+        
+        
+            self.vc0Srp  = [None for i in range(6)]
+            self.vc1Prbs = [None for i in range(6)]
+            self.srp     = [None for i in range(6)]
+            self.prbsTx   = [None for i in range(6)]
+            self.prbsRx   = [None for i in range(6)]
+            
+            for i in range(allLane):
+                self.vc0Srp[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0,True)
+                # self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+1,True)
+                self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0xC0,True)
+            
+                self.srp[i] = rogue.protocols.srp.SrpV3()
+                pr.streamConnectBiDir(self.vc0Srp[i],self.srp[i])            
+                
+                self.add(Fpga(
+                    name     = f'Fpga[{i}]',
+                    memBase  = self.srp[i],
+                ))    
+
+
+                if (loopback):
+                    # Loopback the PRBS data
+                    pr.streamConnect(self.vc1Prbs[i],self.vc1Prbs[i])  
+                
+                else:
+                    if (swTx):
+                        # Connect VC1 to FW RX PRBS
+                        self.prbsTx[i] = pr.utilities.prbs.PrbsTx(name=f'PrbsTx[{i}]',width=128,expand=False)
+                        pr.streamConnect(self.prbsTx[i], self.vc1Prbs[i])
+                        self.add(self.prbsTx[i]) 
+                            
+                    if (swRx):
+                        # Connect VC1 to FW TX PRBS
+                        self.prbsRx[i] = pr.utilities.prbs.PrbsRx(name=f'PrbsRx[{i}]',width=128,expand=True)
+                        pr.streamConnect(self.vc1Prbs[i],self.prbsRx[i])
+                        self.add(self.prbsRx[i])    
+    
+        
+        else:
+            
+            self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
+            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
+            
+            # TDEST 0 routed to stream 0 (SRPv3)
+            self.srp = rogue.protocols.srp.SrpV3()
+            pr.streamConnectBiDir(self.vc0Srp,self.srp)
+            
+            if (loopback):
+                # Loopback the PRBS data
+                pr.streamConnect(self.vc1Prbs,self.vc1Prbs)  
+            
+            else:
+                if (swTx):
+                    # Connect VC1 to FW RX PRBS
+                    self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+                    pr.streamConnect(self.prbTx, self.vc1Prbs)
+                    self.add(self.prbTx) 
+                        
+                if (swRx):
+                    # Connect VC1 to FW TX PRBS
+                    self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=True)
+                    pr.streamConnect(self.vc1Prbs,self.prbsRx)
+                    self.add(self.prbsRx)       
+                    
+            self.add(Fpga(
+                memBase  = self.srp,
+            ))
+        
