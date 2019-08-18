@@ -67,12 +67,22 @@ architecture rtl of EthConfig is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal axilReset : sl;
+
 begin
+
+   U_axilRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axilClk,
+         rstIn  => axilRst,
+         rstOut => axilReset);
 
    --------------------- 
    -- AXI Lite Interface
    --------------------- 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, keepAliveSlave, r) is
+   comb : process (axilReadMaster, axilReset, axilWriteMaster, keepAliveSlave, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -117,7 +127,7 @@ begin
       v.keepAliveMaster.tKeep            := toSlv(1, AXI_STREAM_MAX_TKEEP_WIDTH_C); -- 1 byte
 
       -- Synchronous Reset
-      if (axilRst = '1') then
+      if (axilReset = '1') then
          v := REG_INIT_C;
       end if;
 

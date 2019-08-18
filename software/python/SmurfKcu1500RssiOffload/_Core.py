@@ -14,7 +14,8 @@ import rogue.hardware.axi
 import pyrogue                  as pr
 import axipcie                  as pcie
 import surf.protocols.ssi       as ssi
-import surf.ethernet.ten_gig    as ethPhy     
+import surf.ethernet.ten_gig    as ethPhy    
+import surf.axi                 as axi  
 import SmurfKcu1500RssiOffload  as smurf
 
 class Core(pr.Device):
@@ -28,28 +29,36 @@ class Core(pr.Device):
         self.add(pcie.AxiPcieCore(            
             offset      = 0x00000000, 
             expand      = True,
-            numDmaLanes = 8,
+            numDmaLanes = 6,
         ))   
         
         # Add Ethernet Lane
-        for i in range(8):        
+        for i in range(6):        
             self.add(ethPhy.TenGigEthReg(            
-                name        = f'EthPhy[{i}]',
-                offset      = 0x00880000 + i*0x1000, 
-                writeEn     = True,
-                expand      = False,
+                name    = f'EthPhy[{i}]',
+                offset  = 0x00860000 + i*0x1000, 
+                writeEn = True,
+                expand  = False,
             ))               
             
         # Add Ethernet Lane
-        for i in range(8):
+        for i in range(6):
             self.add(smurf.EthLane(            
-                name        = f'EthLane[{i}]',
-                offset      = (0x00800000 + i*0x10000), 
-                expand      = True,
+                name   = f'EthLane[{i}]',
+                offset = (0x00800000 + i*0x10000), 
+                expand = True,
             )) 
+            
+        # Add UDP Buffer
+        for i in range(6):
+            self.add(axi.AxiStreamDmaFifo(            
+                name   = f'UdpBuffer[{i}]',
+                offset = (0x00870000 + i*0x1000), 
+                expand = False,
+            ))             
 
         @self.command(name="C_RestartConn", description="Restart connection request",)
         def C_RestartConn():                        
-            for i in range(8):
+            for i in range(6):
                 self.EthLane[i].RssiClient.C_RestartConn()
                 

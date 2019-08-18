@@ -28,26 +28,44 @@ use work.AppPkg.all;
 
 entity Hardware is
    generic (
-      TPD_G           : time    := 1 ns;
-      CLK_FREQUENCY_G : real    := 156.25E+6;  -- units of Hz
+      TPD_G           : time := 1 ns;
+      CLK_FREQUENCY_G : real := 156.25E+6;  -- units of Hz
       AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
       ------------------------      
       --  Top Level Interfaces
       ------------------------    
-      -- AXI-Lite Interface
+      -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- RSSI Interface (axilClk domain)
-      rssiLinkUp      : out slv(NUM_RSSI_C-1 downto 0);
-      rssiIbMasters   : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      rssiIbSlaves    : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      rssiObMasters   : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      rssiObSlaves    : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      -- Primary DMA Interface (dmaPriClk domain)
+      dmaPriClk       : in  sl;
+      dmaPriRst       : in  sl;
+      dmaPriObMasters : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      dmaPriObSlaves  : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      dmaPriIbMasters : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      dmaPriIbSlaves  : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      -- Secondary DMA Interface (dmaSecClk domain)
+      dmaSecClk       : in  sl;
+      dmaSecRst       : in  sl;
+      dmaSecObMasters : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      dmaSecObSlaves  : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      dmaSecIbMasters : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+      dmaSecIbSlaves  : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      -- DDR Interface (ddrClk domain)
+      ddrClk          : in  slv((NUM_RSSI_C/2)-1 downto 0);
+      ddrRst          : in  slv((NUM_RSSI_C/2)-1 downto 0);
+      ddrWriteMasters : out AxiWriteMasterArray((NUM_RSSI_C/2)-1 downto 0);
+      ddrWriteSlaves  : in  AxiWriteSlaveArray((NUM_RSSI_C/2)-1 downto 0);
+      ddrReadMasters  : out AxiReadMasterArray((NUM_RSSI_C/2)-1 downto 0);
+      ddrReadSlaves   : in  AxiReadSlaveArray((NUM_RSSI_C/2)-1 downto 0);
+      -- User AXI Clock and Reset
+      axiClk          : in  sl;
+      axiRst          : in  sl;
       ---------------------
       --  Hardware Ports
       ---------------------    
@@ -69,30 +87,114 @@ end Hardware;
 
 architecture mapping of Hardware is
 
-   constant NUM_AXI_MASTERS_C : natural := NUM_RSSI_C+1;
+   constant NUM_AXI_MASTERS_C : natural := NUM_RSSI_C+2;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 16);
+   constant PHY_INDEX_C  : natural := NUM_RSSI_C;
+   constant BUFF_INDEX_C : natural := NUM_RSSI_C+1;
+
+   constant AXI_CONFIG_C  : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 16);
+   constant BUFF_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_RSSI_C downto 0)          := genAxiLiteConfig(NUM_RSSI_C+1, AXI_CONFIG_C(BUFF_INDEX_C).baseAddr, 16, 12);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+
+   signal buffWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal buffWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C;
+   signal buffReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal buffReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C;
+
+   signal buffWriteMasters : AxiLiteWriteMasterArray(NUM_RSSI_C downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
+   signal buffWriteSlaves  : AxiLiteWriteSlaveArray(NUM_RSSI_C downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal buffReadMasters  : AxiLiteReadMasterArray(NUM_RSSI_C downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
+   signal buffReadSlaves   : AxiLiteReadSlaveArray(NUM_RSSI_C downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
 
    signal macObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal macObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
    signal macIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal macIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal linkUp    : slv(NUM_RSSI_C-1 downto 0);
-   signal ibMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal ibSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal obMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal obSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal udpIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal udpIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+
+   signal ddrIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal ddrIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal ddrObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal ddrObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+
+   signal rssiIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
    signal phyReady : slv(NUM_RSSI_C-1 downto 0);
    signal localMac : Slv48Array(NUM_RSSI_C-1 downto 0);
 
+   signal udpObMuxSel : sl;
+   signal udpObDest   : slv(7 downto 0);
+
+   signal axilReset : sl;
+   signal axiReset  : sl;
+
 begin
+
+   U_axilRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axilClk,
+         rstIn  => axilRst,
+         rstOut => axilReset);
+
+   U_axiRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axiClk,
+         rstIn  => axiRst,
+         rstOut => axiReset);
+
+   ------------------
+   -- DMA ASYNC FIFOs
+   ------------------
+   GEN_DMA : for i in NUM_RSSI_C-1 downto 0 generate
+      U_DmaAsyncFifo : entity work.DmaAsyncFifo
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            -- UDP Outbound Config Interface (axiClk domain)
+            udpObMuxSel    => udpObMuxSel,
+            udpObDest      => udpObDest,
+            -- Primary DMA Interface (dmaPriClk domain)
+            dmaPriClk      => dmaPriClk,
+            dmaPriRst      => dmaPriRst,
+            dmaPriObMaster => dmaPriObMasters(i),
+            dmaPriObSlave  => dmaPriObSlaves(i),
+            dmaPriIbMaster => dmaPriIbMasters(i),
+            dmaPriIbSlave  => dmaPriIbSlaves(i),
+            -- Secondary DMA Interface (dmaSecClk domain)
+            dmaSecClk      => dmaSecClk,
+            dmaSecRst      => dmaSecRst,
+            dmaSecObMaster => dmaSecObMasters(i),
+            dmaSecObSlave  => dmaSecObSlaves(i),
+            dmaSecIbMaster => dmaSecIbMasters(i),
+            dmaSecIbSlave  => dmaSecIbSlaves(i),
+            -- UDP Interface (axiClk/axilClk domain)
+            axiClk         => axiClk,
+            axiRst         => axiReset,
+            udpIbMaster    => udpIbMasters(i),
+            udpIbSlave     => udpIbSlaves(i),
+            udpObMaster    => ddrObMasters(i),
+            udpObSlave     => ddrObSlaves(i),
+            -- RSSI Interface (axilClk domain)
+            axilClk        => axilClk,
+            axilRst        => axilReset,
+            rssiIbMaster   => rssiIbMasters(i),
+            rssiIbSlave    => rssiIbSlaves(i),
+            rssiObMaster   => rssiObMasters(i),
+            rssiObSlave    => rssiObSlaves(i));
+   end generate GEN_DMA;
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -105,7 +207,7 @@ begin
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
       port map (
          axiClk              => axilClk,
-         axiClkRst           => axilRst,
+         axiClkRst           => axilReset,
          sAxiWriteMasters(0) => axilWriteMaster,
          sAxiWriteSlaves(0)  => axilWriteSlave,
          sAxiReadMasters(0)  => axilReadMaster,
@@ -115,28 +217,67 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
+   U_AxiLiteAsync : entity work.AxiLiteAsync
+      generic map (
+         TPD_G           => TPD_G,
+         COMMON_CLK_G    => false,
+         NUM_ADDR_BITS_G => 24)
+      port map (
+         -- Slave Interface
+         sAxiClk         => axilClk,
+         sAxiClkRst      => axilReset,
+         sAxiReadMaster  => axilReadMasters(BUFF_INDEX_C),
+         sAxiReadSlave   => axilReadSlaves(BUFF_INDEX_C),
+         sAxiWriteMaster => axilWriteMasters(BUFF_INDEX_C),
+         sAxiWriteSlave  => axilWriteSlaves(BUFF_INDEX_C),
+         -- Master Interface
+         mAxiClk         => axiClk,
+         mAxiClkRst      => axiReset,
+         mAxiReadMaster  => buffReadMaster,
+         mAxiReadSlave   => buffReadSlave,
+         mAxiWriteMaster => buffWriteMaster,
+         mAxiWriteSlave  => buffWriteSlave);
+
+   U_XBAR_BUFFER : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_RSSI_C+1,
+         MASTERS_CONFIG_G   => BUFF_CONFIG_C)
+      port map (
+         axiClk              => axiClk,
+         axiClkRst           => axiReset,
+         sAxiWriteMasters(0) => buffWriteMaster,
+         sAxiWriteSlaves(0)  => buffWriteSlave,
+         sAxiReadMasters(0)  => buffReadMaster,
+         sAxiReadSlaves(0)   => buffReadSlave,
+         mAxiWriteMasters    => buffWriteMasters,
+         mAxiWriteSlaves     => buffWriteSlaves,
+         mAxiReadMasters     => buffReadMasters,
+         mAxiReadSlaves      => buffReadSlaves);
+
    --------------------------------------------
    -- 10 GigE Modules for QSFP[1:0]
    --------------------------------------------
    U_EthPhyMac : entity work.EthPhyWrapper
       generic map (
-         TPD_G     => TPD_G,
-         AXI_BASE_ADDR_G => AXI_CONFIG_C(NUM_RSSI_C).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(PHY_INDEX_C).baseAddr)
       port map (
          -- Local Configurations
          localMac        => localMac,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(NUM_RSSI_C),
-         axilReadSlave   => axilReadSlaves(NUM_RSSI_C),
-         axilWriteMaster => axilWriteMasters(NUM_RSSI_C),
-         axilWriteSlave  => axilWriteSlaves(NUM_RSSI_C),
+         axilRst         => axilReset,
+         axilReadMaster  => axilReadMasters(PHY_INDEX_C),
+         axilReadSlave   => axilReadSlaves(PHY_INDEX_C),
+         axilWriteMaster => axilWriteMasters(PHY_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(PHY_INDEX_C),
          -- Streaming DMA Interface 
-         dmaIbMasters     => macObMasters,
-         dmaIbSlaves      => macObSlaves,
-         dmaObMasters     => macIbMasters,
-         dmaObSlaves      => macIbSlaves,
+         dmaIbMasters    => macObMasters,
+         dmaIbSlaves     => macObSlaves,
+         dmaObMasters    => macIbMasters,
+         dmaObSlaves     => macIbSlaves,
          -- Misc. Signals
          phyReady        => phyReady,
          ---------------------
@@ -160,7 +301,8 @@ begin
    ------------
    -- ETH Lanes
    ------------
-   GEN_LANE : for i in 5 downto 0 generate   
+   GEN_LANE : for i in NUM_RSSI_C-1 downto 0 generate
+
       U_Lane : entity work.EthLane
          generic map (
             TPD_G           => TPD_G,
@@ -168,11 +310,17 @@ begin
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map (
             -- RSSI Interface (axilClk domain)
-            rssiLinkUp     => linkUp(i),
-            rssiIbMaster   => ibMasters(i),
-            rssiIbSlave    => ibSlaves(i),
-            rssiObMaster   => obMasters(i),
-            rssiObSlave    => obSlaves(i),
+            rssiIbMaster    => rssiIbMasters(i),
+            rssiIbSlave     => rssiIbSlaves(i),
+            rssiObMaster    => rssiObMasters(i),
+            rssiObSlave     => rssiObSlaves(i),
+            -- UDP Interface (axiClk/axilClk domain)
+            axiClk          => axiClk,
+            axiRst          => axiReset,
+            udpIbMaster     => udpIbMasters(i),
+            udpIbSlave      => udpIbSlaves(i),
+            udpObMaster     => ddrIbMasters(i),
+            udpObSlave      => ddrIbSlaves(i),
             -- PHY Interface (axilClk domain)
             macObMaster     => macObMasters(i),
             macObSlave      => macObSlaves(i),
@@ -182,49 +330,56 @@ begin
             mac             => localMac(i),
             -- AXI-Lite Interface (axilClk domain)
             axilClk         => axilClk,
-            axilRst         => axilRst,
+            axilRst         => axilReset,
             axilReadMaster  => axilReadMasters(i),
             axilReadSlave   => axilReadSlaves(i),
             axilWriteMaster => axilWriteMasters(i),
             axilWriteSlave  => axilWriteSlaves(i));
-   end generate GEN_LANE;         
 
-   -----------------------------------------------------------------
-   -- Adding Pipelining to help with making timing between SLR0/SLR1
-   -----------------------------------------------------------------
-   GEN_VEC : for i in NUM_RSSI_C-1 downto 0 generate
+   end generate GEN_LANE;
 
-      U_IbPipe : entity work.AxiStreamPipeline
+   GEN_VEC : for i in (NUM_RSSI_C/2)-1 downto 0 generate
+
+      U_Buffer : entity work.UdpLargeDataBuffer
          generic map (
-            TPD_G         => TPD_G,
-            PIPE_STAGES_G => 1)
+            TPD_G => TPD_G)
          port map (
-            axisClk     => axilClk,
-            axisRst     => axilRst,
-            sAxisMaster => rssiIbMasters(i),
-            sAxisSlave  => rssiIbSlaves(i),
-            mAxisMaster => ibMasters(i),
-            mAxisSlave  => ibSlaves(i));
-
-      U_ObPipe : entity work.AxiStreamPipeline
-         generic map (
-            TPD_G         => TPD_G,
-            PIPE_STAGES_G => 1)
-         port map (
-            axisClk     => axilClk,
-            axisRst     => axilRst,
-            sAxisMaster => obMasters(i),
-            sAxisSlave  => obSlaves(i),
-            mAxisMaster => rssiObMasters(i),
-            mAxisSlave  => rssiObSlaves(i));
+            -- UDP Large Data Buffer (axiClk domain)
+            axiClk           => axiClk,
+            axiRst           => axiReset,
+            ddrIbMasters     => ddrIbMasters(2*i+1 downto 2*i),
+            ddrIbSlaves      => ddrIbSlaves(2*i+1 downto 2*i),
+            ddrObMasters     => ddrObMasters(2*i+1 downto 2*i),
+            ddrObSlaves      => ddrObSlaves(2*i+1 downto 2*i),
+            -- AXI-Lite Interface (axiClk domain)
+            axilReadMasters  => buffReadMasters(2*i+1 downto 2*i),
+            axilReadSlaves   => buffReadSlaves(2*i+1 downto 2*i),
+            axilWriteMasters => buffWriteMasters(2*i+1 downto 2*i),
+            axilWriteSlaves  => buffWriteSlaves(2*i+1 downto 2*i),
+            -- DDR Memory Interface (ddrClk domain)
+            ddrClk           => ddrClk(i),
+            ddrRst           => ddrRst(i),
+            ddrWriteMaster   => ddrWriteMasters(i),
+            ddrWriteSlave    => ddrWriteSlaves(i),
+            ddrReadMaster    => ddrReadMasters(i),
+            ddrReadSlave     => ddrReadSlaves(i));
 
    end generate GEN_VEC;
 
-   process(axilClk)
-   begin
-      if rising_edge(axilClk) then
-         rssiLinkUp <= linkUp after TPD_G;  -- Adding Pipelining to help with making timing between SLR0/SLR1
-      end if;
-   end process;
+   U_Config : entity work.UdpLargeDataConfig
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- Clock and Reset
+         axiClk          => axiClk,
+         axiRst          => axiReset,
+         -- UDP Outbound Config Interface
+         udpObMuxSel     => udpObMuxSel,
+         udpObDest       => udpObDest,
+         -- AXI-Lite Interface 
+         axilReadMaster  => buffReadMasters(NUM_RSSI_C),
+         axilReadSlave   => buffReadSlaves(NUM_RSSI_C),
+         axilWriteMaster => buffWriteMasters(NUM_RSSI_C),
+         axilWriteSlave  => buffWriteSlaves(NUM_RSSI_C));
 
 end mapping;

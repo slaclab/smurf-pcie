@@ -86,6 +86,7 @@ entity RssiCoreWrapperInterleaved is
       axilWriteMaster   : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave    : out AxiLiteWriteSlaveType;
       -- Internal statuses
+      linkUp            : out sl;
       statusReg_o       : out slv(6 downto 0));
 end entity RssiCoreWrapperInterleaved;
 
@@ -123,10 +124,52 @@ architecture mapping of RssiCoreWrapperInterleaved is
    -- else use Packetizer AXIS format. Packetizer will then convert to RSSI config.
    constant CONV_AXIS_CONFIG_C : AxiStreamConfigType := ite(BYPASS_CHUNKER_G, RSSI_AXIS_CONFIG_C, PACKETIZER_AXIS_CONFIG_C);
 
+   signal rxMasterPipe : AxiStreamMasterType;
+   signal rxSlavePipe  : AxiStreamSlaveType;
+
+   signal reset : sl;
+
 begin
 
-   packetizerMasters(0) <= sAppAxisMaster_i;
-   sAppAxisSlave_o      <= packetizerSlaves(0);
+   U_reset : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => clk_i,
+         rstIn  => rst_i,
+         rstOut => reset);
+
+   -- packetizerMasters(0) <= sAppAxisMaster_i;
+   -- sAppAxisSlave_o      <= packetizerSlaves(0);
+   BLOWOFF_FILTER : process (rxSlavePipe, sAppAxisMaster_i, statusReg) is
+      variable master : AxiStreamMasterType;
+      variable slave  : AxiStreamSlaveType;
+   begin
+      -- Init
+      master := sAppAxisMaster_i;
+      slave  := rxSlavePipe;
+      -- Check for link down
+      if (statusReg(0) = '0') then
+         -- Blow off the data (prevent DMA lock up)
+         master.tValid := '0';
+         slave.tReady  := '1';
+      end if;
+      -- Outputs
+      rxMasterPipe    <= master;
+      sAppAxisSlave_o <= slave;
+   end process;
+   
+   U_IbPipe : entity work.AxiStreamPipeline
+      generic map (
+         TPD_G         => TPD_G,
+         PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => clk_i,
+         axisRst     => reset,
+         sAxisMaster => rxMasterPipe,
+         sAxisSlave  => rxSlavePipe,
+         mAxisMaster => packetizerMasters(0),
+         mAxisSlave  => packetizerSlaves(0));   
 
    -- GEN_RX :
    -- for i in (APP_STREAMS_G-1) downto 0 generate
@@ -141,7 +184,7 @@ begin
          -- port map (
             -- -- Clock and reset
             -- axisClk     => clk_i,
-            -- axisRst     => rst_i,
+            -- axisRst     => reset,
             -- -- Slave Port
             -- sAxisMaster => sAppAxisMasters_i(i),
             -- sAxisSlave  => sAppAxisSlaves_o(i),
@@ -163,7 +206,7 @@ begin
       -- port map (
          -- -- Clock and reset
          -- axisClk      => clk_i,
-         -- axisRst      => rst_i,
+         -- axisRst      => reset,
          -- -- Slaves
          -- sAxisMasters => rxMasters,
          -- sAxisSlaves  => rxSlaves,
@@ -189,7 +232,7 @@ begin
                OUTPUT_PIPE_STAGES_G => 1)
             port map (
                axisClk     => clk_i,
-               axisRst     => rst_i,
+               axisRst     => reset,
                maxPktBytes => maxSegs,
                sAxisMaster => packetizerMasters(0),
                sAxisSlave  => packetizerSlaves(0),
@@ -201,6 +244,7 @@ begin
             generic map (
                TPD_G                => TPD_G,
                BRAM_EN_G            => true,
+               REG_EN_G             => true,
                CRC_MODE_G           => "FULL",
                CRC_POLY_G           => x"04C11DB7",
                TDEST_BITS_G         => 8,
@@ -209,7 +253,7 @@ begin
                OUTPUT_PIPE_STAGES_G => 1)
             port map (
                axisClk     => clk_i,
-               axisRst     => rst_i,
+               axisRst     => reset,
                maxPktBytes => maxSegs,
                sAxisMaster => packetizerMasters(0),
                sAxisSlave  => packetizerSlaves(0),
@@ -257,7 +301,7 @@ begin
       port map (
          -- Clock and Reset
          clk_i            => clk_i,
-         rst_i            => rst_i,
+         rst_i            => reset,
          -- SSI Application side
          sAppAxisMaster_i => packetizerMasters(1),
          sAppAxisSlave_o  => packetizerSlaves(1),
@@ -286,6 +330,13 @@ begin
    statusReg_o      <= statusReg;
    rssiConnected    <= statusReg(0);
    rssiNotConnected <= not(rssiConnected);
+   
+   process(clk_i)
+   begin
+      if rising_edge(clk_i) then
+         linkUp <= statusReg(0) after TPD_G;
+      end if;
+   end process;   
 
    GEN_DEPACKER : if (BYPASS_CHUNKER_G = false) generate
       DEPACKER_V1 : if (APP_ILEAVE_EN_G = false) generate
@@ -296,7 +347,7 @@ begin
                OUTPUT_PIPE_STAGES_G => 1)
             port map (
                axisClk     => clk_i,
-               axisRst     => rst_i,
+               axisRst     => reset,
                restart     => rssiNotConnected,
                sAxisMaster => depacketizerMasters(1),
                sAxisSlave  => depacketizerSlaves(1),
@@ -308,6 +359,7 @@ begin
             generic map (
                TPD_G                => TPD_G,
                BRAM_EN_G            => true,
+               REG_EN_G             => true,
                CRC_MODE_G           => "FULL",
                CRC_POLY_G           => x"04C11DB7",
                TDEST_BITS_G         => 8,
@@ -315,7 +367,7 @@ begin
                OUTPUT_PIPE_STAGES_G => 1)
             port map (
                axisClk     => clk_i,
-               axisRst     => rst_i,
+               axisRst     => reset,
                linkGood    => rssiConnected,
                sAxisMaster => depacketizerMasters(1),
                sAxisSlave  => depacketizerSlaves(1),
@@ -339,7 +391,7 @@ begin
       -- port map (
          -- -- Clock and reset
          -- axisClk      => clk_i,
-         -- axisRst      => rst_i,
+         -- axisRst      => reset,
          -- -- Slaves
          -- sAxisMaster  => depacketizerMasters(0),
          -- sAxisSlave   => depacketizerSlaves(0),
@@ -360,7 +412,7 @@ begin
          -- port map (
             -- -- Clock and reset
             -- axisClk     => clk_i,
-            -- axisRst     => rst_i,
+            -- axisRst     => reset,
             -- -- Slave Port
             -- sAxisMaster => txMasters(i),
             -- sAxisSlave  => txSlaves(i),

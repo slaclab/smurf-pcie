@@ -71,7 +71,7 @@ base.Core.AxiPcieCore.AxiVersion.printStatus()
 
 # Create GUI
 appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop(group='PyRogueGui')
+guiTop = pr.gui.GuiTop()
 guiTop.addTree(base)
 guiTop.resize(800, 1200)
 

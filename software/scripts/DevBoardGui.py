@@ -73,7 +73,7 @@ parser.add_argument(
     "--swRx", 
     type     = argBool,
     required = False,
-    default  = False,
+    default  = True,
     help     = "SW loopback of PRBS stream",
 )  
 

@@ -70,16 +70,55 @@ architecture mapping of EthPhyWrapper is
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_RSSI_C-1 downto 0) := genAxiLiteConfig(NUM_RSSI_C, AXI_BASE_ADDR_G, 16, 12);
 
-   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_RSSI_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_RSSI_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(7 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(7 downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal axilReadMasters  : AxiLiteReadMasterArray(7 downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(7 downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+
+   signal ibMasters : AxiStreamMasterArray(7 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal ibSlaves  : AxiStreamSlaveArray(7 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal obMasters : AxiStreamMasterArray(7 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal obSlaves  : AxiStreamSlaveArray(7 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+
+   signal mac   : Slv48Array(7 downto 0) := (others => (others => '0'));
+   signal ready : slv(7 downto 0)        := (others => '0');
+
+   signal dmaClk : slv(7 downto 0) := (others => '0');
+   signal dmaRst : slv(7 downto 0) := (others => '1');
+
+   signal axilReset : sl;
 
    signal refClk                  : slv(1 downto 0);
    attribute dont_touch           : string;
    attribute dont_touch of refClk : signal is "TRUE";
 
 begin
+
+   -------------------------------
+   -- TODO: Add routing logic here 
+   -------------------------------
+   dmaClk(NUM_RSSI_C-1 downto 0) <= (others => axilClk);
+   dmaRst(NUM_RSSI_C-1 downto 0) <= (others => axilReset);
+
+   mac(NUM_RSSI_C-1 downto 0) <= localMac;
+   phyReady                   <= ready(NUM_RSSI_C-1 downto 0);
+
+   dmaIbMasters                    <= ibMasters(NUM_RSSI_C-1 downto 0);
+   ibSlaves(NUM_RSSI_C-1 downto 0) <= dmaIbSlaves;
+
+   obMasters(NUM_RSSI_C-1 downto 0) <= dmaObMasters;
+   dmaObSlaves                      <= obSlaves(NUM_RSSI_C-1 downto 0);
+
+   -----------------
+   -- Reset Pipeline
+   -----------------
+   U_axilRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axilClk,
+         rstIn  => axilRst,
+         rstOut => axilReset);
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -92,15 +131,15 @@ begin
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
       port map (
          axiClk              => axilClk,
-         axiClkRst           => axilRst,
+         axiClkRst           => axilReset,
          sAxiWriteMasters(0) => axilWriteMaster,
          sAxiWriteSlaves(0)  => axilWriteSlave,
          sAxiReadMasters(0)  => axilReadMaster,
          sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
+         mAxiWriteMasters    => axilWriteMasters(NUM_RSSI_C-1 downto 0),
+         mAxiWriteSlaves     => axilWriteSlaves(NUM_RSSI_C-1 downto 0),
+         mAxiReadMasters     => axilReadMasters(NUM_RSSI_C-1 downto 0),
+         mAxiReadSlaves      => axilReadSlaves(NUM_RSSI_C-1 downto 0));
 
    ----------------
    -- 10GigE Module 
@@ -114,24 +153,24 @@ begin
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
-         localMac            => localMac(3 downto 0),
+         localMac            => mac(3 downto 0),
          -- Streaming DMA Interface 
-         dmaClk              => (others => axilClk),
-         dmaRst              => (others => axilRst),
-         dmaIbMasters        => dmaIbMasters(3 downto 0),
-         dmaIbSlaves         => dmaIbSlaves(3 downto 0),
-         dmaObMasters        => dmaObMasters(3 downto 0),
-         dmaObSlaves         => dmaObSlaves(3 downto 0),
+         dmaClk              => dmaClk(3 downto 0),
+         dmaRst              => dmaRst(3 downto 0),
+         dmaIbMasters        => ibMasters(3 downto 0),
+         dmaIbSlaves         => ibSlaves(3 downto 0),
+         dmaObMasters        => obMasters(3 downto 0),
+         dmaObSlaves         => obSlaves(3 downto 0),
          -- Slave AXI-Lite Interface 
-         axiLiteClk          => (others => axilClk),
-         axiLiteRst          => (others => axilRst),
+         axiLiteClk          => dmaClk(3 downto 0),
+         axiLiteRst          => dmaRst(3 downto 0),
          axiLiteReadMasters  => axilReadMasters(3 downto 0),
          axiLiteReadSlaves   => axilReadSlaves(3 downto 0),
          axiLiteWriteMasters => axilWriteMasters(3 downto 0),
          axiLiteWriteSlaves  => axilWriteSlaves(3 downto 0),
          -- Misc. Signals
-         extRst              => axilRst,
-         phyReady            => phyReady(3 downto 0),
+         extRst              => axilReset,
+         phyReady            => ready(3 downto 0),
          -- MGT Clock Port
          gtClkP              => qsfp0RefClkP(0),
          gtClkN              => qsfp0RefClkN(0),
@@ -150,24 +189,24 @@ begin
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
-         localMac            => localMac(7 downto 4),
+         localMac            => mac(7 downto 4),
          -- Streaming DMA Interface 
-         dmaClk              => (others => axilClk),
-         dmaRst              => (others => axilRst),
-         dmaIbMasters        => dmaIbMasters(7 downto 4),
-         dmaIbSlaves         => dmaIbSlaves(7 downto 4),
-         dmaObMasters        => dmaObMasters(7 downto 4),
-         dmaObSlaves         => dmaObSlaves(7 downto 4),
+         dmaClk              => dmaClk(7 downto 4),
+         dmaRst              => dmaRst(7 downto 4),
+         dmaIbMasters        => ibMasters(7 downto 4),
+         dmaIbSlaves         => ibSlaves(7 downto 4),
+         dmaObMasters        => obMasters(7 downto 4),
+         dmaObSlaves         => obSlaves(7 downto 4),
          -- Slave AXI-Lite Interface 
-         axiLiteClk          => (others => axilClk),
-         axiLiteRst          => (others => axilRst),
+         axiLiteClk          => dmaClk(7 downto 4),
+         axiLiteRst          => dmaRst(7 downto 4),
          axiLiteReadMasters  => axilReadMasters(7 downto 4),
          axiLiteReadSlaves   => axilReadSlaves(7 downto 4),
          axiLiteWriteMasters => axilWriteMasters(7 downto 4),
          axiLiteWriteSlaves  => axilWriteSlaves(7 downto 4),
          -- Misc. Signals
-         extRst              => axilRst,
-         phyReady            => phyReady(7 downto 4),
+         extRst              => axilReset,
+         phyReady            => ready(7 downto 4),
          -- MGT Clock Port
          gtClkP              => qsfp1RefClkP(0),
          gtClkN              => qsfp1RefClkN(0),

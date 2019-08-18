@@ -20,80 +20,375 @@ use ieee.std_logic_unsigned.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
+use work.EthMacPkg.all;
 use work.AppPkg.all;
 
 entity DmaAsyncFifo is
    generic (
       TPD_G : time := 1 ns);
    port (
-      -- DMA Interface (dmaClk domain)
-      dmaClk        : in  sl;
-      dmaRst        : in  sl;
-      dmaObMasters  : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      dmaObSlaves   : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      dmaIbMasters  : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      dmaIbSlaves   : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      -- DMA Interface (axilClk domain)
-      axilClk       : in  sl;
-      axilRst       : in  sl;
-      rssiIbMasters : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      rssiIbSlaves  : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      rssiObMasters : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      rssiObSlaves  : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0));
+      -- UDP Outbound Config Interface (axiClk domain)
+      udpObMuxSel    : in  sl;
+      udpObDest      : in  slv(7 downto 0);
+      -- Primary DMA Interface (dmaPriClk domain)
+      dmaPriClk      : in  sl;
+      dmaPriRst      : in  sl;
+      dmaPriObMaster : in  AxiStreamMasterType;
+      dmaPriObSlave  : out AxiStreamSlaveType;
+      dmaPriIbMaster : out AxiStreamMasterType;
+      dmaPriIbSlave  : in  AxiStreamSlaveType;
+      -- Secondary DMA Interface (dmaSecClk domain)
+      dmaSecClk      : in  sl;
+      dmaSecRst      : in  sl;
+      dmaSecObMaster : in  AxiStreamMasterType;
+      dmaSecObSlave  : out AxiStreamSlaveType;
+      dmaSecIbMaster : out AxiStreamMasterType;
+      dmaSecIbSlave  : in  AxiStreamSlaveType;
+      -- UDP Interface (axiClk/axilClk domain)
+      axiClk         : in  sl;
+      axiRst         : in  sl;
+      udpIbMaster    : out AxiStreamMasterType;  -- Same clock domain as UdpEngine
+      udpIbSlave     : in  AxiStreamSlaveType;
+      udpObMaster    : in  AxiStreamMasterType;  -- Same clock domain as UdpLargeDataBuffer
+      udpObSlave     : out AxiStreamSlaveType;
+      -- RSSI Interface (axilClk domain)
+      axilClk        : in  sl;
+      axilRst        : in  sl;
+      rssiIbMaster   : out AxiStreamMasterType;
+      rssiIbSlave    : in  AxiStreamSlaveType;
+      rssiObMaster   : in  AxiStreamMasterType;
+      rssiObSlave    : out AxiStreamSlaveType);
 end DmaAsyncFifo;
 
 architecture mapping of DmaAsyncFifo is
 
+   constant MUX_ROUTES_C : Slv8Array(CLIENT_SIZE_C-1 downto 0) := (
+      0 => "--------",
+      1 => "--------");
+
+   signal rssiTxMaster : AxiStreamMasterType;
+   signal rssiTxSlave  : AxiStreamSlaveType;
+
+   signal rssiRxMaster : AxiStreamMasterType;
+   signal rssiRxSlave  : AxiStreamSlaveType;
+
+   signal dmaPriIbMasters : AxiStreamMasterArray(1 downto 0);
+   signal dmaPriIbSlaves  : AxiStreamSlaveArray(1 downto 0);
+
+   signal udpObMasters : AxiStreamMasterArray(1 downto 0);
+   signal udpObSlaves  : AxiStreamSlaveArray(1 downto 0);
+
+   signal udpRxMasters : AxiStreamMasterArray(1 downto 0);
+   signal udpRxSlaves  : AxiStreamSlaveArray(1 downto 0);
+
+   signal udpTxMaster : AxiStreamMasterType;
+   signal udpTxSlave  : AxiStreamSlaveType;
+
+   signal axilReset   : sl;
+   signal axiReset    : sl;
+   signal dmaPriReset : sl;
+   signal dmaSecReset : sl;
+
+   signal muxSel : sl;
+   signal obDest : slv(7 downto 0);
+
 begin
 
-   GEN_VEC : for i in NUM_RSSI_C-1 downto 0 generate
+   -----------------------------------------------------------------
+   --                   Pipelined Resets
+   -----------------------------------------------------------------
 
-      U_OB_DMA : entity work.AxiStreamFifoV2
-         generic map (
-            -- General Configurations
-            TPD_G               => TPD_G,
-            -- FIFO configurations
-            BRAM_EN_G           => false,
-            GEN_SYNC_FIFO_G     => false,
-            FIFO_ADDR_WIDTH_G   => 4,
-            -- AXI Stream Port Configurations
-            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
-         port map (
-            -- Slave Port
-            sAxisClk    => dmaClk,
-            sAxisRst    => dmaRst,
-            sAxisMaster => dmaObMasters(i),
-            sAxisSlave  => dmaObSlaves(i),
-            -- Master Port
-            mAxisClk    => axilClk,
-            mAxisRst    => axilRst,
-            mAxisMaster => rssiIbMasters(i),
-            mAxisSlave  => rssiIbSlaves(i));
+   U_axilRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axilClk,
+         rstIn  => axilRst,
+         rstOut => axilReset);
 
-      U_IB_DMA : entity work.AxiStreamFifoV2
-         generic map (
-            -- General Configurations
-            TPD_G               => TPD_G,
-            -- FIFO configurations
-            BRAM_EN_G           => false,
-            GEN_SYNC_FIFO_G     => false,
-            FIFO_ADDR_WIDTH_G   => 4,
-            -- AXI Stream Port Configurations
-            SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
-         port map (
-            -- Slave Port
-            sAxisClk    => axilClk,
-            sAxisRst    => axilRst,
-            sAxisMaster => rssiObMasters(i),
-            sAxisSlave  => rssiObSlaves(i),
-            -- Master Port
-            mAxisClk    => dmaClk,
-            mAxisRst    => dmaRst,
-            mAxisMaster => dmaIbMasters(i),
-            mAxisSlave  => dmaIbSlaves(i));
+   U_axiRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axiClk,
+         rstIn  => axiRst,
+         rstOut => axiReset);
 
-   end generate GEN_VEC;
+   U_dmaPriRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => dmaPriClk,
+         rstIn  => dmaPriRst,
+         rstOut => dmaPriReset);
+
+   U_dmaSecRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => dmaSecClk,
+         rstIn  => dmaSecRst,
+         rstOut => dmaSecReset);
+
+   -----------------------------------------------------------------
+   --             Primary DMA Path: APP->DMA
+   -----------------------------------------------------------------
+
+   -- Adding Pipelining to help with making timing between SLR0/SLR1
+   U_ObPipe_PriDma : entity work.AxiStreamPipeline
+      generic map (
+         TPD_G         => TPD_G,
+         PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => axilClk,
+         axisRst     => axilReset,
+         sAxisMaster => rssiObMaster,
+         sAxisSlave  => rssiObSlave,
+         mAxisMaster => rssiRxMaster,
+         mAxisSlave  => rssiRxSlave);
+
+   U_IB_DMA_1 : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => false,
+         GEN_SYNC_FIFO_G     => false,
+         FIFO_ADDR_WIDTH_G   => 4,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => axilClk,
+         sAxisRst    => axilReset,
+         sAxisMaster => rssiRxMaster,
+         sAxisSlave  => rssiRxSlave,
+         -- Master Port
+         mAxisClk    => dmaPriClk,
+         mAxisRst    => dmaPriReset,
+         mAxisMaster => dmaPriIbMasters(1),
+         mAxisSlave  => dmaPriIbSlaves(1));
+
+   U_IB_DMA_0 : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => false,
+         GEN_SYNC_FIFO_G     => false,
+         FIFO_ADDR_WIDTH_G   => 4,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => axiClk,  -- Same clock domain as UdpLargeDataBuffer
+         sAxisRst    => axiReset,
+         sAxisMaster => udpRxMasters(0),
+         sAxisSlave  => udpRxSlaves(0),
+         -- Master Port
+         mAxisClk    => dmaPriClk,
+         mAxisRst    => dmaPriReset,
+         mAxisMaster => dmaPriIbMasters(0),
+         mAxisSlave  => dmaPriIbSlaves(0));
+
+   U_AxiStreamMux : entity work.AxiStreamMux
+      generic map (
+         TPD_G                => TPD_G,
+         PIPE_STAGES_G        => 1,
+         NUM_SLAVES_G         => 2,
+         MODE_G               => "ROUTED",
+         TDEST_ROUTES_G       => MUX_ROUTES_C,
+         ILEAVE_EN_G          => true,
+         ILEAVE_ON_NOTVALID_G => true,
+         ILEAVE_REARB_G       => 128)
+      port map (
+         -- Clock and reset
+         axisClk      => dmaPriClk,
+         axisRst      => dmaPriReset,
+         -- Slaves
+         sAxisMasters => dmaPriIbMasters,
+         sAxisSlaves  => dmaPriIbSlaves,
+         -- Master
+         mAxisMaster  => dmaPriIbMaster,
+         mAxisSlave   => dmaPriIbSlave);
+
+   -----------------------------------------------------------------
+   --             Primary DMA Path: DMA->APP
+   -----------------------------------------------------------------
+
+   U_OB_DMA : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => false,
+         GEN_SYNC_FIFO_G     => false,
+         FIFO_ADDR_WIDTH_G   => 4,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => dmaPriClk,
+         sAxisRst    => dmaPriReset,
+         sAxisMaster => dmaPriObMaster,
+         sAxisSlave  => dmaPriObSlave,
+         -- Master Port
+         mAxisClk    => axilClk,
+         mAxisRst    => axilReset,
+         mAxisMaster => rssiTxMaster,
+         mAxisSlave  => rssiTxSlave);
+
+   -- Adding Pipelining to help with making timing between SLR0/SLR1
+   U_IbPipe_PriDma : entity work.AxiStreamPipeline
+      generic map (
+         TPD_G         => TPD_G,
+         PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => axilClk,
+         axisRst     => axilReset,
+         sAxisMaster => rssiTxMaster,
+         sAxisSlave  => rssiTxSlave,
+         mAxisMaster => rssiIbMaster,
+         mAxisSlave  => rssiIbSlave);
+
+   -----------------------------------------------------------------
+   --             Secondary DMA Path: APP->DMA
+   -----------------------------------------------------------------
+
+   -- Adding Pipelining to help with making timing between SLR0/SLR1
+   U_ObPipe_SecDma : entity work.AxiStreamRepeater
+      generic map (
+         TPD_G                => TPD_G,
+         NUM_MASTERS_G        => 2,
+         INPUT_PIPE_STAGES_G  => 1,
+         OUTPUT_PIPE_STAGES_G => 1)
+      port map (
+         -- Clock and reset
+         axisClk      => axiClk,
+         axisRst      => axiReset,
+         -- Slave
+         sAxisMaster  => udpObMaster,
+         sAxisSlave   => udpObSlave,
+         -- Masters
+         mAxisMasters => udpObMasters,
+         mAxisSlaves  => udpObSlaves);
+
+   process (axiClk) is
+   begin
+      if (rising_edge(axiClk)) then
+         -- Register to help with making timing
+         muxSel <= udpObMuxSel after TPD_G;
+         obDest <= udpObDest   after TPD_G;
+      end if;
+   end process;
+
+   UDP_OB_MUX : process (muxSel, obDest, udpObMasters, udpRxSlaves) is
+      variable masters : AxiStreamMasterArray(1 downto 0);
+      variable slaves  : AxiStreamSlaveArray(1 downto 0);
+   begin
+
+      -- Init
+      masters := udpObMasters;
+      slaves  := udpRxSlaves;
+
+      -- Force the TDEST
+      masters(0).tDest := obDest;
+      masters(1).tDest := obDest;
+
+      -- Check if forwarding to primary DMA path
+      if (muxSel = '0') then  -- Used for testing with computer without PCIe bifurcation 
+         -- Blowoff secondary DMA path
+         masters(1).tValid := '0';
+         slaves(1).tReady  := '1';
+      -- Else forwarding to secondary DMA path
+      else                              -- Default Configuration 
+         -- Blowoff primary DMA path
+         masters(0).tValid := '0';
+         slaves(0).tReady  := '1';
+      end if;
+
+      -- Outputs
+      udpRxMasters <= masters;
+      udpObSlaves  <= slaves;
+
+   end process;
+
+   U_IB_DMA : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => false,
+         GEN_SYNC_FIFO_G     => false,
+         FIFO_ADDR_WIDTH_G   => 4,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => axiClk,  -- Same clock domain as UdpLargeDataBuffer
+         sAxisRst    => axiReset,
+         sAxisMaster => udpRxMasters(1),
+         sAxisSlave  => udpRxSlaves(1),
+         -- Master Port
+         mAxisClk    => dmaSecClk,
+         mAxisRst    => dmaSecReset,
+         mAxisMaster => dmaSecIbMaster,
+         mAxisSlave  => dmaSecIbSlave);
+
+   -----------------------------------------------------------------
+   --             Secondary DMA Path: DMA->APP
+   -----------------------------------------------------------------
+
+   U_OB_DMA_SecDma : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => false,
+         GEN_SYNC_FIFO_G     => false,
+         FIFO_ADDR_WIDTH_G   => 4,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => dmaSecClk,
+         sAxisRst    => dmaSecReset,
+         sAxisMaster => dmaSecObMaster,
+         sAxisSlave  => dmaSecObSlave,
+         -- Master Port
+         mAxisClk    => axilClk,        -- Same clock domain as UdpEngine
+         mAxisRst    => axilReset,
+         mAxisMaster => udpTxMaster,
+         mAxisSlave  => udpTxSlave);
+
+   -----------------------------------------------------------------
+   -- Adding Pipelining to help with making timing between SLR0/SLR1
+   -----------------------------------------------------------------
+   U_IbPipe : entity work.AxiStreamPipeline
+      generic map (
+         TPD_G         => TPD_G,
+         PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => axilClk,
+         axisRst     => axilReset,
+         sAxisMaster => udpTxMaster,
+         sAxisSlave  => udpTxSlave,
+         mAxisMaster => udpIbMaster,
+         mAxisSlave  => udpIbSlave);
 
 end mapping;

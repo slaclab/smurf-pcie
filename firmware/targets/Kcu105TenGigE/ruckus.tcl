@@ -12,6 +12,7 @@ loadSource -path "$::DIR_PATH/ip/SystemManagementCore.dcp"
 # loadIpCore  -path "$::DIR_PATH/ip/SystemManagementCore.xci" 
 
 # Load local SIM source Code
-set_property top {RssiInterleaveTb} [get_filesets sim_1]
+#set_property top {RssiInterleaveTb} [get_filesets sim_1]
+set_property top {EthMacTb} [get_filesets sim_1]
 
 #set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
