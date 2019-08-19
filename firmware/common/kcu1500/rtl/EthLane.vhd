@@ -79,6 +79,9 @@ architecture mapping of EthLane is
    signal keepAliveMaster : AxiStreamMasterType;
    signal keepAliveSlave  : AxiStreamSlaveType;
    
+   signal sTspAxisMaster : AxiStreamMasterType;
+   signal sTspAxisSlave  : AxiStreamSlaveType;
+   
    signal localIp  : slv(31 downto 0);
    signal localMac : slv(47 downto 0);
 
@@ -228,6 +231,31 @@ begin
          mAxisRst    => axiRst,
          mAxisMaster => udpObMaster,
          mAxisSlave  => udpObSlave);
+         
+   U_BUFFER : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => true,
+         GEN_SYNC_FIFO_G     => true,
+         FIFO_ADDR_WIDTH_G   => 10, -- 16B x 1024 = 16KB > 9000 MTU
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => axilClk,
+         sAxisRst    => axilReset,
+         sAxisMaster => obUdpMasters(0),
+         sAxisSlave  => obUdpSlaves(0),
+         -- Master Port
+         mAxisClk    => axilClk,
+         mAxisRst    => axilReset,
+         mAxisMaster => sTspAxisMaster,
+         mAxisSlave  => sTspAxisSlave);         
 
    --------------------------
    -- Software's RSSI Clients
@@ -253,8 +281,8 @@ begin
          clk_i            => axilClk,
          rst_i            => axilReset,
          -- Transport Layer Interface
-         sTspAxisMaster_i => obUdpMasters(0),
-         sTspAxisSlave_o  => obUdpSlaves(0),
+         sTspAxisMaster_i => sTspAxisMaster,
+         sTspAxisSlave_o  => sTspAxisSlave,
          mTspAxisMaster_o => ibUdpMasters(0),
          mTspAxisSlave_i  => ibUdpSlaves(0),
          -- Application Layer Interface
