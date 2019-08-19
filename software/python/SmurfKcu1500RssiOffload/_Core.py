@@ -59,7 +59,7 @@ class Core(pr.Device):
         
         # Add the UDP Large Buffer Traffic Config
         self.add(smurf.UdpObConfig(            
-            offset = 0x00877000, 
+            offset = 0x00876000, 
             expand = False,
         )) 
 
