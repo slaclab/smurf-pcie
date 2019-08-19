@@ -116,19 +116,20 @@ architecture top_level of SmurfKcu1500RssiOffload10GbE is
          addrBits     => 23,
          connectivity => x"FFFF"));
 
+   signal bar0WriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bar0WriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal bar0ReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bar0ReadSlaves   : AxiLiteReadSlaveArray(1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
 
-   signal userClk156      : sl;
-   signal axilClk         : sl;
-   signal axilRst         : sl;
-   signal axilReset       : sl;
-   signal axilReadMaster  : AxiLiteReadMasterType;
-   signal axilReadSlave   : AxiLiteReadSlaveType;
-   signal axilWriteMaster : AxiLiteWriteMasterType;
-   signal axilWriteSlave  : AxiLiteWriteSlaveType;
+   signal userClk156 : sl;
+   signal axilClk    : sl;
+   signal axilRst    : sl;
+   signal axilReset  : sl;
 
    signal dmaPriClk       : sl;
    signal dmaPriRst       : sl;
@@ -240,7 +241,7 @@ begin
          ddrClkN        => ddrClkN(2),
          ddrOut         => ddrOut(2),
          ddrInOut       => ddrInOut(2));
-         
+
    -----------------
    -- MIG[3] IP Core
    -----------------
@@ -286,10 +287,10 @@ begin
          -- Application AXI-Lite Interfaces [0x00080000:0x00FFFFFF] (appClk domain)
          appClk         => axilClk,
          appRst         => axilReset,
-         appReadMaster  => axilReadMaster,
-         appReadSlave   => axilReadSlave,
-         appWriteMaster => axilWriteMaster,
-         appWriteSlave  => axilWriteSlave,
+         appReadMaster  => bar0ReadMasters(0),
+         appReadSlave   => bar0ReadSlaves(0),
+         appWriteMaster => bar0WriteMasters(0),
+         appWriteSlave  => bar0WriteSlaves(0),
          --------------
          --  Core Ports
          --------------   
@@ -333,23 +334,30 @@ begin
          --  Top Level Interfaces
          ------------------------        
          -- DMA Interfaces
-         dmaClk        => dmaSecClk,
-         dmaRst        => dmaSecRst,
-         dmaObMasters  => dmaSecObMasters,
-         dmaObSlaves   => dmaSecObSlaves,
-         dmaIbMasters  => dmaSecIbMasters,
-         dmaIbSlaves   => dmaSecIbSlaves,
+         dmaClk         => dmaSecClk,
+         dmaRst         => dmaSecRst,
+         dmaObMasters   => dmaSecObMasters,
+         dmaObSlaves    => dmaSecObSlaves,
+         dmaIbMasters   => dmaSecIbMasters,
+         dmaIbSlaves    => dmaSecIbSlaves,
+         -- Application AXI-Lite Interfaces [0x00080000:0x00FFFFFF] (appClk domain)
+         appClk         => axilClk,
+         appRst         => axilReset,
+         appReadMaster  => bar0ReadMasters(1),
+         appReadSlave   => bar0ReadSlaves(1),
+         appWriteMaster => bar0WriteMasters(1),
+         appWriteSlave  => bar0WriteSlaves(1),
          --------------
          --  Core Ports
          --------------   
          -- Extended PCIe Ports 
-         pciRstL       => pciRstL,
-         pciExtRefClkP => pciExtRefClkP,
-         pciExtRefClkN => pciExtRefClkN,
-         pciExtRxP     => pciExtRxP,
-         pciExtRxN     => pciExtRxN,
-         pciExtTxP     => pciExtTxP,
-         pciExtTxN     => pciExtTxN);
+         pciRstL        => pciRstL,
+         pciExtRefClkP  => pciExtRefClkP,
+         pciExtRefClkN  => pciExtRefClkN,
+         pciExtRxP      => pciExtRxP,
+         pciExtRxN      => pciExtRxN,
+         pciExtTxP      => pciExtTxP,
+         pciExtTxN      => pciExtTxN);
 
    ----------------
    -- AXI-Lite XBAR
@@ -357,20 +365,20 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_SLAVE_SLOTS_G  => 2,
          NUM_MASTER_SLOTS_G => NUM_AXIL_MASTERS_C,
          MASTERS_CONFIG_G   => AXIL_CONFIG_C)
       port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilReset,
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
+         axiClk           => axilClk,
+         axiClkRst        => axilReset,
+         sAxiWriteMasters => bar0WriteMasters,
+         sAxiWriteSlaves  => bar0WriteSlaves,
+         sAxiReadMasters  => bar0ReadMasters,
+         sAxiReadSlaves   => bar0ReadSlaves,
+         mAxiWriteMasters => axilWriteMasters,
+         mAxiWriteSlaves  => axilWriteSlaves,
+         mAxiReadMasters  => axilReadMasters,
+         mAxiReadSlaves   => axilReadSlaves);
 
    ------------------
    -- RSSI/ETH Module
