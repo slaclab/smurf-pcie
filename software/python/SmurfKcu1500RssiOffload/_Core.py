@@ -28,8 +28,8 @@ class Core(pr.Device):
         # Add axi-pcie-core 
         self.add(pcie.AxiPcieCore(            
             offset      = 0x00000000, 
-            expand      = True,
             numDmaLanes = 6,
+            expand      = True,
         ))   
         
         # Add Ethernet Lane
@@ -46,7 +46,7 @@ class Core(pr.Device):
             self.add(smurf.EthLane(            
                 name   = f'EthLane[{i}]',
                 offset = (0x00800000 + i*0x10000), 
-                expand = True,
+                expand = False,
             )) 
             
         # Add UDP Buffer
@@ -56,6 +56,12 @@ class Core(pr.Device):
                 offset = (0x00870000 + i*0x1000), 
                 expand = False,
             ))             
+        
+        # Add the UDP Large Buffer Traffic Config
+        self.add(smurf.UdpObConfig(            
+            offset = 0x00877000, 
+            expand = False,
+        )) 
 
         @self.command(name="C_RestartConn", description="Restart connection request",)
         def C_RestartConn():                        
