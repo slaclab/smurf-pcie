@@ -350,7 +350,6 @@ begin
          U_DmaFiFo : entity work.AxiStreamDmaFifo
             generic map (
                TPD_G              => TPD_G,
-               PEND_THRESH_G      => 2048,  -- AxiDmaStreamRead pending threshold = 50% of 4kB burst
                -- FIFO Configuration
                MAX_FRAME_WIDTH_G  => 14,  -- 2^14 = 16KB > 9000B ETH jumbo frame
                ------------------------------------------------------
