@@ -171,7 +171,7 @@ begin
          -- MMCM attributes
          CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
          CLKFBOUT_MULT_G    => 8,       -- 1.25GHz = 8 x 156.25 MHz
-         CLKOUT0_DIVIDE_F_G => 12.5,  -- 100 MHz (100 MHz x 128b = 12.8Gb/s > 10GbE)
+         CLKOUT0_DIVIDE_F_G => 10.0,  -- 125 MHz (125 MHz x 128b = 16.0Gb/s > 10GbE)
          CLKOUT1_DIVIDE_G   => 8)  -- 156.25 MHz (must match CLK_FREQUENCY_C)
       port map(
          -- Clock Input
