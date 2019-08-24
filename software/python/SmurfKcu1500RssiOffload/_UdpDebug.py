@@ -12,17 +12,17 @@
 import pyrogue as pr
 from surf.ethernet import udp
 
-class UdpObConfig(pr.Device):
+class UdpDebug(pr.Device):
     def __init__(   self,       
-            name        = 'UdpObConfig',
-            description = 'Container for UdpObConfig',
+            name        = 'UdpDebug',
+            description = 'Container for UdpDebug',
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
           
         self.add(pr.RemoteVariable(   
             name         = 'MuxSel',
             description  = 'Select which DMA/PCIe endpoint to send the UDP large buffer traffic (default: SecondaryDMA)',
-            offset       = 0x0,
+            offset       = 0x00,
             bitSize      = 1, 
             mode         = 'RW',
             enum         = {
@@ -34,7 +34,41 @@ class UdpObConfig(pr.Device):
         self.add(pr.RemoteVariable(   
             name         = 'TDest',
             description  = 'Sets the UDP Large buffer TDEST',
-            offset       = 0x4,
+            offset       = 0x04,
             bitSize      = 8,
             mode         = 'RW',
         ))  
+       
+        self.add(pr.RemoteVariable(   
+            name         = 'NUM_RSSI_C',
+            offset       =  0x10,
+            mode         = 'RO',
+        ))            
+        
+        self.add(pr.RemoteVariable(   
+            name         = 'CLIENT_SIZE_C',
+            offset       =  0x14,
+            mode         = 'RO',
+        ))    
+        
+        self.add(pr.RemoteVariable(   
+            name         = 'CLIENT_PORTS_C[0]',
+            offset       =  0x18,
+            mode         = 'RO',
+        ))
+
+        self.add(pr.RemoteVariable(   
+            name         = 'CLIENT_PORTS_C[1]',
+            offset       =  0x1C,
+            mode         = 'RO',
+        ))
+        
+        # self.addRemoteVariables(   
+            # name         = 'UdpToPhyRoute',
+            # description  = 'Route table for mapping the UDP lanes to ETH PHY lanes',
+            # offset       = 0x80,
+            # bitSize      = 3,
+            # mode         = 'RW',
+            # number       = 6,
+            # stride       = 4,
+        # )        

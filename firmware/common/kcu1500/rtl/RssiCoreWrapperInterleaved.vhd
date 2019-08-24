@@ -22,6 +22,7 @@ use work.RssiPkg.all;
 use work.SsiPkg.all;
 use work.AxiStreamPkg.all;
 use work.AxiLitePkg.all;
+use work.EthMacPkg.all;
 
 entity RssiCoreWrapperInterleaved is
    generic (
@@ -40,7 +41,7 @@ entity RssiCoreWrapperInterleaved is
       BYP_TX_BUFFER_G      : boolean              := false;
       BYP_RX_BUFFER_G      : boolean              := false;
       SYNTH_MODE_G         : string               := "inferred";
-      MEMORY_TYPE_G        : string               := "block";       
+      MEMORY_TYPE_G        : string               := "block";
       ILEAVE_ON_NOTVALID_G : boolean              := true;
       -- AXIS Configurations
       APP_AXIS_CONFIG_G    : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(8, TKEEP_NORMAL_C));
@@ -62,38 +63,37 @@ entity RssiCoreWrapperInterleaved is
       MAX_CUM_ACK_CNT_G    : positive             := 3);
    port (
       -- Clock and Reset
-      clk_i             : in  sl;
-      rst_i             : in  sl;
+      clk_i            : in  sl;
+      rst_i            : in  sl;
       -- SSI Application side
       sAppAxisMaster_i : in  AxiStreamMasterType;
       sAppAxisSlave_o  : out AxiStreamSlaveType;
       mAppAxisMaster_o : out AxiStreamMasterType;
       mAppAxisSlave_i  : in  AxiStreamSlaveType;
       -- SSI Transport side
-      sTspAxisMaster_i  : in  AxiStreamMasterType;
-      sTspAxisSlave_o   : out AxiStreamSlaveType;
-      mTspAxisMaster_o  : out AxiStreamMasterType;
-      mTspAxisSlave_i   : in  AxiStreamSlaveType;
+      sTspAxisMaster_i : in  AxiStreamMasterType;
+      sTspAxisSlave_o  : out AxiStreamSlaveType;
+      mTspAxisMaster_o : out AxiStreamMasterType;
+      mTspAxisSlave_i  : in  AxiStreamSlaveType;
       -- High level  Application side interface
-      openRq_i          : in  sl                     := '0';
-      closeRq_i         : in  sl                     := '0';
-      inject_i          : in  sl                     := '0';
+      openRq_i         : in  sl                     := '0';
+      closeRq_i        : in  sl                     := '0';
+      inject_i         : in  sl                     := '0';
       -- AXI-Lite Register Interface
-      axiClk_i          : in  sl                     := '0';
-      axiRst_i          : in  sl                     := '0';
-      axilReadMaster    : in  AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-      axilReadSlave     : out AxiLiteReadSlaveType;
-      axilWriteMaster   : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-      axilWriteSlave    : out AxiLiteWriteSlaveType;
+      axiClk_i         : in  sl                     := '0';
+      axiRst_i         : in  sl                     := '0';
+      axilReadMaster   : in  AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+      axilReadSlave    : out AxiLiteReadSlaveType;
+      axilWriteMaster  : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+      axilWriteSlave   : out AxiLiteWriteSlaveType;
       -- Internal statuses
-      linkUp            : out sl;
-      statusReg_o       : out slv(6 downto 0));
+      linkUp           : out sl;
+      statusReg_o      : out slv(6 downto 0));
 end entity RssiCoreWrapperInterleaved;
 
 architecture mapping of RssiCoreWrapperInterleaved is
 
-   -- signal rxMasters : AxiStreamMasterArray(APP_STREAMS_G-1 downto 0);
-   -- signal rxSlaves  : AxiStreamSlaveArray(APP_STREAMS_G-1 downto 0);
+   constant MAX_SEGS_BITS_C : positive := bitSize(MAX_SEG_SIZE_G);
 
    signal depacketizerMasters : AxiStreamMasterArray(1 downto 0);
    signal depacketizerSlaves  : AxiStreamSlaveArray(1 downto 0);
@@ -101,16 +101,13 @@ architecture mapping of RssiCoreWrapperInterleaved is
    signal packetizerMasters : AxiStreamMasterArray(1 downto 0);
    signal packetizerSlaves  : AxiStreamSlaveArray(1 downto 0);
 
-   -- signal txMasters : AxiStreamMasterArray(APP_STREAMS_G-1 downto 0);
-   -- signal txSlaves  : AxiStreamSlaveArray(APP_STREAMS_G-1 downto 0);
-
    signal statusReg        : slv(6 downto 0);
    signal rssiNotConnected : sl;
    signal rssiConnected    : sl;
 
-   signal maxObSegSize     : slv(15 downto 0);
+   signal maxObSegSize : slv(15 downto 0);
+   signal maxSegs      : slv(MAX_SEGS_BITS_C - 1 downto 0);
 
-   -- This should really go in a AxiStreamPacketizerPkg
    constant PACKETIZER_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => 8,
@@ -120,14 +117,16 @@ architecture mapping of RssiCoreWrapperInterleaved is
       TUSER_BITS_C  => 8,
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
 
-   -- If bypassing chunker, convert directly to RSSI AXIS config
-   -- else use Packetizer AXIS format. Packetizer will then convert to RSSI config.
    constant CONV_AXIS_CONFIG_C : AxiStreamConfigType := ite(BYPASS_CHUNKER_G, RSSI_AXIS_CONFIG_C, PACKETIZER_AXIS_CONFIG_C);
 
    signal rxMasterPipe : AxiStreamMasterType;
    signal rxSlavePipe  : AxiStreamSlaveType;
 
    signal reset : sl;
+
+
+   signal sTspAxisMaster : AxiStreamMasterType;
+   signal sTspAxisSlave  : AxiStreamSlaveType;
 
 begin
 
@@ -158,7 +157,7 @@ begin
       rxMasterPipe    <= master;
       sAppAxisSlave_o <= slave;
    end process;
-   
+
    U_IbPipe : entity work.AxiStreamPipeline
       generic map (
          TPD_G         => TPD_G,
@@ -169,103 +168,56 @@ begin
          sAxisMaster => rxMasterPipe,
          sAxisSlave  => rxSlavePipe,
          mAxisMaster => packetizerMasters(0),
-         mAxisSlave  => packetizerSlaves(0));   
+         mAxisSlave  => packetizerSlaves(0));
 
-   -- GEN_RX :
-   -- for i in (APP_STREAMS_G-1) downto 0 generate
-      -- U_Rx : entity work.AxiStreamResize
-         -- generic map (
-            -- -- General Configurations
-            -- TPD_G               => TPD_G,
-            -- READY_EN_G          => true,
-            -- -- AXI Stream Port Configurations
-            -- SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_G(i),
-            -- MASTER_AXI_CONFIG_G => CONV_AXIS_CONFIG_C)
-         -- port map (
-            -- -- Clock and reset
-            -- axisClk     => clk_i,
-            -- axisRst     => reset,
-            -- -- Slave Port
-            -- sAxisMaster => sAppAxisMasters_i(i),
-            -- sAxisSlave  => sAppAxisSlaves_o(i),
-            -- -- Master Port
-            -- mAxisMaster => rxMasters(i),
-            -- mAxisSlave  => rxSlaves(i));
-   -- end generate GEN_RX;
+   maxSegs <= ite(unsigned(maxObSegSize) >= MAX_SEG_SIZE_G,
+                  slv(to_unsigned(MAX_SEG_SIZE_G, maxSegs'length)),
+                  maxObSegSize(maxSegs'range));
 
-   -- U_AxiStreamMux : entity work.AxiStreamMux
-      -- generic map (
-         -- TPD_G                => TPD_G,
-         -- NUM_SLAVES_G         => APP_STREAMS_G,
-         -- MODE_G               => "ROUTED",
-         -- TDEST_ROUTES_G       => APP_STREAM_ROUTES_G,
-         -- ILEAVE_EN_G          => APP_ILEAVE_EN_G,
-         -- ILEAVE_ON_NOTVALID_G => ILEAVE_ON_NOTVALID_G,
-         -- ILEAVE_REARB_G       => (MAX_SEG_SIZE_G/CONV_AXIS_CONFIG_C.TDATA_BYTES_C),
-         -- PIPE_STAGES_G        => 1)
-      -- port map (
-         -- -- Clock and reset
-         -- axisClk      => clk_i,
-         -- axisRst      => reset,
-         -- -- Slaves
-         -- sAxisMasters => rxMasters,
-         -- sAxisSlaves  => rxSlaves,
-         -- -- Master
-         -- mAxisMaster  => packetizerMasters(0),
-         -- mAxisSlave   => packetizerSlaves(0));
+   U_Packetizer : entity work.AxiStreamPacketizer2
+      generic map (
+         TPD_G                => TPD_G,
+         BRAM_EN_G            => true,
+         REG_EN_G             => true,
+         CRC_MODE_G           => "FULL",
+         CRC_POLY_G           => x"04C11DB7",
+         TDEST_BITS_G         => 8,
+         MAX_PACKET_BYTES_G   => MAX_SEG_SIZE_G,
+         INPUT_PIPE_STAGES_G  => 0,
+         OUTPUT_PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => clk_i,
+         axisRst     => reset,
+         maxPktBytes => maxSegs,
+         sAxisMaster => packetizerMasters(0),
+         sAxisSlave  => packetizerSlaves(0),
+         mAxisMaster => packetizerMasters(1),
+         mAxisSlave  => packetizerSlaves(1));
 
-   GEN_PACKER : if (BYPASS_CHUNKER_G = false) generate
-      constant MAX_SEGS_BITS_C : positive := bitSize(MAX_SEG_SIZE_G);
-      signal   maxSegs         : slv(MAX_SEGS_BITS_C - 1 downto 0);
-   begin
-
-      maxSegs <= ite(unsigned(maxObSegSize) >= MAX_SEG_SIZE_G,
-                     slv(to_unsigned(MAX_SEG_SIZE_G, maxSegs'length)),
-                     maxObSegSize(maxSegs'range));
-
-      PACKER_V1 : if (APP_ILEAVE_EN_G = false) generate
-         U_Packetizer : entity work.AxiStreamPacketizer
-            generic map (
-               TPD_G                => TPD_G,
-               MAX_PACKET_BYTES_G   => MAX_SEG_SIZE_G,
-               INPUT_PIPE_STAGES_G  => 0,
-               OUTPUT_PIPE_STAGES_G => 1)
-            port map (
-               axisClk     => clk_i,
-               axisRst     => reset,
-               maxPktBytes => maxSegs,
-               sAxisMaster => packetizerMasters(0),
-               sAxisSlave  => packetizerSlaves(0),
-               mAxisMaster => packetizerMasters(1),
-               mAxisSlave  => packetizerSlaves(1));
-      end generate;
-      PACKER_V2 : if (APP_ILEAVE_EN_G = true) generate
-         U_Packetizer : entity work.AxiStreamPacketizer2
-            generic map (
-               TPD_G                => TPD_G,
-               BRAM_EN_G            => true,
-               REG_EN_G             => true,
-               CRC_MODE_G           => "FULL",
-               CRC_POLY_G           => x"04C11DB7",
-               TDEST_BITS_G         => 8,
-               MAX_PACKET_BYTES_G   => MAX_SEG_SIZE_G,
-               INPUT_PIPE_STAGES_G  => 0,
-               OUTPUT_PIPE_STAGES_G => 1)
-            port map (
-               axisClk     => clk_i,
-               axisRst     => reset,
-               maxPktBytes => maxSegs,
-               sAxisMaster => packetizerMasters(0),
-               sAxisSlave  => packetizerSlaves(0),
-               mAxisMaster => packetizerMasters(1),
-               mAxisSlave  => packetizerSlaves(1));
-      end generate;
-   end generate;
-
-   BYPASS_PACKER : if (BYPASS_CHUNKER_G = true) generate
-      packetizerMasters(1) <= packetizerMasters(0);
-      packetizerSlaves(0)  <= packetizerSlaves(1);
-   end generate;
+   U_BUFFER : entity work.AxiStreamFifoV2
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
+         -- FIFO configurations
+         BRAM_EN_G           => true,
+         GEN_SYNC_FIFO_G     => true,
+         FIFO_ADDR_WIDTH_G   => 10,     -- 16B x 1024 = 16KB > 9000 MTU
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Slave Port
+         sAxisClk    => clk_i,
+         sAxisRst    => reset,
+         sAxisMaster => sTspAxisMaster_i,
+         sAxisSlave  => sTspAxisSlave_o,
+         -- Master Port
+         mAxisClk    => clk_i,
+         mAxisRst    => reset,
+         mAxisMaster => sTspAxisMaster,
+         mAxisSlave  => sTspAxisSlave);
 
    U_RssiCore : entity work.RssiCore
       generic map (
@@ -279,7 +231,7 @@ begin
          BYP_TX_BUFFER_G     => BYP_TX_BUFFER_G,
          BYP_RX_BUFFER_G     => BYP_RX_BUFFER_G,
          SYNTH_MODE_G        => SYNTH_MODE_G,
-         MEMORY_TYPE_G       => MEMORY_TYPE_G,         
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          -- AXIS Configurations
          APP_AXIS_CONFIG_G   => CONV_AXIS_CONFIG_C,
          TSP_AXIS_CONFIG_G   => TSP_AXIS_CONFIG_G,
@@ -308,8 +260,8 @@ begin
          mAppAxisMaster_o => depacketizerMasters(1),
          mAppAxisSlave_i  => depacketizerSlaves(1),
          -- SSI Transport side
-         sTspAxisMaster_i => sTspAxisMaster_i,
-         sTspAxisSlave_o  => sTspAxisSlave_o,
+         sTspAxisMaster_i => sTspAxisMaster,
+         sTspAxisSlave_o  => sTspAxisSlave,
          mTspAxisMaster_o => mTspAxisMaster_o,
          mTspAxisSlave_i  => mTspAxisSlave_i,
          -- High level  Application side interface
@@ -330,98 +282,34 @@ begin
    statusReg_o      <= statusReg;
    rssiConnected    <= statusReg(0);
    rssiNotConnected <= not(rssiConnected);
-   
+
    process(clk_i)
    begin
       if rising_edge(clk_i) then
          linkUp <= statusReg(0) after TPD_G;
       end if;
-   end process;   
+   end process;
 
-   GEN_DEPACKER : if (BYPASS_CHUNKER_G = false) generate
-      DEPACKER_V1 : if (APP_ILEAVE_EN_G = false) generate
-         U_Depacketizer : entity work.AxiStreamDepacketizer
-            generic map (
-               TPD_G                => TPD_G,
-               INPUT_PIPE_STAGES_G  => 0,  -- No need for input stage, RSSI output is already pipelined
-               OUTPUT_PIPE_STAGES_G => 1)
-            port map (
-               axisClk     => clk_i,
-               axisRst     => reset,
-               restart     => rssiNotConnected,
-               sAxisMaster => depacketizerMasters(1),
-               sAxisSlave  => depacketizerSlaves(1),
-               mAxisMaster => depacketizerMasters(0),
-               mAxisSlave  => depacketizerSlaves(0));
-      end generate;
-      DEPACKER_V2 : if (APP_ILEAVE_EN_G = true) generate
-         U_Depacketizer : entity work.AxiStreamDepacketizer2
-            generic map (
-               TPD_G                => TPD_G,
-               BRAM_EN_G            => true,
-               REG_EN_G             => true,
-               CRC_MODE_G           => "FULL",
-               CRC_POLY_G           => x"04C11DB7",
-               TDEST_BITS_G         => 8,
-               INPUT_PIPE_STAGES_G  => 0,  -- No need for input stage, RSSI output is already pipelined
-               OUTPUT_PIPE_STAGES_G => 1)
-            port map (
-               axisClk     => clk_i,
-               axisRst     => reset,
-               linkGood    => rssiConnected,
-               sAxisMaster => depacketizerMasters(1),
-               sAxisSlave  => depacketizerSlaves(1),
-               mAxisMaster => depacketizerMasters(0),
-               mAxisSlave  => depacketizerSlaves(0));
-      end generate;
-   end generate;
+   U_Depacketizer : entity work.AxiStreamDepacketizer2
+      generic map (
+         TPD_G                => TPD_G,
+         BRAM_EN_G            => true,
+         REG_EN_G             => true,
+         CRC_MODE_G           => "FULL",
+         CRC_POLY_G           => x"04C11DB7",
+         TDEST_BITS_G         => 8,
+         INPUT_PIPE_STAGES_G  => 0,  -- No need for input stage, RSSI output is already pipelined
+         OUTPUT_PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => clk_i,
+         axisRst     => reset,
+         linkGood    => rssiConnected,
+         sAxisMaster => depacketizerMasters(1),
+         sAxisSlave  => depacketizerSlaves(1),
+         mAxisMaster => depacketizerMasters(0),
+         mAxisSlave  => depacketizerSlaves(0));
 
-   BYPASS_DEPACKER : if (BYPASS_CHUNKER_G = true) generate
-      depacketizerMasters(0) <= depacketizerMasters(1);
-      depacketizerSlaves(1)  <= depacketizerSlaves(0);
-   end generate;
-   
-   -- U_AxiStreamDeMux : entity work.AxiStreamDeMux
-      -- generic map (
-         -- TPD_G          => TPD_G,
-         -- PIPE_STAGES_G  => 1,
-         -- NUM_MASTERS_G  => APP_STREAMS_G,
-         -- MODE_G         => "ROUTED",
-         -- TDEST_ROUTES_G => APP_STREAM_ROUTES_G)
-      -- port map (
-         -- -- Clock and reset
-         -- axisClk      => clk_i,
-         -- axisRst      => reset,
-         -- -- Slaves
-         -- sAxisMaster  => depacketizerMasters(0),
-         -- sAxisSlave   => depacketizerSlaves(0),
-         -- -- Master
-         -- mAxisMasters => txMasters,
-         -- mAxisSlaves  => txSlaves);
-
-   -- GEN_TX :
-   -- for i in (APP_STREAMS_G-1) downto 0 generate
-      -- U_Tx : entity work.AxiStreamResize
-         -- generic map (
-            -- -- General Configurations
-            -- TPD_G               => TPD_G,
-            -- READY_EN_G          => true,
-            -- -- AXI Stream Port Configurations
-            -- SLAVE_AXI_CONFIG_G  => CONV_AXIS_CONFIG_C,
-            -- MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_G(i))
-         -- port map (
-            -- -- Clock and reset
-            -- axisClk     => clk_i,
-            -- axisRst     => reset,
-            -- -- Slave Port
-            -- sAxisMaster => txMasters(i),
-            -- sAxisSlave  => txSlaves(i),
-            -- -- Master Port
-            -- mAxisMaster => mAppAxisMasters_o(i),
-            -- mAxisSlave  => mAppAxisSlaves_i(i));
-   -- end generate GEN_TX;
-   
    mAppAxisMaster_o      <= depacketizerMasters(0);
-   depacketizerSlaves(0) <= mAppAxisSlave_i;      
+   depacketizerSlaves(0) <= mAppAxisSlave_i;
 
 end mapping;

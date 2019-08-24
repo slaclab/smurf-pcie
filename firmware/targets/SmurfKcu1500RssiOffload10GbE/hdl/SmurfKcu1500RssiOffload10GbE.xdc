@@ -15,8 +15,8 @@ set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_LANE[0].U_Lane}
 set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_LANE[1].U_Lane}]
 set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_LANE[2].U_Lane}]
 set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_LANE[3].U_Lane}]
-set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_LANE[4].U_Lane}]
-set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_LANE[5].U_Lane}]
+set_property USER_SLR_ASSIGNMENT SLR0 [get_cells {U_Hardware/GEN_LANE[4].U_Lane}]
+set_property USER_SLR_ASSIGNMENT SLR0 [get_cells {U_Hardware/GEN_LANE[5].U_Lane}]
 
 set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_VEC[0].U_Buffer}]
 set_property USER_SLR_ASSIGNMENT SLR1 [get_cells {U_Hardware/GEN_VEC[1].U_Buffer}]

@@ -10,31 +10,26 @@
 ##############################################################################
 
 import pyrogue as pr
-import SmurfKcu1500RssiOffload as smurf
-import surf.ethernet.udp as udp
-import surf.protocols.rssi as rssi
+from surf.ethernet import udp
 
-class EthLane(pr.Device):
+class UdpConfig(pr.Device):
     def __init__(   self,       
-            name        = "EthLane",
-            description = "Container for EthLane",
+            name        = 'UdpConfig',
+            description = 'Container for UdpConfig',
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-        
-        self.add(smurf.EthConfig(
-            offset = 0x0000, 
-            expand = False,
-        ))
-        
-        self.add(udp.UdpEngine(
-            offset = 0x1000, 
-            numClt = 2,
-            expand = False,
-        ))        
-                
-        self.add(rssi.RssiCore(
-            name   = "RssiClient",
-            offset = 0x2000, 
-            expand =  False,
-        ))
-        
+       
+        self.add(pr.RemoteVariable(   
+            name         = 'EnKeepAlive',
+            offset       = 0x0C,
+            bitSize      = 1,
+            mode         = 'RW',
+        ))  
+
+        self.add(pr.RemoteVariable(   
+            name         = 'KeepAliveConfig',
+            offset       = 0x10,
+            bitSize      = 32,
+            mode         = 'RW',
+        ))  
+    

@@ -4,7 +4,7 @@
 source /afs/slac.stanford.edu/g/reseng/rogue/anaconda/rogue_pre-release.sh
 
 #source /afs/slac.stanford.edu/g/reseng/vol26/anaconda/miniconda3/etc/profile.d/conda.sh
-#conda activate rogue_v3.6.0
+#conda activate rogue_v3.7.0
 
 # Python Package directories
 TOP=${PWD}/

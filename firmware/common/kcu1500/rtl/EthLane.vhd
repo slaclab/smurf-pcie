@@ -27,7 +27,7 @@ use work.AppPkg.all;
 entity EthLane is
    generic (
       TPD_G           : time := 1 ns;
-      CLK_FREQUENCY_G : real := 156.25E+6;  -- units of Hz
+      CLK_FREQUENCY_G : real := 156.25E+6;        -- units of Hz
       AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
       -- RSSI Interface (axilClk domain)
@@ -38,17 +38,17 @@ entity EthLane is
       -- UDP Interface (axiClk/axilClk domain)
       axiClk          : in  sl;
       axiRst          : in  sl;
-      udpIbMaster     : in  AxiStreamMasterType; -- (axilClk domain)
+      udpIbMaster     : in  AxiStreamMasterType;  -- (axilClk domain)
       udpIbSlave      : out AxiStreamSlaveType;
-      udpObMaster     : out AxiStreamMasterType; -- (axiClk domain)
+      udpObMaster     : out AxiStreamMasterType;  -- (axiClk domain)
       udpObSlave      : in  AxiStreamSlaveType;
       -- PHY/MAC Interface (axilClk domain)
       macObMaster     : in  AxiStreamMasterType;
       macObSlave      : out AxiStreamSlaveType;
       macIbMaster     : out AxiStreamMasterType;
       macIbSlave      : in  AxiStreamSlaveType;
-      phyReady        : in  sl;
-      mac             : out slv(47 downto 0);
+      localMac        : in  slv(47 downto 0);
+      localIp         : in  slv(31 downto 0);
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -61,7 +61,8 @@ end EthLane;
 architecture mapping of EthLane is
 
    constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
-   constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
+   -- constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
+   constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
    constant NUM_AXI_MASTERS_C  : natural  := 3;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 16, 12);
@@ -78,15 +79,12 @@ architecture mapping of EthLane is
 
    signal keepAliveMaster : AxiStreamMasterType;
    signal keepAliveSlave  : AxiStreamSlaveType;
-   
-   signal sTspAxisMaster : AxiStreamMasterType;
-   signal sTspAxisSlave  : AxiStreamSlaveType;
-   
-   signal localIp  : slv(31 downto 0);
-   signal localMac : slv(47 downto 0);
+
+   signal mac : slv(47 downto 0);
+   signal ip  : slv(31 downto 0);
 
    signal axilReset : sl;
-   signal axiReset : sl;
+   signal axiReset  : sl;
 
 begin
 
@@ -97,19 +95,20 @@ begin
          clk    => axilClk,
          rstIn  => axilRst,
          rstOut => axilReset);
-         
+
    U_axiRst : entity work.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
          clk    => axiClk,
          rstIn  => axiRst,
-         rstOut => axiReset);    
-         
+         rstOut => axiReset);
+
    process(axilClk)
    begin
       if rising_edge(axilClk) then
          mac <= localMac after TPD_G;
+         ip  <= localIp  after TPD_G;
       end if;
    end process;
 
@@ -137,12 +136,10 @@ begin
    ---------------------
    -- ETH Configurations
    ---------------------
-   U_EthConfig : entity work.EthConfig
+   U_UdpConfig : entity work.UdpConfig
       generic map (
          TPD_G => TPD_G)
       port map (
-         localIp         => localIp,
-         localMac        => localMac,
          keepAliveMaster => keepAliveMaster,
          keepAliveSlave  => keepAliveSlave,
          -- AXI-Lite Register Interface (axilClk domain)
@@ -168,26 +165,26 @@ begin
          CLIENT_PORTS_G => CLIENT_PORTS_C)
       port map (
          -- Local Configurations
-         localMac           => localMac,
-         localIp            => localIp,
+         localMac        => mac,
+         localIp         => ip,
          -- Interface to Ethernet Media Access Controller (MAC)
-         obMacMaster        => macObMaster,
-         obMacSlave         => macObSlave,
-         ibMacMaster        => macIbMaster,
-         ibMacSlave         => macIbSlave,
+         obMacMaster     => macObMaster,
+         obMacSlave      => macObSlave,
+         ibMacMaster     => macIbMaster,
+         ibMacSlave      => macIbSlave,
          -- Interface to UDP Client engine(s)
-         obClientMasters    => obUdpMasters,
-         obClientSlaves     => obUdpSlaves,
-         ibClientMasters    => ibUdpMasters,
-         ibClientSlaves     => ibUdpSlaves,
+         obClientMasters => obUdpMasters,
+         obClientSlaves  => obUdpSlaves,
+         ibClientMasters => ibUdpMasters,
+         ibClientSlaves  => ibUdpSlaves,
          -- AXI-Lite Interface
-         axilReadMaster     => axilReadMasters(1),
-         axilReadSlave      => axilReadSlaves(1),
-         axilWriteMaster    => axilWriteMasters(1),
-         axilWriteSlave     => axilWriteSlaves(1),
+         axilReadMaster  => axilReadMasters(1),
+         axilReadSlave   => axilReadSlaves(1),
+         axilWriteMaster => axilWriteMasters(1),
+         axilWriteSlave  => axilWriteSlaves(1),
          -- Clock and Reset
-         clk                => axilClk,
-         rst                => axilReset);
+         clk             => axilClk,
+         rst             => axilReset);
 
    U_AxiStreamMux : entity work.AxiStreamMux
       generic map (
@@ -216,7 +213,7 @@ begin
          -- FIFO configurations
          BRAM_EN_G           => true,
          GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 10, -- 16B x 1024 = 16KB > 9000 MTU
+         FIFO_ADDR_WIDTH_G   => 10,     -- 16B x 1024 = 16KB > 9000 MTU
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
@@ -231,31 +228,6 @@ begin
          mAxisRst    => axiRst,
          mAxisMaster => udpObMaster,
          mAxisSlave  => udpObSlave);
-         
-   U_BUFFER : entity work.AxiStreamFifoV2
-      generic map (
-         -- General Configurations
-         TPD_G               => TPD_G,
-         INT_PIPE_STAGES_G   => 1,
-         PIPE_STAGES_G       => 1,
-         -- FIFO configurations
-         BRAM_EN_G           => true,
-         GEN_SYNC_FIFO_G     => true,
-         FIFO_ADDR_WIDTH_G   => 10, -- 16B x 1024 = 16KB > 9000 MTU
-         -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilReset,
-         sAxisMaster => obUdpMasters(0),
-         sAxisSlave  => obUdpSlaves(0),
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilReset,
-         mAxisMaster => sTspAxisMaster,
-         mAxisSlave  => sTspAxisSlave);         
 
    --------------------------
    -- Software's RSSI Clients
@@ -281,8 +253,8 @@ begin
          clk_i            => axilClk,
          rst_i            => axilReset,
          -- Transport Layer Interface
-         sTspAxisMaster_i => sTspAxisMaster,
-         sTspAxisSlave_o  => sTspAxisSlave,
+         sTspAxisMaster_i => obUdpMasters(0),
+         sTspAxisSlave_o  => obUdpSlaves(0),
          mTspAxisMaster_o => ibUdpMasters(0),
          mTspAxisSlave_i  => ibUdpSlaves(0),
          -- Application Layer Interface

@@ -128,11 +128,12 @@ architecture mapping of Hardware is
    signal rssiObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal rssiObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal phyReady : slv(NUM_RSSI_C-1 downto 0);
    signal localMac : Slv48Array(NUM_RSSI_C-1 downto 0);
+   signal localIp  : Slv32Array(NUM_RSSI_C-1 downto 0);
 
-   signal udpObMuxSel : sl;
-   signal udpObDest   : slv(7 downto 0);
+   signal udpObMuxSel   : sl;
+   signal udpObDest     : slv(7 downto 0);
+   signal udpToPhyRoute : Slv8Array(NUM_RSSI_C-1 downto 0);
 
    signal axilReset : sl;
    signal axiReset  : sl;
@@ -266,6 +267,8 @@ begin
       port map (
          -- Local Configurations
          localMac        => localMac,
+         localIp         => localIp,
+         udpToPhyRoute   => udpToPhyRoute,
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilReset,
@@ -274,12 +277,10 @@ begin
          axilWriteMaster => axilWriteMasters(PHY_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(PHY_INDEX_C),
          -- Streaming DMA Interface 
-         dmaIbMasters    => macObMasters,
-         dmaIbSlaves     => macObSlaves,
-         dmaObMasters    => macIbMasters,
-         dmaObSlaves     => macIbSlaves,
-         -- Misc. Signals
-         phyReady        => phyReady,
+         udpIbMasters    => macObMasters,
+         udpIbSlaves     => macObSlaves,
+         udpObMasters    => macIbMasters,
+         udpObSlaves     => macIbSlaves,
          ---------------------
          --  Hardware Ports
          ---------------------    
@@ -326,8 +327,8 @@ begin
             macObSlave      => macObSlaves(i),
             macIbMaster     => macIbMasters(i),
             macIbSlave      => macIbSlaves(i),
-            phyReady        => phyReady(i),
-            mac             => localMac(i),
+            localMac        => localMac(i),
+            localIp         => localIp(i),
             -- AXI-Lite Interface (axilClk domain)
             axilClk         => axilClk,
             axilRst         => axilReset,
@@ -366,16 +367,18 @@ begin
 
    end generate GEN_VEC;
 
-   U_Config : entity work.UdpLargeDataConfig
+   U_Debug : entity work.UdpDebug
       generic map (
          TPD_G => TPD_G)
       port map (
+         userClk         => axilClk,
          -- Clock and Reset
          axiClk          => axiClk,
          axiRst          => axiReset,
          -- UDP Outbound Config Interface
          udpObMuxSel     => udpObMuxSel,
          udpObDest       => udpObDest,
+         udpToPhyRoute   => udpToPhyRoute,
          -- AXI-Lite Interface 
          axilReadMaster  => buffReadMasters(NUM_RSSI_C),
          axilReadSlave   => buffReadSlaves(NUM_RSSI_C),
