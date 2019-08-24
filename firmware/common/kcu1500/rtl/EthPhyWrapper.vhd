@@ -267,90 +267,90 @@ begin
          gtRxP               => qsfp0RxP,
          gtRxN               => qsfp0RxN);
 
-   -- U_QSFP1 : entity work.TenGigEthGthUltraScaleWrapper
-   -- generic map (
-   -- TPD_G         => TPD_G,
-   -- NUM_LANE_G    => 4,
-   -- EN_AXI_REG_G  => true,
-   -- -- AXI Streaming Configurations
-   -- AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
-   -- port map (
-   -- -- Local Configurations
-   -- localMac            => mac(7 downto 4),
-   -- -- Streaming DMA Interface 
-   -- dmaClk              => dmaClk(7 downto 4),
-   -- dmaRst              => dmaRst(7 downto 4),
-   -- dmaIbMasters        => phyObMasters(7 downto 4),
-   -- dmaIbSlaves         => phyObSlaves(7 downto 4),
-   -- dmaObMasters        => phyIbMasters(7 downto 4),
-   -- dmaObSlaves         => phyIbSlaves(7 downto 4),
-   -- -- Slave AXI-Lite Interface 
-   -- axiLiteClk          => axiLiteClk(7 downto 4),
-   -- axiLiteRst          => axiLiteRst(7 downto 4),
-   -- axiLiteReadMasters  => axilReadMasters(7 downto 4),
-   -- axiLiteReadSlaves   => axilReadSlaves(7 downto 4),
-   -- axiLiteWriteMasters => axilWriteMasters(7 downto 4),
-   -- axiLiteWriteSlaves  => axilWriteSlaves(7 downto 4),
-   -- -- Misc. Signals
-   -- extRst              => axilReset,
-   -- -- Transceiver Debug Interface
-   -- gtTxPreCursor       => gtTxPreCursor(7 downto 4),
-   -- gtTxPostCursor      => gtTxPostCursor(7 downto 4),
-   -- gtTxDiffCtrl        => gtTxDiffCtrl(7 downto 4),
-   -- -- MGT Clock Port
-   -- gtClkP              => qsfp1RefClkP(0),
-   -- gtClkN              => qsfp1RefClkN(0),
-   -- -- MGT Ports
-   -- gtTxP               => qsfp1TxP,
-   -- gtTxN               => qsfp1TxN,
-   -- gtRxP               => qsfp1RxP,
-   -- gtRxN               => qsfp1RxN);
-
    U_QSFP1 : entity work.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
-         NUM_LANE_G    => 2,
+         NUM_LANE_G    => 4,
          EN_AXI_REG_G  => true,
          -- AXI Streaming Configurations
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
-         localMac            => mac(5 downto 4),
+         localMac            => mac(7 downto 4),
          -- Streaming DMA Interface 
-         dmaClk              => dmaClk(5 downto 4),
-         dmaRst              => dmaRst(5 downto 4),
-         dmaIbMasters        => phyObMasters(5 downto 4),
-         dmaIbSlaves         => phyObSlaves(5 downto 4),
-         dmaObMasters        => phyIbMasters(5 downto 4),
-         dmaObSlaves         => phyIbSlaves(5 downto 4),
+         dmaClk              => dmaClk(7 downto 4),
+         dmaRst              => dmaRst(7 downto 4),
+         dmaIbMasters        => phyObMasters(7 downto 4),
+         dmaIbSlaves         => phyObSlaves(7 downto 4),
+         dmaObMasters        => phyIbMasters(7 downto 4),
+         dmaObSlaves         => phyIbSlaves(7 downto 4),
          -- Slave AXI-Lite Interface 
-         axiLiteClk          => axiLiteClk(5 downto 4),
-         axiLiteRst          => axiLiteRst(5 downto 4),
-         axiLiteReadMasters  => axilReadMasters(5 downto 4),
-         axiLiteReadSlaves   => axilReadSlaves(5 downto 4),
-         axiLiteWriteMasters => axilWriteMasters(5 downto 4),
-         axiLiteWriteSlaves  => axilWriteSlaves(5 downto 4),
+         axiLiteClk          => axiLiteClk(7 downto 4),
+         axiLiteRst          => axiLiteRst(7 downto 4),
+         axiLiteReadMasters  => axilReadMasters(7 downto 4),
+         axiLiteReadSlaves   => axilReadSlaves(7 downto 4),
+         axiLiteWriteMasters => axilWriteMasters(7 downto 4),
+         axiLiteWriteSlaves  => axilWriteSlaves(7 downto 4),
          -- Misc. Signals
          extRst              => axilReset,
+         -- Transceiver Debug Interface
+         gtTxPreCursor       => gtTxPreCursor(7 downto 4),
+         gtTxPostCursor      => gtTxPostCursor(7 downto 4),
+         gtTxDiffCtrl        => gtTxDiffCtrl(7 downto 4),
          -- MGT Clock Port
          gtClkP              => qsfp1RefClkP(0),
          gtClkN              => qsfp1RefClkN(0),
          -- MGT Ports
-         gtTxP               => qsfp1TxP(1 downto 0),
-         gtTxN               => qsfp1TxN(1 downto 0),
-         gtRxP               => qsfp1RxP(1 downto 0),
-         gtRxN               => qsfp1RxN(1 downto 0));
+         gtTxP               => qsfp1TxP,
+         gtTxN               => qsfp1TxN,
+         gtRxP               => qsfp1RxP,
+         gtRxN               => qsfp1RxN);
 
-   U_GTH_TERM : entity work.Gthe3ChannelDummy
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 2)
-      port map (
-         refClk => axilRst,
-         gtTxP  => qsfp1TxP(3 downto 2),
-         gtTxN  => qsfp1TxN(3 downto 2),
-         gtRxP  => qsfp1RxP(3 downto 2),
-         gtRxN  => qsfp1RxN(3 downto 2));
+   -- U_QSFP1 : entity work.TenGigEthGthUltraScaleWrapper
+   -- generic map (
+   -- TPD_G         => TPD_G,
+   -- NUM_LANE_G    => 2,
+   -- EN_AXI_REG_G  => true,
+   -- -- AXI Streaming Configurations
+   -- AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
+   -- port map (
+   -- -- Local Configurations
+   -- localMac            => mac(5 downto 4),
+   -- -- Streaming DMA Interface 
+   -- dmaClk              => dmaClk(5 downto 4),
+   -- dmaRst              => dmaRst(5 downto 4),
+   -- dmaIbMasters        => phyObMasters(5 downto 4),
+   -- dmaIbSlaves         => phyObSlaves(5 downto 4),
+   -- dmaObMasters        => phyIbMasters(5 downto 4),
+   -- dmaObSlaves         => phyIbSlaves(5 downto 4),
+   -- -- Slave AXI-Lite Interface 
+   -- axiLiteClk          => axiLiteClk(5 downto 4),
+   -- axiLiteRst          => axiLiteRst(5 downto 4),
+   -- axiLiteReadMasters  => axilReadMasters(5 downto 4),
+   -- axiLiteReadSlaves   => axilReadSlaves(5 downto 4),
+   -- axiLiteWriteMasters => axilWriteMasters(5 downto 4),
+   -- axiLiteWriteSlaves  => axilWriteSlaves(5 downto 4),
+   -- -- Misc. Signals
+   -- extRst              => axilReset,
+   -- -- MGT Clock Port
+   -- gtClkP              => qsfp1RefClkP(0),
+   -- gtClkN              => qsfp1RefClkN(0),
+   -- -- MGT Ports
+   -- gtTxP               => qsfp1TxP(1 downto 0),
+   -- gtTxN               => qsfp1TxN(1 downto 0),
+   -- gtRxP               => qsfp1RxP(1 downto 0),
+   -- gtRxN               => qsfp1RxN(1 downto 0));
+
+   -- U_GTH_TERM : entity work.Gthe3ChannelDummy
+   -- generic map (
+   -- TPD_G   => TPD_G,
+   -- WIDTH_G => 2)
+   -- port map (
+   -- refClk => axilRst,
+   -- gtTxP  => qsfp1TxP(3 downto 2),
+   -- gtTxN  => qsfp1TxN(3 downto 2),
+   -- gtRxP  => qsfp1RxP(3 downto 2),
+   -- gtRxN  => qsfp1RxN(3 downto 2));
 
    --------------------
    -- Unused GTH Clocks
