@@ -1,12 +1,16 @@
 pcie:
   Core:  
 ########################################################    
+    # UdpBufferGrp:           
+      # UdpDebug:
+        # MuxSel: PrimaryDMA   
+########################################################   
     EthPhyGrp:
       ############################   
-      EthConfig[:]:      
-        TxPreCursor: 0x7
-        TxPostCursor: 0x7
-        TxDiffCtrl: 0xF
+      # EthConfig[:]:      
+        # TxPreCursor: 0x7
+        # TxPostCursor: 0x7
+        # TxDiffCtrl: 0xF
       ############################   
       EthConfig[0]:
         # Set the local MAC address
@@ -76,12 +80,5 @@ pcie:
       ############################     
       UdpEngine[5]:  
         ClientRemoteIp[:]: 192.168.2.15 # Slot#7 Link 
-      ############################       
-########################################################    
-    UdpBufferGrp:      
-      ############################       
-      UdpDebug:
-        MuxSel: PrimaryDMA
-        # MuxSel: SecondaryDMA
       ############################       
 ########################################################    
