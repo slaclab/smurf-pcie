@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : EthConfig.vhd
+-- File       : UdpConfig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 
@@ -24,15 +24,12 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AppPkg.all;
 
-entity EthConfig is
+entity UdpConfig is
    generic (
       TPD_G : time := 1 ns);
    port (
-      localIp         : out slv(31 downto 0);  -- big endianness
-      localMac        : out slv(47 downto 0);  -- big endianness
-      gtTxPreCursor   : out slv(4 downto 0);
-      gtTxPostCursor  : out slv(4 downto 0);
-      gtTxDiffCtrl    : out slv(3 downto 0);
+      keepAliveMaster : out AxiStreamMasterType;
+      keepAliveSlave  : in  AxiStreamSlaveType;
       -- AXI-Lite Register Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -40,28 +37,26 @@ entity EthConfig is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType);
-end EthConfig;
+end UdpConfig;
 
-architecture rtl of EthConfig is
+architecture rtl of UdpConfig is
 
    type RegType is record
-      localIp        : slv(31 downto 0);
-      localMac       : slv(47 downto 0);
-      gtTxPreCursor  : slv(4 downto 0);
-      gtTxPostCursor : slv(4 downto 0);
-      gtTxDiffCtrl   : slv(3 downto 0);
-      axilReadSlave  : AxiLiteReadSlaveType;
-      axilWriteSlave : AxiLiteWriteSlaveType;
+      enKeepAlive     : sl;
+      keepAliveMaster : AxiStreamMasterType;
+      keepAliveConfig : slv(31 downto 0);
+      cnt             : slv(31 downto 0);
+      axilReadSlave   : AxiLiteReadSlaveType;
+      axilWriteSlave  : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      localIp        => (others => '0'),  -- big endianness
-      localMac       => (others => '0'),  -- big endianness
-      gtTxPreCursor  => "00111",
-      gtTxPostCursor => "00111",
-      gtTxDiffCtrl   => "1111",
-      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
+      enKeepAlive     => '0',
+      keepAliveMaster => AXI_STREAM_MASTER_INIT_C,
+      keepAliveConfig => (others => '1'),
+      cnt             => (others => '0'),
+      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -81,26 +76,43 @@ begin
    --------------------- 
    -- AXI Lite Interface
    --------------------- 
-   comb : process (axilReadMaster, axilReset, axilWriteMaster, r) is
+   comb : process (axilReadMaster, axilReset, axilWriteMaster, keepAliveSlave,
+                   r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
       -- Latch the current value
       v := r;
 
+      -- Flow control
+      if keepAliveSlave.tReady = '1' then
+         v.keepAliveMaster.tValid := '0';
+      end if;
+
       -- Determine the transaction type
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read registers
-      axiSlaveRegister(regCon, x"00", 0, v.localMac);
-      axiSlaveRegister(regCon, x"08", 0, v.localIp);
-
-      axiSlaveRegister(regCon, x"20", 0, v.gtTxPreCursor);
-      axiSlaveRegister(regCon, x"24", 0, v.gtTxPostCursor);
-      axiSlaveRegister(regCon, x"28", 0, v.gtTxDiffCtrl);
+      axiSlaveRegister(regCon, x"0C", 0, v.enKeepAlive);
+      axiSlaveRegister(regCon, x"10", 0, v.keepAliveConfig);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
+
+      -- Generate keep alive message for direct UDP interface
+      if (r.keepAliveConfig /= v.keepAliveConfig) or (r.enKeepAlive = '0') then
+         v.cnt := r.keepAliveConfig;
+      elsif r.cnt = r.keepAliveConfig then
+         v.cnt                    := (others => '0');
+         v.keepAliveMaster.tValid := '1';
+      else
+         v.cnt := r.cnt + 1;
+      end if;
+
+      -- Only send 1 byte for keep alive
+      v.keepAliveMaster.tUser(SSI_SOF_C) := '1';  -- SOF
+      v.keepAliveMaster.tLast            := '1';  -- EOF
+      v.keepAliveMaster.tKeep            := toSlv(1, AXI_STREAM_MAX_TKEEP_WIDTH_C);  -- 1 byte
 
       -- Synchronous Reset
       if (axilReset = '1') then
@@ -111,13 +123,9 @@ begin
       rin <= v;
 
       -- Outputs
-      axilWriteSlave <= r.axilWriteSlave;
-      axilReadSlave  <= r.axilReadSlave;
-      localIp        <= r.localIp;
-      localMac       <= r.localMac;
-      gtTxPreCursor  <= r.gtTxPreCursor;
-      gtTxPostCursor <= r.gtTxPostCursor;
-      gtTxDiffCtrl   <= r.gtTxDiffCtrl;
+      keepAliveMaster <= r.keepAliveMaster;
+      axilWriteSlave  <= r.axilWriteSlave;
+      axilReadSlave   <= r.axilReadSlave;
 
    end process comb;
 

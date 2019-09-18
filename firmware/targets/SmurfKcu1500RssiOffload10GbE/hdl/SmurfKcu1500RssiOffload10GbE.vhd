@@ -19,6 +19,7 @@ use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.AppPkg.all;
+use work.MigPkg.all;
 
 entity SmurfKcu1500RssiOffload10GbE is
    generic (
@@ -29,50 +30,62 @@ entity SmurfKcu1500RssiOffload10GbE is
       --  Application Ports
       ---------------------
       -- QSFP[0] Ports
-      qsfp0RefClkP : in  slv(1 downto 0);
-      qsfp0RefClkN : in  slv(1 downto 0);
-      qsfp0RxP     : in  slv(3 downto 0);
-      qsfp0RxN     : in  slv(3 downto 0);
-      qsfp0TxP     : out slv(3 downto 0);
-      qsfp0TxN     : out slv(3 downto 0);
+      qsfp0RefClkP  : in    slv(1 downto 0);
+      qsfp0RefClkN  : in    slv(1 downto 0);
+      qsfp0RxP      : in    slv(3 downto 0);
+      qsfp0RxN      : in    slv(3 downto 0);
+      qsfp0TxP      : out   slv(3 downto 0);
+      qsfp0TxN      : out   slv(3 downto 0);
       -- QSFP[1] Ports
-      qsfp1RefClkP : in  slv(1 downto 0);
-      qsfp1RefClkN : in  slv(1 downto 0);
-      qsfp1RxP     : in  slv(3 downto 0);
-      qsfp1RxN     : in  slv(3 downto 0);
-      qsfp1TxP     : out slv(3 downto 0);
-      qsfp1TxN     : out slv(3 downto 0);
+      qsfp1RefClkP  : in    slv(1 downto 0);
+      qsfp1RefClkN  : in    slv(1 downto 0);
+      qsfp1RxP      : in    slv(3 downto 0);
+      qsfp1RxN      : in    slv(3 downto 0);
+      qsfp1TxP      : out   slv(3 downto 0);
+      qsfp1TxN      : out   slv(3 downto 0);
+      -- DDR Ports
+      ddrClkP       : in    slv(3 downto 0);
+      ddrClkN       : in    slv(3 downto 0);
+      ddrOut        : out   DdrOutArray(3 downto 0);
+      ddrInOut      : inout DdrInOutArray(3 downto 0);
       --------------
       --  Core Ports
       --------------
       -- System Ports
-      emcClk       : in  sl;
-      userClkP     : in  sl;
-      userClkN     : in  sl;
+      emcClk        : in    sl;
+      userClkP      : in    sl;
+      userClkN      : in    sl;
       -- QSFP[0] Ports
-      qsfp0RstL    : out sl;
-      qsfp0LpMode  : out sl;
-      qsfp0ModSelL : out sl;
-      qsfp0ModPrsL : in  sl;
+      qsfp0RstL     : out   sl;
+      qsfp0LpMode   : out   sl;
+      qsfp0ModSelL  : out   sl;
+      qsfp0ModPrsL  : in    sl;
       -- QSFP[1] Ports
-      qsfp1RstL    : out sl;
-      qsfp1LpMode  : out sl;
-      qsfp1ModSelL : out sl;
-      qsfp1ModPrsL : in  sl;
+      qsfp1RstL     : out   sl;
+      qsfp1LpMode   : out   sl;
+      qsfp1ModSelL  : out   sl;
+      qsfp1ModPrsL  : in    sl;
       -- Boot Memory Ports 
-      flashCsL     : out sl;
-      flashMosi    : out sl;
-      flashMiso    : in  sl;
-      flashHoldL   : out sl;
-      flashWp      : out sl;
+      flashCsL      : out   sl;
+      flashMosi     : out   sl;
+      flashMiso     : in    sl;
+      flashHoldL    : out   sl;
+      flashWp       : out   sl;
       -- PCIe Ports
-      pciRstL      : in  sl;
-      pciRefClkP   : in  sl;
-      pciRefClkN   : in  sl;
-      pciRxP       : in  slv(7 downto 0);
-      pciRxN       : in  slv(7 downto 0);
-      pciTxP       : out slv(7 downto 0);
-      pciTxN       : out slv(7 downto 0));
+      pciRstL       : in    sl;
+      pciRefClkP    : in    sl;
+      pciRefClkN    : in    sl;
+      pciRxP        : in    slv(7 downto 0);
+      pciRxN        : in    slv(7 downto 0);
+      pciTxP        : out   slv(7 downto 0);
+      pciTxN        : out   slv(7 downto 0);
+      -- Extended PCIe Ports 
+      pciExtRefClkP : in    sl;
+      pciExtRefClkN : in    sl;
+      pciExtRxP     : in    slv(7 downto 0);
+      pciExtRxN     : in    slv(7 downto 0);
+      pciExtTxP     : out   slv(7 downto 0);
+      pciExtTxN     : out   slv(7 downto 0));
 end SmurfKcu1500RssiOffload10GbE;
 
 architecture top_level of SmurfKcu1500RssiOffload10GbE is
@@ -103,37 +116,44 @@ architecture top_level of SmurfKcu1500RssiOffload10GbE is
          addrBits     => 23,
          connectivity => x"FFFF"));
 
+   signal bar0WriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bar0WriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal bar0ReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bar0ReadSlaves   : AxiLiteReadSlaveArray(1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
 
-   signal userClk156      : sl;
-   signal axilClk         : sl;
-   signal axilRst         : sl;
-   signal axilReset       : sl;
-   signal axilReadMaster  : AxiLiteReadMasterType;
-   signal axilReadSlave   : AxiLiteReadSlaveType;
-   signal axilWriteMaster : AxiLiteWriteMasterType;
-   signal axilWriteSlave  : AxiLiteWriteSlaveType;
+   signal userClk156 : sl;
+   signal axilClk    : sl;
+   signal axilRst    : sl;
+   signal axilReset  : sl;
 
-   signal dmaClk       : sl;
-   signal dmaRst       : sl;
-   signal dmaObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal dmaObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal dmaIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal dmaIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal dmaPriClk       : sl;
+   signal dmaPriRst       : sl;
+   signal dmaPriObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal dmaPriObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal dmaPriIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal dmaPriIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal rssiLinkUp    : slv(NUM_RSSI_C-1 downto 0);
-   signal rssiIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal dmaSecClk       : sl;
+   signal dmaSecRst       : sl;
+   signal dmaSecObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal dmaSecObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+   signal dmaSecIbMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
+   signal dmaSecIbSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
 
-   signal devIbMaster : AxiStreamMasterType;
-   signal devIbSlave  : AxiStreamSlaveType;
-   signal devObMaster : AxiStreamMasterType;
-   signal devObSlave  : AxiStreamSlaveType;
+   signal axiClk          : sl;
+   signal axiRst          : sl;
+   signal axiReset        : sl;
+   signal ddrClk          : slv((NUM_RSSI_C/2)-1 downto 0);
+   signal ddrRst          : slv((NUM_RSSI_C/2)-1 downto 0);
+   signal ddrWriteMasters : AxiWriteMasterArray((NUM_RSSI_C/2)-1 downto 0);
+   signal ddrWriteSlaves  : AxiWriteSlaveArray((NUM_RSSI_C/2)-1 downto 0);
+   signal ddrReadMasters  : AxiReadMasterArray((NUM_RSSI_C/2)-1 downto 0);
+   signal ddrReadSlaves   : AxiReadSlaveArray((NUM_RSSI_C/2)-1 downto 0);
 
 begin
 
@@ -147,27 +167,102 @@ begin
          INPUT_BUFG_G       => true,
          FB_BUFG_G          => true,
          RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 1,
+         NUM_CLOCKS_G       => 2,
          -- MMCM attributes
          CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
          CLKFBOUT_MULT_G    => 8,       -- 1.25GHz = 8 x 156.25 MHz
-         CLKOUT0_DIVIDE_F_G => 8.0)    -- 156.25 MHz (must match CLK_FREQUENCY_C)
+         -- CLKOUT0_DIVIDE_F_G => 10.0,  -- 125 MHz (125 MHz x 128b = 16.0Gb/s > 10GbE)
+         CLKOUT0_DIVIDE_F_G => 12.5,  -- 100 MHz (100 MHz x 128b = 12.8Gb/s > 10GbE)
+         CLKOUT1_DIVIDE_G   => 8)  -- 156.25 MHz (must match CLK_FREQUENCY_C)
       port map(
          -- Clock Input
          clkIn     => userClk156,
-         rstIn     => dmaRst,
+         rstIn     => dmaPriRst,
          -- Clock Outputs
-         clkOut(0) => axilClk,
+         clkOut(0) => axiClk,
+         clkOut(1) => axilClk,
          -- Reset Outputs
-         rstOut(0) => axilReset);
+         rstOut(0) => axiRst,
+         rstOut(1) => axilRst);
+
+   U_axiRst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => axiClk,
+         rstIn  => axiRst,
+         rstOut => axiReset);
 
    U_axilRst : entity work.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
          clk    => axilClk,
-         rstIn  => axilReset,
-         rstOut => axilRst);
+         rstIn  => axilRst,
+         rstOut => axilReset);
+
+   -----------------
+   -- MIG[0] IP Core
+   -----------------         
+   U_Mig0 : entity work.Mig0
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         extRst         => dmaPriRst,
+         -- AXI MEM Interface
+         axiClk         => ddrClk(2),
+         axiRst         => ddrRst(2),
+         axiWriteMaster => ddrWriteMasters(2),
+         axiWriteSlave  => ddrWriteSlaves(2),
+         axiReadMaster  => ddrReadMasters(2),
+         axiReadSlave   => ddrReadSlaves(2),
+         -- DDR Ports
+         ddrClkP        => ddrClkP(0),
+         ddrClkN        => ddrClkN(0),
+         ddrOut         => ddrOut(0),
+         ddrInOut       => ddrInOut(0));
+
+   -----------------
+   -- MIG[2] IP Core
+   -----------------         
+   U_Mig2 : entity work.Mig2
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         extRst         => dmaPriRst,
+         -- AXI MEM Interface
+         axiClk         => ddrClk(1),
+         axiRst         => ddrRst(1),
+         axiWriteMaster => ddrWriteMasters(1),
+         axiWriteSlave  => ddrWriteSlaves(1),
+         axiReadMaster  => ddrReadMasters(1),
+         axiReadSlave   => ddrReadSlaves(1),
+         -- DDR Ports
+         ddrClkP        => ddrClkP(2),
+         ddrClkN        => ddrClkN(2),
+         ddrOut         => ddrOut(2),
+         ddrInOut       => ddrInOut(2));
+
+   -----------------
+   -- MIG[3] IP Core
+   -----------------
+   U_Mig3 : entity work.Mig3
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         extRst         => dmaPriRst,
+         -- AXI MEM Interface 
+         axiClk         => ddrClk(0),
+         axiRst         => ddrRst(0),
+         axiWriteMaster => ddrWriteMasters(0),
+         axiWriteSlave  => ddrWriteSlaves(0),
+         axiReadMaster  => ddrReadMasters(0),
+         axiReadSlave   => ddrReadSlaves(0),
+         -- DDR Ports
+         ddrClkP        => ddrClkP(3),
+         ddrClkN        => ddrClkN(3),
+         ddrOut         => ddrOut(3),
+         ddrInOut       => ddrInOut(3));
 
    ---------------------
    -- PCIE/DMA Interface
@@ -183,20 +278,20 @@ begin
          --  Top Level Interfaces
          ------------------------        
          userClk156     => userClk156,
-         -- DMA Interfaces  (dmaClk domain)
-         dmaClk         => dmaClk,
-         dmaRst         => dmaRst,
-         dmaObMasters   => dmaObMasters,
-         dmaObSlaves    => dmaObSlaves,
-         dmaIbMasters   => dmaIbMasters,
-         dmaIbSlaves    => dmaIbSlaves,
+         -- DMA Interfaces
+         dmaClk         => dmaPriClk,
+         dmaRst         => dmaPriRst,
+         dmaObMasters   => dmaPriObMasters,
+         dmaObSlaves    => dmaPriObSlaves,
+         dmaIbMasters   => dmaPriIbMasters,
+         dmaIbSlaves    => dmaPriIbSlaves,
          -- Application AXI-Lite Interfaces [0x00080000:0x00FFFFFF] (appClk domain)
          appClk         => axilClk,
-         appRst         => axilRst,
-         appReadMaster  => axilReadMaster,
-         appReadSlave   => axilReadSlave,
-         appWriteMaster => axilWriteMaster,
-         appWriteSlave  => axilWriteSlave,
+         appRst         => axilReset,
+         appReadMaster  => bar0ReadMasters(0),
+         appReadSlave   => bar0ReadSlaves(0),
+         appWriteMaster => bar0WriteMasters(0),
+         appWriteSlave  => bar0WriteSlaves(0),
          --------------
          --  Core Ports
          --------------   
@@ -229,27 +324,41 @@ begin
          pciTxP         => pciTxP,
          pciTxN         => pciTxN);
 
-   --------------------------------
-   -- dmaClk<-->axilClk ASYNC FIFOs
-   --------------------------------
-   U_DmaAsyncFifo : entity work.DmaAsyncFifo
+   U_ExtendedCore : entity work.XilinxKcu1500PcieExtendedCore
       generic map (
-         TPD_G => TPD_G)
+         TPD_G             => TPD_G,
+         BUILD_INFO_G      => BUILD_INFO_G,
+         DMA_AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
+         DMA_SIZE_G        => NUM_RSSI_C)
       port map (
-         -- DMA Interface (dmaClk domain)
-         dmaClk        => dmaClk,
-         dmaRst        => dmaRst,
-         dmaObMasters  => dmaObMasters,
-         dmaObSlaves   => dmaObSlaves,
-         dmaIbMasters  => dmaIbMasters,
-         dmaIbSlaves   => dmaIbSlaves,
-         -- DMA Interface (axilClk domain)
-         axilClk       => axilClk,
-         axilRst       => axilRst,
-         rssiIbMasters => rssiIbMasters,
-         rssiIbSlaves  => rssiIbSlaves,
-         rssiObMasters => rssiObMasters,
-         rssiObSlaves  => rssiObSlaves);
+         ------------------------      
+         --  Top Level Interfaces
+         ------------------------        
+         -- DMA Interfaces
+         dmaClk         => dmaSecClk,
+         dmaRst         => dmaSecRst,
+         dmaObMasters   => dmaSecObMasters,
+         dmaObSlaves    => dmaSecObSlaves,
+         dmaIbMasters   => dmaSecIbMasters,
+         dmaIbSlaves    => dmaSecIbSlaves,
+         -- Application AXI-Lite Interfaces [0x00080000:0x00FFFFFF] (appClk domain)
+         appClk         => axilClk,
+         appRst         => axilReset,
+         appReadMaster  => bar0ReadMasters(1),
+         appReadSlave   => bar0ReadSlaves(1),
+         appWriteMaster => bar0WriteMasters(1),
+         appWriteSlave  => bar0WriteSlaves(1),
+         --------------
+         --  Core Ports
+         --------------   
+         -- Extended PCIe Ports 
+         pciRstL        => pciRstL,
+         pciExtRefClkP  => pciExtRefClkP,
+         pciExtRefClkN  => pciExtRefClkN,
+         pciExtRxP      => pciExtRxP,
+         pciExtRxN      => pciExtRxN,
+         pciExtTxP      => pciExtTxP,
+         pciExtTxN      => pciExtTxN);
 
    ----------------
    -- AXI-Lite XBAR
@@ -257,20 +366,20 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_SLAVE_SLOTS_G  => 2,
          NUM_MASTER_SLOTS_G => NUM_AXIL_MASTERS_C,
          MASTERS_CONFIG_G   => AXIL_CONFIG_C)
       port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
+         axiClk           => axilClk,
+         axiClkRst        => axilReset,
+         sAxiWriteMasters => bar0WriteMasters,
+         sAxiWriteSlaves  => bar0WriteSlaves,
+         sAxiReadMasters  => bar0ReadMasters,
+         sAxiReadSlaves   => bar0ReadSlaves,
+         mAxiWriteMasters => axilWriteMasters,
+         mAxiWriteSlaves  => axilWriteSlaves,
+         mAxiReadMasters  => axilReadMasters,
+         mAxiReadSlaves   => axilReadSlaves);
 
    ------------------
    -- RSSI/ETH Module
@@ -286,17 +395,35 @@ begin
          ------------------------    
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
-         axilRst         => axilRst,
+         axilRst         => axilReset,
          axilReadMaster  => axilReadMasters(4),
          axilReadSlave   => axilReadSlaves(4),
          axilWriteMaster => axilWriteMasters(4),
          axilWriteSlave  => axilWriteSlaves(4),
-         -- RSSI Interface (axilClk domain)
-         rssiIbMasters   => rssiIbMasters,
-         rssiIbSlaves    => rssiIbSlaves,
-         rssiObMasters   => rssiObMasters,
-         rssiObSlaves    => rssiObSlaves,
-         rssiLinkUp      => rssiLinkUp,
+         -- Primary DMA Interface (dmaPriClk domain)
+         dmaPriClk       => dmaPriClk,
+         dmaPriRst       => dmaPriRst,
+         dmaPriObMasters => dmaPriObMasters,
+         dmaPriObSlaves  => dmaPriObSlaves,
+         dmaPriIbMasters => dmaPriIbMasters,
+         dmaPriIbSlaves  => dmaPriIbSlaves,
+         -- Secondary DMA Interface (dmaSecClk domain)
+         dmaSecClk       => dmaSecClk,
+         dmaSecRst       => dmaSecRst,
+         dmaSecObMasters => dmaSecObMasters,
+         dmaSecObSlaves  => dmaSecObSlaves,
+         dmaSecIbMasters => dmaSecIbMasters,
+         dmaSecIbSlaves  => dmaSecIbSlaves,
+         -- DDR Memory Interface (ddrClk domain)
+         ddrClk          => ddrClk,
+         ddrRst          => ddrRst,
+         ddrWriteMasters => ddrWriteMasters,
+         ddrWriteSlaves  => ddrWriteSlaves,
+         ddrReadMasters  => ddrReadMasters,
+         ddrReadSlaves   => ddrReadSlaves,
+         -- User AXI Clock and Reset
+         axiClk          => axiClk,
+         axiRst          => axiReset,
          ------------------
          --  Hardware Ports
          ------------------       

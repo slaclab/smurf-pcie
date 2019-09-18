@@ -56,40 +56,22 @@ class EthConfig(pr.Device):
         ))          
         
         self.add(pr.RemoteVariable(   
-            name         = 'EnKeepAlive',
-            offset       = 0x0C,
-            bitSize      = 1,
+            name         = 'TxPreCursor',
+            offset       = 0x20,
+            bitSize      = 5,
             mode         = 'RW',
         ))  
-
-        self.add(pr.RemoteVariable(   
-            name         = 'KeepAliveConfig',
-            offset       = 0x10,
-            bitSize      = 32,
-            mode         = 'RW',
-        ))  
-       
-        self.add(pr.RemoteVariable(   
-            name         = 'NUM_RSSI_C',
-            offset       =  0x80,
-            mode         = 'RO',
-        ))            
         
         self.add(pr.RemoteVariable(   
-            name         = 'CLIENT_SIZE_C',
-            offset       =  0x84,
-            mode         = 'RO',
+            name         = 'TxPostCursor',
+            offset       = 0x24,
+            bitSize      = 5,
+            mode         = 'RW',
         ))    
-        
-        self.add(pr.RemoteVariable(   
-            name         = 'CLIENT_PORTS_C[0]',
-            offset       =  0x88,
-            mode         = 'RO',
-        ))
 
         self.add(pr.RemoteVariable(   
-            name         = 'CLIENT_PORTS_C[1]',
-            offset       =  0x8C,
-            mode         = 'RO',
-        ))
-        
+            name         = 'TxDiffCtrl',
+            offset       = 0x28,
+            bitSize      = 4,
+            mode         = 'RW',
+        ))            

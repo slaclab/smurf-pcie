@@ -1,3 +1,6 @@
+*.save
+*.orig
+
 # SVN files
 .svn*
 
@@ -33,6 +36,7 @@ build*
 *.mcs
 *.gz
 *.ltx
+*.hdf
 
 # Sysgen
 .Xil/

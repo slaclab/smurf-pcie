@@ -139,7 +139,7 @@ class TopLevel(pr.Root):
             for i in range(allLane):
                 self.vc0Srp[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0,True)
                 # self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+1,True)
-                self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0xC0,True)
+                self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0xC1,True)
             
                 self.srp[i] = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir(self.vc0Srp[i],self.srp[i])            
@@ -171,7 +171,8 @@ class TopLevel(pr.Root):
         else:
             
             self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
-            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
+            # self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
+            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0xC1,True)
             
             # TDEST 0 routed to stream 0 (SRPv3)
             self.srp = rogue.protocols.srp.SrpV3()

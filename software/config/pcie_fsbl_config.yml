@@ -1,81 +1,75 @@
 pcie:
   Core:
-    EthLane[:]:
-      ############################    
-      EthConfig:
-        EnKeepAlive: 0x0
-      ############################    
-      RssiClient:   
-        OpenConn: 0x0
-        CloseConn: 0x1      
-      ############################    
-      UdpEngine:
-        ClientRemotePort[0]: 0 # Disabled
-        ClientRemotePort[1]: 8192 # UDP_SRV_SRPV0_IDX_C = Legacy SRPv0 register access (still used for remote FPGA reprogramming)
 ########################################################    
-    EthLane[0]:
-########################################################     
-      EthConfig:
+    EthPhyGrp:
+      ############################   
+      EthConfig[0]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:50
         # Set the local IP address
         LocalIp: 10.0.3.202  
-      ############################    
-      UdpEngine:
-         ClientRemoteIp[:]: 10.0.3.102 # Slot#2 Link 
-########################################################    
-    EthLane[1]:
-######################################################## 
-      EthConfig:
+      ############################   
+      EthConfig[1]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:51
         # Set the local IP address
-        LocalIp: 10.0.3.203
-      ############################    
-      UdpEngine:
-         ClientRemoteIp[:]: 10.0.3.103 # Slot#3 Link 
-########################################################    
-    EthLane[2]:
-######################################################## 
-      EthConfig:
+        LocalIp: 10.0.3.203  
+      ############################   
+      EthConfig[2]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:52
         # Set the local IP address
-        LocalIp: 10.0.3.204
-      ############################    
-      UdpEngine:
-         ClientRemoteIp[:]: 10.0.3.104 # Slot#4 Link    
-########################################################    
-    EthLane[3]:
-######################################################## 
-      EthConfig:
+        LocalIp: 10.0.3.204  
+      ############################   
+      EthConfig[3]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:53
         # Set the local IP address
-        LocalIp: 10.0.3.205
-      ############################    
-      UdpEngine:
-         ClientRemoteIp[:]: 10.0.3.105 # Slot#5 Link  
-########################################################    
-    EthLane[4]:
-######################################################## 
-      EthConfig:
+        LocalIp: 10.0.3.205  
+      ############################   
+      EthConfig[4]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:54
         # Set the local IP address
-        LocalIp: 10.0.3.206
-      ############################    
-      UdpEngine:
-         ClientRemoteIp[:]: 10.0.3.106 # Slot#6 Link   
-########################################################    
-    EthLane[5]:
-######################################################## 
-      EthConfig:
+        LocalIp: 10.0.3.206  
+      ############################   
+      EthConfig[5]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:55
         # Set the local IP address
-        LocalIp: 10.0.3.207
+        LocalIp: 10.0.3.207  
+      ############################   
+########################################################    
+    UdpGrp:
       ############################    
-      UdpEngine:
-         ClientRemoteIp[:]: 10.0.3.107 # Slot#7 Link            
-######################################################## 
+      UdpConfig[:]:
+        EnKeepAlive: 0x1
+        KeepAliveConfig: 0x2E90EDD0 # 5 seconds    
+      ############################    
+      UdpEngine[:]:
+        ClientRemotePort[0]: 0 # Disabled
+        ClientRemotePort[1]: 8192 # UDP_SRV_SRPV0_IDX_C = Legacy SRPv0 register access (still used for remote FPGA reprogramming) 
+      ############################    
+      RssiClient[:]:   
+        OpenConn: 0x0
+        CloseConn: 0x1          
+      ############################     
+      UdpEngine[0]:  
+        ClientRemoteIp[:]: 10.0.3.102 # Slot#2 Link 
+      ############################   
+      UdpEngine[1]:  
+        ClientRemoteIp[:]: 10.0.3.103 # Slot#3 Link 
+      ############################     
+      UdpEngine[2]:  
+        ClientRemoteIp[:]: 10.0.3.104 # Slot#4 Link 
+      ############################     
+      UdpEngine[3]:  
+        ClientRemoteIp[:]: 10.0.3.105 # Slot#5 Link 
+      ############################     
+      UdpEngine[4]:  
+        ClientRemoteIp[:]: 10.0.3.106 # Slot#6 Link 
+      ############################     
+      UdpEngine[5]:  
+        ClientRemoteIp[:]: 10.0.3.107 # Slot#7 Link 
+      ############################       
+########################################################    
