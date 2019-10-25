@@ -255,9 +255,9 @@ begin
          -- Misc. Signals
          extRst              => axilReset,
          -- Transceiver Debug Interface
-         gtTxPreCursor       => gtTxPreCursor(3 downto 0),
-         gtTxPostCursor      => gtTxPostCursor(3 downto 0),
-         gtTxDiffCtrl        => gtTxDiffCtrl(3 downto 0),
+--         gtTxPreCursor       => gtTxPreCursor(3 downto 0),
+--         gtTxPostCursor      => gtTxPostCursor(3 downto 0),
+--         gtTxDiffCtrl        => gtTxDiffCtrl(3 downto 0),
          -- MGT Clock Port
          gtClkP              => qsfp0RefClkP(0),
          gtClkN              => qsfp0RefClkN(0),
@@ -294,9 +294,9 @@ begin
          -- Misc. Signals
          extRst              => axilReset,
          -- Transceiver Debug Interface
-         gtTxPreCursor       => gtTxPreCursor(7 downto 4),
-         gtTxPostCursor      => gtTxPostCursor(7 downto 4),
-         gtTxDiffCtrl        => gtTxDiffCtrl(7 downto 4),
+--         gtTxPreCursor       => gtTxPreCursor(7 downto 4),
+--         gtTxPostCursor      => gtTxPostCursor(7 downto 4),
+--         gtTxDiffCtrl        => gtTxDiffCtrl(7 downto 4),
          -- MGT Clock Port
          gtClkP              => qsfp1RefClkP(0),
          gtClkN              => qsfp1RefClkN(0),
