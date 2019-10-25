@@ -65,7 +65,7 @@ base.Core.AxiPcieCore.AxiVersion.printStatus()
 
 # Load the YAML file
 print( 'Loading %s YAML file' % args.yaml);
-base.LoadConfig(args.yaml) 
+base.ReadConfig(args.yaml) 
     
 # Close
 base.stop()
