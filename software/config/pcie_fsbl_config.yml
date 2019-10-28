@@ -7,37 +7,37 @@ pcie:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:50
         # Set the local IP address
-        LocalIp: 10.0.3.202  
+        LocalIp: 10.0.2.202  
       ############################   
       EthConfig[1]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:51
         # Set the local IP address
-        LocalIp: 10.0.3.203  
+        LocalIp: 10.0.2.203  
       ############################   
       EthConfig[2]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:52
         # Set the local IP address
-        LocalIp: 10.0.3.204  
+        LocalIp: 10.0.2.204  
       ############################   
       EthConfig[3]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:53
         # Set the local IP address
-        LocalIp: 10.0.3.205  
+        LocalIp: 10.0.2.205  
       ############################   
       EthConfig[4]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:54
         # Set the local IP address
-        LocalIp: 10.0.3.206  
+        LocalIp: 10.0.2.206  
       ############################   
       EthConfig[5]:
         # Set the local MAC address
         LocalMac: 00:44:56:FF:00:55
         # Set the local IP address
-        LocalIp: 10.0.3.207  
+        LocalIp: 10.0.2.207  
       ############################   
 ########################################################    
     UdpGrp:
@@ -55,21 +55,21 @@ pcie:
         CloseConn: 0x1          
       ############################     
       UdpEngine[0]:  
-        ClientRemoteIp[:]: 10.0.3.102 # Slot#2 Link 
+        ClientRemoteIp[:]: 10.0.2.102 # Slot#2 Link 
       ############################   
       UdpEngine[1]:  
-        ClientRemoteIp[:]: 10.0.3.103 # Slot#3 Link 
+        ClientRemoteIp[:]: 10.0.2.103 # Slot#3 Link 
       ############################     
       UdpEngine[2]:  
-        ClientRemoteIp[:]: 10.0.3.104 # Slot#4 Link 
+        ClientRemoteIp[:]: 10.0.2.104 # Slot#4 Link 
       ############################     
       UdpEngine[3]:  
-        ClientRemoteIp[:]: 10.0.3.105 # Slot#5 Link 
+        ClientRemoteIp[:]: 10.0.2.105 # Slot#5 Link 
       ############################     
       UdpEngine[4]:  
-        ClientRemoteIp[:]: 10.0.3.106 # Slot#6 Link 
+        ClientRemoteIp[:]: 10.0.2.106 # Slot#6 Link 
       ############################     
       UdpEngine[5]:  
-        ClientRemoteIp[:]: 10.0.3.107 # Slot#7 Link 
+        ClientRemoteIp[:]: 10.0.2.107 # Slot#7 Link 
       ############################       
 ########################################################    
