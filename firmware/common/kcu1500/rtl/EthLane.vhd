@@ -18,10 +18,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
 use work.AppPkg.all;
 
 entity EthLane is
@@ -88,7 +90,7 @@ architecture mapping of EthLane is
 
 begin
 
-   U_axilRst : entity work.RstPipeline
+   U_axilRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -96,7 +98,7 @@ begin
          rstIn  => axilRst,
          rstOut => axilReset);
 
-   U_axiRst : entity work.RstPipeline
+   U_axiRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -115,7 +117,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -153,7 +155,7 @@ begin
    ----------------------
    -- IPv4/ARP/UDP Engine
    ----------------------
-   U_UDP : entity work.UdpEngineWrapper
+   U_UDP : entity surf.UdpEngineWrapper
       generic map (
          -- Simulation Generics
          TPD_G          => TPD_G,
@@ -186,7 +188,7 @@ begin
          clk             => axilClk,
          rst             => axilReset);
 
-   U_AxiStreamMux : entity work.AxiStreamMux
+   U_AxiStreamMux : entity surf.AxiStreamMux
       generic map (
          TPD_G         => TPD_G,
          NUM_SLAVES_G  => 2,
@@ -204,14 +206,14 @@ begin
          mAxisMaster     => ibUdpMasters(1),
          mAxisSlave      => ibUdpSlaves(1));
 
-   U_SYNC : entity work.AxiStreamFifoV2
+   U_SYNC : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 10,     -- 16B x 1024 = 16KB > 9000 MTU
          -- AXI Stream Port Configurations

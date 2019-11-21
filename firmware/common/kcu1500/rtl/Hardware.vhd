@@ -18,12 +18,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
 
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.EthMacPkg.all;
 use work.AppPkg.all;
 
 entity Hardware is
@@ -140,7 +141,7 @@ architecture mapping of Hardware is
 
 begin
 
-   U_axilRst : entity work.RstPipeline
+   U_axilRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -148,7 +149,7 @@ begin
          rstIn  => axilRst,
          rstOut => axilReset);
 
-   U_axiRst : entity work.RstPipeline
+   U_axiRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -200,7 +201,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -218,7 +219,7 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   U_AxiLiteAsync : entity work.AxiLiteAsync
+   U_AxiLiteAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,
          COMMON_CLK_G    => false,
@@ -239,7 +240,7 @@ begin
          mAxiWriteMaster => buffWriteMaster,
          mAxiWriteSlave  => buffWriteSlave);
 
-   U_XBAR_BUFFER : entity work.AxiLiteCrossbar
+   U_XBAR_BUFFER : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,

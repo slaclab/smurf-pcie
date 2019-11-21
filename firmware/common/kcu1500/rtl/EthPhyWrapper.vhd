@@ -18,11 +18,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
-use work.TenGigEthPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
+use surf.TenGigEthPkg.all;
+
 use work.AppPkg.all;
 
 library unisim;
@@ -196,7 +198,7 @@ begin
    -----------------
    -- Reset Pipeline
    -----------------
-   U_axilRst : entity work.RstPipeline
+   U_axilRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -207,7 +209,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -228,7 +230,7 @@ begin
    ----------------
    -- 10GigE Module 
    ----------------
-   U_QSFP0 : entity work.TenGigEthGthUltraScaleWrapper
+   U_QSFP0 : entity surf.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
          NUM_LANE_G    => 4,
@@ -267,7 +269,7 @@ begin
          gtRxP               => qsfp0RxP,
          gtRxN               => qsfp0RxN);
 
-   U_QSFP1 : entity work.TenGigEthGthUltraScaleWrapper
+   U_QSFP1 : entity surf.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
          NUM_LANE_G    => 4,
@@ -306,7 +308,7 @@ begin
          gtRxP               => qsfp1RxP,
          gtRxN               => qsfp1RxN);
 
-   -- U_QSFP1 : entity work.TenGigEthGthUltraScaleWrapper
+   -- U_QSFP1 : entity surf.TenGigEthGthUltraScaleWrapper
    -- generic map (
    -- TPD_G         => TPD_G,
    -- NUM_LANE_G    => 2,
@@ -341,7 +343,7 @@ begin
    -- gtRxP               => qsfp1RxP(1 downto 0),
    -- gtRxN               => qsfp1RxN(1 downto 0));
 
-   -- U_GTH_TERM : entity work.Gthe3ChannelDummy
+   -- U_GTH_TERM : entity surf.Gthe3ChannelDummy
    -- generic map (
    -- TPD_G   => TPD_G,
    -- WIDTH_G => 2)

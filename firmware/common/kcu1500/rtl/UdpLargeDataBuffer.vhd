@@ -16,12 +16,15 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.MigPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
+library axi_pcie_core;
+use axi_pcie_core.MigPkg.all;
 
 entity UdpLargeDataBuffer is
    generic (
@@ -318,7 +321,7 @@ begin
 
    BUILD_LOGIC : if (BYPASS_G = false) generate
 
-      U_axiRst : entity work.RstPipeline
+      U_axiRst : entity surf.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -326,7 +329,7 @@ begin
             rstIn  => axiRst,
             rstOut => axiReset);
 
-      U_ddrRstL : entity work.RstPipeline
+      U_ddrRstL : entity surf.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -339,7 +342,7 @@ begin
 
       GEN_VEC : for i in 1 downto 0 generate
 
-         U_axiRstVec : entity work.RstPipeline
+         U_axiRstVec : entity surf.RstPipeline
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -347,7 +350,7 @@ begin
                rstIn  => axiReset,
                rstOut => axiResetVec(i));
 
-         U_DmaFiFo : entity work.AxiStreamDmaFifo
+         U_DmaFiFo : entity surf.AxiStreamDmaFifo
             generic map (
                TPD_G              => TPD_G,
                -- FIFO Configuration
@@ -382,7 +385,7 @@ begin
                axilWriteMaster => axilWriteMasters(i),
                axilWriteSlave  => axilWriteSlaves(i));
 
-         U_Resize : entity work.AxiPcie64BResize
+         U_Resize : entity axi_pcie_core.AxiPcie64BResize
             generic map (
                TPD_G             => TPD_G,
                AXI_DMA_CONFIG_G  => AXI_RESIZE_16B_C,
