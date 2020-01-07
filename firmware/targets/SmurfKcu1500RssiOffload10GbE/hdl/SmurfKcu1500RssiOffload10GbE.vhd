@@ -14,12 +14,17 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library axi_pcie_core;
+use axi_pcie_core.MigPkg.all;
+
 use work.AppPkg.all;
-use work.MigPkg.all;
 
 entity SmurfKcu1500RssiOffload10GbE is
    generic (
@@ -160,7 +165,7 @@ begin
    -----------------------
    -- AXI-Lite Clock/Reset
    -----------------------
-   U_axilClk : entity work.ClockManagerUltraScale
+   U_axilClk : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -185,7 +190,7 @@ begin
          rstOut(0) => axiRst,
          rstOut(1) => axilRst);
 
-   U_axiRst : entity work.RstPipeline
+   U_axiRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -193,7 +198,7 @@ begin
          rstIn  => axiRst,
          rstOut => axiReset);
 
-   U_axilRst : entity work.RstPipeline
+   U_axilRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -204,7 +209,7 @@ begin
    -----------------
    -- MIG[0] IP Core
    -----------------         
-   U_Mig0 : entity work.Mig0
+   U_Mig0 : entity axi_pcie_core.Mig0
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -225,7 +230,7 @@ begin
    -----------------
    -- MIG[2] IP Core
    -----------------         
-   U_Mig2 : entity work.Mig2
+   U_Mig2 : entity axi_pcie_core.Mig2
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -246,7 +251,7 @@ begin
    -----------------
    -- MIG[3] IP Core
    -----------------
-   U_Mig3 : entity work.Mig3
+   U_Mig3 : entity axi_pcie_core.Mig3
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -267,7 +272,7 @@ begin
    ---------------------
    -- PCIE/DMA Interface
    ---------------------
-   U_Core : entity work.XilinxKcu1500Core
+   U_Core : entity axi_pcie_core.XilinxKcu1500Core
       generic map (
          TPD_G             => TPD_G,
          BUILD_INFO_G      => BUILD_INFO_G,
@@ -324,7 +329,7 @@ begin
          pciTxP         => pciTxP,
          pciTxN         => pciTxN);
 
-   U_ExtendedCore : entity work.XilinxKcu1500PcieExtendedCore
+   U_ExtendedCore : entity axi_pcie_core.XilinxKcu1500PcieExtendedCore
       generic map (
          TPD_G             => TPD_G,
          BUILD_INFO_G      => BUILD_INFO_G,
@@ -363,7 +368,7 @@ begin
    ----------------
    -- AXI-Lite XBAR
    ----------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,

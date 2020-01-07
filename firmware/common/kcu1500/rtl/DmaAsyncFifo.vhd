@@ -18,9 +18,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
 use work.AppPkg.all;
 
 entity DmaAsyncFifo is
@@ -98,7 +100,7 @@ begin
    --                   Pipelined Resets
    -----------------------------------------------------------------
 
-   U_axilRst : entity work.RstPipeline
+   U_axilRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -106,7 +108,7 @@ begin
          rstIn  => axilRst,
          rstOut => axilReset);
 
-   U_axiRst : entity work.RstPipeline
+   U_axiRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -114,7 +116,7 @@ begin
          rstIn  => axiRst,
          rstOut => axiReset);
 
-   U_dmaPriRst : entity work.RstPipeline
+   U_dmaPriRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -122,7 +124,7 @@ begin
          rstIn  => dmaPriRst,
          rstOut => dmaPriReset);
 
-   U_dmaSecRst : entity work.RstPipeline
+   U_dmaSecRst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -135,7 +137,7 @@ begin
    -----------------------------------------------------------------
 
    -- Adding Pipelining to help with making timing between SLR0/SLR1
-   U_ObPipe_PriDma : entity work.AxiStreamPipeline
+   U_ObPipe_PriDma : entity surf.AxiStreamPipeline
       generic map (
          TPD_G         => TPD_G,
          PIPE_STAGES_G => 1)
@@ -147,14 +149,14 @@ begin
          mAxisMaster => rssiRxMaster,
          mAxisSlave  => rssiRxSlave);
 
-   U_IB_DMA_1 : entity work.AxiStreamFifoV2
+   U_IB_DMA_1 : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => false,
+         MEMORY_TYPE_G       => "distributed",
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
@@ -172,14 +174,14 @@ begin
          mAxisMaster => dmaPriIbMasters(1),
          mAxisSlave  => dmaPriIbSlaves(1));
 
-   U_IB_DMA_0 : entity work.AxiStreamFifoV2
+   U_IB_DMA_0 : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => false,
+         MEMORY_TYPE_G       => "distributed",
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
@@ -197,7 +199,7 @@ begin
          mAxisMaster => dmaPriIbMasters(0),
          mAxisSlave  => dmaPriIbSlaves(0));
 
-   U_AxiStreamMux : entity work.AxiStreamMux
+   U_AxiStreamMux : entity surf.AxiStreamMux
       generic map (
          TPD_G                => TPD_G,
          PIPE_STAGES_G        => 1,
@@ -222,14 +224,14 @@ begin
    --             Primary DMA Path: DMA->APP
    -----------------------------------------------------------------
 
-   U_OB_DMA : entity work.AxiStreamFifoV2
+   U_OB_DMA : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => false,
+         MEMORY_TYPE_G       => "distributed",
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
@@ -248,7 +250,7 @@ begin
          mAxisSlave  => rssiTxSlave);
 
    -- Adding Pipelining to help with making timing between SLR0/SLR1
-   U_IbPipe_PriDma : entity work.AxiStreamPipeline
+   U_IbPipe_PriDma : entity surf.AxiStreamPipeline
       generic map (
          TPD_G         => TPD_G,
          PIPE_STAGES_G => 1)
@@ -265,7 +267,7 @@ begin
    -----------------------------------------------------------------
 
    -- Adding Pipelining to help with making timing between SLR0/SLR1
-   U_ObPipe_SecDma : entity work.AxiStreamRepeater
+   U_ObPipe_SecDma : entity surf.AxiStreamRepeater
       generic map (
          TPD_G                => TPD_G,
          NUM_MASTERS_G        => 2,
@@ -322,14 +324,14 @@ begin
 
    end process;
 
-   U_IB_DMA : entity work.AxiStreamFifoV2
+   U_IB_DMA : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => false,
+         MEMORY_TYPE_G       => "distributed",
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
@@ -351,14 +353,14 @@ begin
    --             Secondary DMA Path: DMA->APP
    -----------------------------------------------------------------
 
-   U_OB_DMA_SecDma : entity work.AxiStreamFifoV2
+   U_OB_DMA_SecDma : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => false,
+         MEMORY_TYPE_G       => "distributed",
          GEN_SYNC_FIFO_G     => false,
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
@@ -379,7 +381,7 @@ begin
    -----------------------------------------------------------------
    -- Adding Pipelining to help with making timing between SLR0/SLR1
    -----------------------------------------------------------------
-   U_IbPipe : entity work.AxiStreamPipeline
+   U_IbPipe : entity surf.AxiStreamPipeline
       generic map (
          TPD_G         => TPD_G,
          PIPE_STAGES_G => 1)

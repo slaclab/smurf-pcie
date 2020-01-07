@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-15
--- Last update: 2019-08-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -20,11 +18,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 
 entity AppReg is
    generic (
@@ -117,7 +117,7 @@ begin
    ---------------------------
    -- AXI-Lite Crossbar Module
    ---------------------------         
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
@@ -142,7 +142,7 @@ begin
    ---------------------------
    -- AXI-Lite: Version Module
    ---------------------------            
-   U_AxiVersion : entity work.AxiVersion
+   U_AxiVersion : entity surf.AxiVersion
       generic map (
          TPD_G           => TPD_G,
          CLK_PERIOD_G    => (1.0/CLK_FREQUENCY_G),
@@ -160,7 +160,7 @@ begin
    -------------------
    -- AXI-Lite PRBS RX
    -------------------
-   U_SsiPrbsTx : entity work.SsiPrbsTx
+   U_SsiPrbsTx : entity surf.SsiPrbsTx
       generic map (
          TPD_G                      => TPD_G,
          AXI_DEFAULT_PKT_LEN_G      => X"000000FF",
@@ -183,7 +183,7 @@ begin
    -------------------
    -- AXI-Lite PRBS RX
    -------------------
-   U_SsiPrbsRx : entity work.SsiPrbsRx
+   U_SsiPrbsRx : entity surf.SsiPrbsRx
       generic map (
          TPD_G                     => TPD_G,
          SLAVE_AXI_PIPE_STAGES_G   => 1,
