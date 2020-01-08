@@ -94,7 +94,7 @@ architecture mapping of Hardware is
    constant BUFF_INDEX_C : natural := NUM_RSSI_C+1;
 
    constant AXI_CONFIG_C  : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 16);
-   constant BUFF_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_RSSI_C downto 0)          := genAxiLiteConfig(NUM_RSSI_C+1, AXI_CONFIG_C(BUFF_INDEX_C).baseAddr, 16, 12);
+   constant BUFF_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_RSSI_C+2 downto 0)        := genAxiLiteConfig(NUM_RSSI_C+3, AXI_CONFIG_C(BUFF_INDEX_C).baseAddr, 16, 12);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
@@ -106,10 +106,10 @@ architecture mapping of Hardware is
    signal buffReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
    signal buffReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C;
 
-   signal buffWriteMasters : AxiLiteWriteMasterArray(NUM_RSSI_C downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
-   signal buffWriteSlaves  : AxiLiteWriteSlaveArray(NUM_RSSI_C downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
-   signal buffReadMasters  : AxiLiteReadMasterArray(NUM_RSSI_C downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
-   signal buffReadSlaves   : AxiLiteReadSlaveArray(NUM_RSSI_C downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
+   signal buffWriteMasters : AxiLiteWriteMasterArray(NUM_RSSI_C+2 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
+   signal buffWriteSlaves  : AxiLiteWriteSlaveArray(NUM_RSSI_C+2 downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
+   signal buffReadMasters  : AxiLiteReadMasterArray(NUM_RSSI_C+2 downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
+   signal buffReadSlaves   : AxiLiteReadSlaveArray(NUM_RSSI_C+2 downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C);
 
    signal macObMasters : AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
    signal macObSlaves  : AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
@@ -244,7 +244,7 @@ begin
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_RSSI_C+1,
+         NUM_MASTER_SLOTS_G => NUM_RSSI_C+3,
          MASTERS_CONFIG_G   => BUFF_CONFIG_C)
       port map (
          axiClk              => axiClk,
@@ -385,5 +385,47 @@ begin
          axilReadSlave   => buffReadSlaves(NUM_RSSI_C),
          axilWriteMaster => buffWriteMasters(NUM_RSSI_C),
          axilWriteSlave  => buffWriteSlaves(NUM_RSSI_C));
+         
+   DDR_AXIS_MON_IB : entity surf.AxiStreamMonAxiL
+      generic map(
+         TPD_G            => TPD_G,
+         COMMON_CLK_G     => true,
+         AXIS_CLK_FREQ_G  => CLK_FREQUENCY_G,
+         AXIS_NUM_SLOTS_G => NUM_RSSI_C,
+         AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
+      port map(
+         -- AXIS Stream Interface
+         axisClk          => axiClk,
+         axisRst          => axiReset,
+         axisMasters      => ddrIbMasters,
+         axisSlaves       => ddrIbSlaves,
+         -- AXI lite slave port for register access
+         axilClk          => axiClk,
+         axilRst          => axiReset,
+         sAxilWriteMaster => buffWriteMasters(NUM_RSSI_C+1),
+         sAxilWriteSlave  => buffWriteSlaves(NUM_RSSI_C+1),
+         sAxilReadMaster  => buffReadMasters(NUM_RSSI_C+1),
+         sAxilReadSlave   => buffReadSlaves(NUM_RSSI_C+1));  
+
+   DDR_AXIS_MON_OB : entity surf.AxiStreamMonAxiL
+      generic map(
+         TPD_G            => TPD_G,
+         COMMON_CLK_G     => true,
+         AXIS_CLK_FREQ_G  => CLK_FREQUENCY_G,
+         AXIS_NUM_SLOTS_G => NUM_RSSI_C,
+         AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
+      port map(
+         -- AXIS Stream Interface
+         axisClk          => axiClk,
+         axisRst          => axiReset,
+         axisMasters      => ddrObMasters,
+         axisSlaves       => ddrObSlaves,
+         -- AXI lite slave port for register access
+         axilClk          => axiClk,
+         axilRst          => axiReset,
+         sAxilWriteMaster => buffWriteMasters(NUM_RSSI_C+2),
+         sAxilWriteSlave  => buffWriteSlaves(NUM_RSSI_C+2),
+         sAxilReadMaster  => buffReadMasters(NUM_RSSI_C+2),
+         sAxilReadSlave   => buffReadSlaves(NUM_RSSI_C+2));           
 
 end mapping;
