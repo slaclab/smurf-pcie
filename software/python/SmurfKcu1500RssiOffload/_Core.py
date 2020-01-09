@@ -99,7 +99,7 @@ class UdpBufferGrp(pr.Device):
         ))         
 
         # DDR AXI Stream Inbound Monitor
-        self.add(axi.AxiStreamMonitoring(
+        self.add(axi.AxiStreamMonAxiL(
             name        = 'DdrIbAxisMon',
             offset      = 0x7000,
             numberLanes = 6,
@@ -107,7 +107,7 @@ class UdpBufferGrp(pr.Device):
         ))        
 
         # DDR AXI Stream Outbound Monitor
-        self.add(axi.AxiStreamMonitoring(
+        self.add(axi.AxiStreamMonAxiL(
             name        = 'DdrObAxisMon',
             offset      = 0x8000,
             numberLanes = 6,
