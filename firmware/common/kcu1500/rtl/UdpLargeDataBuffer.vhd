@@ -22,6 +22,7 @@ use surf.AxiPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.EthMacPkg.all;
+use surf.SsiPkg.all;
 
 library axi_pcie_core;
 use axi_pcie_core.MigPkg.all;
@@ -60,7 +61,7 @@ architecture mapping of UdpLargeDataBuffer is
       TDEST_BITS_C  => 0,      -- TDEST is assigned in the EthTrafficSwitch.vhd
       TID_BITS_C    => 0,               -- Unused
       TKEEP_MODE_C  => EMAC_AXIS_CONFIG_C.TKEEP_MODE_C,
-      TUSER_BITS_C  => 1,               -- Using SOF_INSERT_G='1' to set SOF
+      TUSER_BITS_C  => SSI_TUSER_BITS_C,
       TUSER_MODE_C  => EMAC_AXIS_CONFIG_C.TUSER_MODE_C);
 
    constant AXI_CONFIG_C : AxiConfigType := (
@@ -290,27 +291,27 @@ architecture mapping of UdpLargeDataBuffer is
          m_axi_rready   : out std_logic);
    end component;
 
-   signal dmaWriteMasters : AxiWriteMasterArray(1 downto 0);
-   signal dmaWriteSlaves  : AxiWriteSlaveArray(1 downto 0);
-   signal dmaReadMasters  : AxiReadMasterArray(1 downto 0);
-   signal dmaReadSlaves   : AxiReadSlaveArray(1 downto 0);
+   signal dmaWriteMasters : AxiWriteMasterArray(1 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
+   signal dmaWriteSlaves  : AxiWriteSlaveArray(1 downto 0)  := (others => AXI_WRITE_SLAVE_INIT_C);
+   signal dmaReadMasters  : AxiReadMasterArray(1 downto 0)  := (others => AXI_READ_MASTER_INIT_C);
+   signal dmaReadSlaves   : AxiReadSlaveArray(1 downto 0)   := (others => AXI_READ_SLAVE_INIT_C);
 
-   signal ddrWriteMasters : AxiWriteMasterArray(1 downto 0);
-   signal ddrWriteSlaves  : AxiWriteSlaveArray(1 downto 0);
-   signal ddrReadMasters  : AxiReadMasterArray(1 downto 0);
-   signal ddrReadSlaves   : AxiReadSlaveArray(1 downto 0);
+   signal ddrWriteMasters : AxiWriteMasterArray(1 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
+   signal ddrWriteSlaves  : AxiWriteSlaveArray(1 downto 0)  := (others => AXI_WRITE_SLAVE_INIT_C);
+   signal ddrReadMasters  : AxiReadMasterArray(1 downto 0)  := (others => AXI_READ_MASTER_INIT_C);
+   signal ddrReadSlaves   : AxiReadSlaveArray(1 downto 0)   := (others => AXI_READ_SLAVE_INIT_C);
 
-   signal axiWriteMaster : AxiWriteMasterType;
-   signal axiWriteSlave  : AxiWriteSlaveType;
-   signal axiReadMaster  : AxiReadMasterType;
-   signal axiReadSlave   : AxiReadSlaveType;
+   signal axiWriteMaster : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+   signal axiWriteSlave  : AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+   signal axiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
+   signal axiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
-   signal axiResetVec : slv(1 downto 0);
-   signal axiReset    : sl;
-   signal axiRstL     : sl;
+   signal axiResetVec : slv(1 downto 0) := (others => '1');
+   signal axiReset    : sl              := '1';
+   signal axiRstL     : sl              := '0';
 
-   signal ddrReset : sl;
-   signal ddrRstL  : sl;
+   signal ddrReset : sl := '1';
+   signal ddrRstL  : sl := '0';
 
 begin
 
