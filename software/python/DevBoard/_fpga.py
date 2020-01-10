@@ -74,7 +74,8 @@ class TopLevel(pr.Root):
     def __init__(   self, 
             name        = 'TopLevel',
             description = 'Container for FPGA Top-Level', 
-            dev         = '/dev/datadev_0',
+            dev0        = '/dev/datadev_0',
+            dev1        = '/dev/datadev_1',
             lane        = 0,
             ip          = None,
             loopback    = False, 
@@ -137,9 +138,9 @@ class TopLevel(pr.Root):
             self.prbsRx   = [None for i in range(6)]
             
             for i in range(allLane):
-                self.vc0Srp[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0,True)
-                # self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+1,True)
-                self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev,(i*0x100)+0xC1,True)
+                self.vc0Srp[i] = rogue.hardware.axi.AxiStreamDma(dev0,(i*0x100)+0,True)
+                # self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev1,(i*0x100)+1,True)
+                self.vc1Prbs[i] = rogue.hardware.axi.AxiStreamDma(dev1,(i*0x100)+0xC1,True)
             
                 self.srp[i] = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir(self.vc0Srp[i],self.srp[i])            
@@ -170,9 +171,9 @@ class TopLevel(pr.Root):
         
         else:
             
-            self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
-            # self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
-            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0xC1,True)
+            self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev0,(lane*0x100)+0,True)
+            # self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev1,(lane*0x100)+1,True)
+            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev1,(lane*0x100)+0xC1,True)
             
             # TDEST 0 routed to stream 0 (SRPv3)
             self.srp = rogue.protocols.srp.SrpV3()
@@ -196,6 +197,7 @@ class TopLevel(pr.Root):
                     self.add(self.prbsRx)       
                     
             self.add(Fpga(
+                name     = 'Fpga[0]',
                 memBase  = self.srp,
             ))
         

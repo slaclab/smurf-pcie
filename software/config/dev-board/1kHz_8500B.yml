@@ -2,8 +2,9 @@ System:
   Fpga[:]:
     SsiPrbsTx:
       AxiEn: True
-      TxEn: True
+      # TxEn: True
+      TxEn: False
       FwCnt: False
-      PacketLength: 530 # 8500
+      PacketLength: 519 # 8320
       TrigDly: 156250 # 1 kHz
       
