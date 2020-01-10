@@ -390,7 +390,7 @@ begin
       generic map(
          TPD_G            => TPD_G,
          COMMON_CLK_G     => true,
-         AXIS_CLK_FREQ_G  => CLK_FREQUENCY_G,
+         AXIS_CLK_FREQ_G  => 100.0E+6,
          AXIS_NUM_SLOTS_G => NUM_RSSI_C,
          AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
       port map(
@@ -411,7 +411,7 @@ begin
       generic map(
          TPD_G            => TPD_G,
          COMMON_CLK_G     => true,
-         AXIS_CLK_FREQ_G  => CLK_FREQUENCY_G,
+         AXIS_CLK_FREQ_G  => 100.0E+6,
          AXIS_NUM_SLOTS_G => NUM_RSSI_C,
          AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
       port map(
