@@ -1,9 +1,11 @@
 System:
+  PrbsRx[:]:
+      checkPayload: False
   Fpga[:]:
     SsiPrbsTx:
       AxiEn: True
       TxEn: True
       FwCnt: False
-      PacketLength: 530 # 8500
+      PacketLength: 0x207 # 8320
       TrigDly: 26041 # 6 kHz
       

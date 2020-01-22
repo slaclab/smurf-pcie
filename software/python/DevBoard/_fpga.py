@@ -186,13 +186,13 @@ class TopLevel(pr.Root):
             else:
                 if (swTx):
                     # Connect VC1 to FW RX PRBS
-                    self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+                    self.prbTx = pr.utilities.prbs.PrbsTx(name="PrbsTx[0]",width=128,expand=False)
                     pr.streamConnect(self.prbTx, self.vc1Prbs)
                     self.add(self.prbTx) 
                         
                 if (swRx):
                     # Connect VC1 to FW TX PRBS
-                    self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=True)
+                    self.prbsRx = pr.utilities.prbs.PrbsRx(name='PrbsRx[0]',width=128,expand=True)
                     pr.streamConnect(self.vc1Prbs,self.prbsRx)
                     self.add(self.prbsRx)       
                     
