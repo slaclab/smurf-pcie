@@ -1,6 +1,4 @@
 System:
-  PrbsRx[:]:
-      checkPayload: False
   Fpga[:]:
     SsiPrbsTx:
       PacketLength: 0x207 # 8320

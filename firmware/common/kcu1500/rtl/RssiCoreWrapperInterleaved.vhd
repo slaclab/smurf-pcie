@@ -41,7 +41,6 @@ entity RssiCoreWrapperInterleaved is
       APP_ILEAVE_EN_G      : boolean              := true;
       BYP_TX_BUFFER_G      : boolean              := false;
       BYP_RX_BUFFER_G      : boolean              := false;
-      SYNTH_MODE_G         : string               := "inferred";
       MEMORY_TYPE_G        : string               := "block";
       ILEAVE_ON_NOTVALID_G : boolean              := true;
       -- AXIS Configurations
@@ -231,7 +230,7 @@ begin
          SEGMENT_ADDR_SIZE_G => SEGMENT_ADDR_SIZE_G,
          BYP_TX_BUFFER_G     => BYP_TX_BUFFER_G,
          BYP_RX_BUFFER_G     => BYP_RX_BUFFER_G,
-         SYNTH_MODE_G        => SYNTH_MODE_G,
+         SYNTH_MODE_G        => "xpm",
          MEMORY_TYPE_G       => MEMORY_TYPE_G,
          -- AXIS Configurations
          APP_AXIS_CONFIG_G   => CONV_AXIS_CONFIG_C,
