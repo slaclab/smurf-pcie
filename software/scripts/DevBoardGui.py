@@ -20,7 +20,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import DevBoard as devBoard
+import SmurfPcie.DevBoard as devBoard
 import pyrogue.gui
 import pyrogue.protocols
 import pyrogue.utilities.prbs

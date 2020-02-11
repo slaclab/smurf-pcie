@@ -119,7 +119,7 @@ class UdpBufferGrp(pr.Device):
 class Core(pr.Device):
     def __init__(   self,       
             name        = "Core",
-            description = "Container for SmurfKcu1500RssiOffload",
+            description = "Container for SmurfKcu1500RssiOffload10GbE",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         

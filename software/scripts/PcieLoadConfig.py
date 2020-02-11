@@ -13,7 +13,7 @@ import sys
 import argparse
 import pyrogue as pr
 import rogue.hardware.axi
-import SmurfKcu1500RssiOffload as smurf
+import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
 
 #################################################################
 

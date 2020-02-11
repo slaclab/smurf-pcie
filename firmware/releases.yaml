@@ -6,7 +6,7 @@ TopRoguePackage: SmurfPcie
 RoguePackages:
   - submodules/surf/python
   - submodules/axi-pcie-core/python
-  - ../software/python     
+  - python     
 
 RogueConfig:
   - ../software/config
