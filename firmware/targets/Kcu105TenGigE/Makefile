@@ -11,5 +11,8 @@ export PRJ_PART = XCKU040-FFVA1156-2-E
 # which requires me to define the TOP_DIR path
 export TOP_DIR = $(abspath $(PWD)/../..)
 
+# Define release
+export RELEASE = Kcu105TenGigE
+
 # Use top level makefile
 include $(TOP_DIR)/submodules/ruckus/system_vivado.mk

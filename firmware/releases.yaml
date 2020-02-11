@@ -1,0 +1,36 @@
+
+GitBase: ..
+
+TopRoguePackage: SmurfPcie
+
+RoguePackages:
+  - submodules/surf/python
+  - submodules/axi-pcie-core/python
+  - ../software/python     
+
+RogueConfig:
+  - ../software/config
+  - ../software/config/dev-board     
+
+Targets:
+  SmurfKcu1500RssiOffload10GbE:
+    ImageDir: targets/SmurfKcu1500RssiOffload10GbE/images
+    Extensions:
+      - mcs
+  Kcu105TenGigE:
+    ImageDir: targets/Kcu105TenGigE/images
+    Extensions:
+      - bit
+      - mcs
+
+Releases:
+  SmurfKcu1500RssiOffload10GbE:
+    Targets:
+      - SmurfKcu1500RssiOffload10GbE
+    Types:
+      - Rogue
+  Kcu105TenGigE:
+    Targets:
+      - Kcu105TenGigE
+    Types:
+      - Rogue
