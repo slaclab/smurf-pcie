@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-15
--- Last update: 2019-08-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -18,9 +16,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 entity AppCore is
    generic (

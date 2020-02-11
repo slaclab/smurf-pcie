@@ -17,12 +17,13 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.RssiPkg.all;
-use work.SsiPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.RssiPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 entity RssiCoreWrapperInterleaved is
    generic (
@@ -40,7 +41,6 @@ entity RssiCoreWrapperInterleaved is
       APP_ILEAVE_EN_G      : boolean              := true;
       BYP_TX_BUFFER_G      : boolean              := false;
       BYP_RX_BUFFER_G      : boolean              := false;
-      SYNTH_MODE_G         : string               := "inferred";
       MEMORY_TYPE_G        : string               := "block";
       ILEAVE_ON_NOTVALID_G : boolean              := true;
       -- AXIS Configurations
@@ -130,7 +130,7 @@ architecture mapping of RssiCoreWrapperInterleaved is
 
 begin
 
-   U_reset : entity work.RstPipeline
+   U_reset : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -158,7 +158,7 @@ begin
       sAppAxisSlave_o <= slave;
    end process;
 
-   U_IbPipe : entity work.AxiStreamPipeline
+   U_IbPipe : entity surf.AxiStreamPipeline
       generic map (
          TPD_G         => TPD_G,
          PIPE_STAGES_G => 1)
@@ -174,10 +174,10 @@ begin
                   slv(to_unsigned(MAX_SEG_SIZE_G, maxSegs'length)),
                   maxObSegSize(maxSegs'range));
 
-   U_Packetizer : entity work.AxiStreamPacketizer2
+   U_Packetizer : entity surf.AxiStreamPacketizer2
       generic map (
          TPD_G                => TPD_G,
-         BRAM_EN_G            => true,
+         MEMORY_TYPE_G        => "block",
          REG_EN_G             => true,
          CRC_MODE_G           => "FULL",
          CRC_POLY_G           => x"04C11DB7",
@@ -194,14 +194,14 @@ begin
          mAxisMaster => packetizerMasters(1),
          mAxisSlave  => packetizerSlaves(1));
 
-   U_BUFFER : entity work.AxiStreamFifoV2
+   U_BUFFER : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          FIFO_ADDR_WIDTH_G   => 10,     -- 16B x 1024 = 16KB > 9000 MTU
          -- AXI Stream Port Configurations
@@ -219,7 +219,7 @@ begin
          mAxisMaster => sTspAxisMaster,
          mAxisSlave  => sTspAxisSlave);
 
-   U_RssiCore : entity work.RssiCore
+   U_RssiCore : entity surf.RssiCore
       generic map (
          TPD_G               => TPD_G,
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
@@ -230,7 +230,7 @@ begin
          SEGMENT_ADDR_SIZE_G => SEGMENT_ADDR_SIZE_G,
          BYP_TX_BUFFER_G     => BYP_TX_BUFFER_G,
          BYP_RX_BUFFER_G     => BYP_RX_BUFFER_G,
-         SYNTH_MODE_G        => SYNTH_MODE_G,
+         SYNTH_MODE_G        => "xpm",
          MEMORY_TYPE_G       => MEMORY_TYPE_G,
          -- AXIS Configurations
          APP_AXIS_CONFIG_G   => CONV_AXIS_CONFIG_C,
@@ -290,10 +290,10 @@ begin
       end if;
    end process;
 
-   U_Depacketizer : entity work.AxiStreamDepacketizer2
+   U_Depacketizer : entity surf.AxiStreamDepacketizer2
       generic map (
          TPD_G                => TPD_G,
-         BRAM_EN_G            => true,
+         MEMORY_TYPE_G        => "block",
          REG_EN_G             => true,
          CRC_MODE_G           => "FULL",
          CRC_POLY_G           => x"04C11DB7",

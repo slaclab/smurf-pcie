@@ -1,0 +1,9 @@
+System:
+  Fpga[:]:
+    SsiPrbsTx:
+      AxiEn: True
+      TxEn: False # Disabled TX means 0 kHz
+      FwCnt: False
+      PacketLength: 519 # 8320
+      TrigDly: 156250 # 1 kHz
+      

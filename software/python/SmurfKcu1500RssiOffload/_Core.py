@@ -84,6 +84,7 @@ class UdpBufferGrp(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
+        # AXI Stream DDR FIFOs
         for i in range(6):
             self.add(axi.AxiStreamDmaFifo(            
                 name   = f'UdpBuffer[{i}]',
@@ -91,10 +92,27 @@ class UdpBufferGrp(pr.Device):
                 expand = False,
             ))     
 
+        # Misc. UDP debug
         self.add(smurf.UdpDebug(            
             offset = 0x6000, 
             expand = False,
         ))         
+
+        # DDR AXI Stream Inbound Monitor
+        self.add(axi.AxiStreamMonAxiL(
+            name        = 'DdrIbAxisMon',
+            offset      = 0x7000,
+            numberLanes = 6,
+            expand      = False,
+        ))        
+
+        # DDR AXI Stream Outbound Monitor
+        self.add(axi.AxiStreamMonAxiL(
+            name        = 'DdrObAxisMon',
+            offset      = 0x8000,
+            numberLanes = 6,
+            expand      = False,
+        ))
 
 ##############################################################################
 

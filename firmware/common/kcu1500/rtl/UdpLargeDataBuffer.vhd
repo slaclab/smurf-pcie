@@ -16,12 +16,16 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.MigPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+use surf.SsiPkg.all;
+
+library axi_pcie_core;
+use axi_pcie_core.MigPkg.all;
 
 entity UdpLargeDataBuffer is
    generic (
@@ -57,7 +61,7 @@ architecture mapping of UdpLargeDataBuffer is
       TDEST_BITS_C  => 0,      -- TDEST is assigned in the EthTrafficSwitch.vhd
       TID_BITS_C    => 0,               -- Unused
       TKEEP_MODE_C  => EMAC_AXIS_CONFIG_C.TKEEP_MODE_C,
-      TUSER_BITS_C  => 1,               -- Using SOF_INSERT_G='1' to set SOF
+      TUSER_BITS_C  => SSI_TUSER_BITS_C,
       TUSER_MODE_C  => EMAC_AXIS_CONFIG_C.TUSER_MODE_C);
 
    constant AXI_CONFIG_C : AxiConfigType := (
@@ -287,27 +291,27 @@ architecture mapping of UdpLargeDataBuffer is
          m_axi_rready   : out std_logic);
    end component;
 
-   signal dmaWriteMasters : AxiWriteMasterArray(1 downto 0);
-   signal dmaWriteSlaves  : AxiWriteSlaveArray(1 downto 0);
-   signal dmaReadMasters  : AxiReadMasterArray(1 downto 0);
-   signal dmaReadSlaves   : AxiReadSlaveArray(1 downto 0);
+   signal dmaWriteMasters : AxiWriteMasterArray(1 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
+   signal dmaWriteSlaves  : AxiWriteSlaveArray(1 downto 0)  := (others => AXI_WRITE_SLAVE_INIT_C);
+   signal dmaReadMasters  : AxiReadMasterArray(1 downto 0)  := (others => AXI_READ_MASTER_INIT_C);
+   signal dmaReadSlaves   : AxiReadSlaveArray(1 downto 0)   := (others => AXI_READ_SLAVE_INIT_C);
 
-   signal ddrWriteMasters : AxiWriteMasterArray(1 downto 0);
-   signal ddrWriteSlaves  : AxiWriteSlaveArray(1 downto 0);
-   signal ddrReadMasters  : AxiReadMasterArray(1 downto 0);
-   signal ddrReadSlaves   : AxiReadSlaveArray(1 downto 0);
+   signal ddrWriteMasters : AxiWriteMasterArray(1 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
+   signal ddrWriteSlaves  : AxiWriteSlaveArray(1 downto 0)  := (others => AXI_WRITE_SLAVE_INIT_C);
+   signal ddrReadMasters  : AxiReadMasterArray(1 downto 0)  := (others => AXI_READ_MASTER_INIT_C);
+   signal ddrReadSlaves   : AxiReadSlaveArray(1 downto 0)   := (others => AXI_READ_SLAVE_INIT_C);
 
-   signal axiWriteMaster : AxiWriteMasterType;
-   signal axiWriteSlave  : AxiWriteSlaveType;
-   signal axiReadMaster  : AxiReadMasterType;
-   signal axiReadSlave   : AxiReadSlaveType;
+   signal axiWriteMaster : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+   signal axiWriteSlave  : AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+   signal axiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
+   signal axiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
-   signal axiResetVec : slv(1 downto 0);
-   signal axiReset    : sl;
-   signal axiRstL     : sl;
+   signal axiResetVec : slv(1 downto 0) := (others => '1');
+   signal axiReset    : sl              := '1';
+   signal axiRstL     : sl              := '0';
 
-   signal ddrReset : sl;
-   signal ddrRstL  : sl;
+   signal ddrReset : sl := '1';
+   signal ddrRstL  : sl := '0';
 
 begin
 
@@ -318,7 +322,7 @@ begin
 
    BUILD_LOGIC : if (BYPASS_G = false) generate
 
-      U_axiRst : entity work.RstPipeline
+      U_axiRst : entity surf.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -326,7 +330,7 @@ begin
             rstIn  => axiRst,
             rstOut => axiReset);
 
-      U_ddrRstL : entity work.RstPipeline
+      U_ddrRstL : entity surf.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -339,7 +343,7 @@ begin
 
       GEN_VEC : for i in 1 downto 0 generate
 
-         U_axiRstVec : entity work.RstPipeline
+         U_axiRstVec : entity surf.RstPipeline
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -347,7 +351,7 @@ begin
                rstIn  => axiReset,
                rstOut => axiResetVec(i));
 
-         U_DmaFiFo : entity work.AxiStreamDmaFifo
+         U_DmaFiFo : entity surf.AxiStreamDmaFifo
             generic map (
                TPD_G              => TPD_G,
                -- FIFO Configuration
@@ -382,7 +386,7 @@ begin
                axilWriteMaster => axilWriteMasters(i),
                axilWriteSlave  => axilWriteSlaves(i));
 
-         U_Resize : entity work.AxiPcie64BResize
+         U_Resize : entity axi_pcie_core.AxiPcie64BResize
             generic map (
                TPD_G             => TPD_G,
                AXI_DMA_CONFIG_G  => AXI_RESIZE_16B_C,

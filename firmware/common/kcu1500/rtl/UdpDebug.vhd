@@ -18,8 +18,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
 use work.AppPkg.all;
 
 entity UdpDebug is
@@ -125,7 +127,7 @@ begin
 
    GEN_VEC : for i in NUM_RSSI_C-1 downto 0 generate
 
-      U_Sync : entity work.SynchronizerVector
+      U_Sync : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 8)

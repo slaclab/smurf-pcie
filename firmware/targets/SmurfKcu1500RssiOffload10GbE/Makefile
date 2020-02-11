@@ -1,10 +1,5 @@
-export OVERRIDE_SUBMODULE_LOCKS=1
-
-# Using custom common/shared/rtl/TimingExtnPkg.vhd
-export TIMING_EXT_PKG = 1
-
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000307
+export PRJ_VERSION = 0x00000317
 
 # Define target part
 export PRJ_PART = xcku115-flvb2104-2-e
