@@ -1,3 +1,8 @@
+# Define release
+ifndef RELEASE
+export RELEASE = all
+endif
+
 # Define target output
 target: prom
 
