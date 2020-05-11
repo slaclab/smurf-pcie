@@ -212,6 +212,7 @@ begin
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,
          PIPE_STAGES_G       => 1,
+         SLAVE_READY_EN_G    => false,  -- Never assert back pressure between UDP RX engine and Large DDR memory buffer
          -- FIFO configurations
          MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
@@ -224,12 +225,14 @@ begin
          sAxisClk    => axilClk,
          sAxisRst    => axilReset,
          sAxisMaster => obUdpMasters(1),
-         sAxisSlave  => obUdpSlaves(1),
          -- Master Port
          mAxisClk    => axiClk,
          mAxisRst    => axiRst,
          mAxisMaster => udpObMaster,
          mAxisSlave  => udpObSlave);
+
+   -- Never assert back pressure between UDP RX engine and Large DDR memory buffer
+   obUdpSlaves(1) <= AXI_STREAM_SLAVE_FORCE_C;
 
    --------------------------
    -- Software's RSSI Clients
