@@ -1,14 +1,3 @@
-# Define release
-ifndef RELEASE
-export RELEASE = all
-endif
-
-# Define target output
-target: prom
-
-# Define Firmware Version Number
-export PRJ_VERSION = 0x00000318
-
 # Define target part
 export PRJ_PART = xcku115-flvb2104-2-e
 
@@ -16,8 +5,6 @@ export PRJ_PART = xcku115-flvb2104-2-e
 # which requires me to define the TOP_DIR path
 export TOP_DIR = $(abspath $(PWD)/../..)
 
-# Define release
-export RELEASE = SmurfKcu1500RssiOffload10GbE
-
 # Use top level makefile
+include $(TOP_DIR)/targets/shared_config.mk
 include $(TOP_DIR)/submodules/ruckus/system_vivado.mk

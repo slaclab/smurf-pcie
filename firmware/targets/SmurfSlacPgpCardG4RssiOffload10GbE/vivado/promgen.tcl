@@ -10,4 +10,4 @@
 
 set format     "mcs"
 set inteface   "SPIx8"
-set size       "1024"
+set size       "512"
