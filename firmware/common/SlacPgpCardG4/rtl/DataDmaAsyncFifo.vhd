@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
--- File       : DmaAsyncFifo.vhd
+-- File       : DataDmaAsyncFifo.vhd
 -- Company    : SLAC National Accelerator Laboratory
--------------------------------------------------------------------------------
--- Description: DmaAsyncFifo File
 -------------------------------------------------------------------------------
 -- This file is part of 'axi-pcie-core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -25,7 +23,7 @@ use surf.EthMacPkg.all;
 
 use work.AppPkg.all;
 
-entity DmaAsyncFifo is
+entity DataDmaAsyncFifo is
    generic (
       TPD_G : time := 1 ns);
    port (
@@ -42,25 +40,15 @@ entity DmaAsyncFifo is
       dmaIbMaster  : out AxiStreamMasterType;
       dmaIbSlave   : in  AxiStreamSlaveType;
       -- UDP Interface (axilClk domain)
-      udpIbMaster  : out AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+      udpIbMaster  : out AxiStreamMasterType;
       udpIbSlave   : in  AxiStreamSlaveType;
       udpObMaster  : in  AxiStreamMasterType;
-      udpObSlave   : out AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
-      -- RSSI Interface (axilClk domain)
-      rssiIbMaster : out AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
-      rssiIbSlave  : in  AxiStreamSlaveType;
-      rssiObMaster : in  AxiStreamMasterType;
-      rssiObSlave  : out AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C);
-end DmaAsyncFifo;
+      udpObSlave   : out AxiStreamSlaveType);
+end DataDmaAsyncFifo;
 
-architecture mapping of DmaAsyncFifo is
+architecture mapping of DataDmaAsyncFifo is
 
-   constant MUX_ROUTES_C : Slv8Array(CLIENT_SIZE_C-1 downto 0) := (
-      0 => "--------",
-      1 => "--------");
-
-   signal dmaIbMasters : AxiStreamMasterArray(1 downto 0);
-   signal dmaIbSlaves  : AxiStreamSlaveArray(1 downto 0);
+   signal udpRxMaster  : AxiStreamMasterType;
 
    signal axilReset : sl;
    signal dmaReset  : sl;
@@ -91,30 +79,22 @@ begin
    --             DMA Path: APP->DMA
    -----------------------------------------------------------------
 
-   U_IB_DMA_1 : entity surf.AxiStreamFifoV2
-      generic map (
-         -- General Configurations
-         TPD_G               => TPD_G,
-         -- FIFO configurations
-         MEMORY_TYPE_G       => "distributed",
-         GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 5,
-         -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilReset,
-         sAxisMaster => rssiObMaster,
-         sAxisSlave  => rssiObSlave,
-         -- Master Port
-         mAxisClk    => dmaClk,
-         mAxisRst    => dmaReset,
-         mAxisMaster => dmaIbMasters(1),
-         mAxisSlave  => dmaIbSlaves(1));
+   UDP_OB_MUX : process (udpDest, udpObMaster) is
+      variable master : AxiStreamMasterType;
+   begin
 
-   U_IB_DMA_0 : entity surf.AxiStreamFifoV2
+      -- Init
+      master := udpObMaster;
+
+      -- Force the TDEST
+      master.tDest := udpDest;
+
+      -- Outputs
+      udpRxMaster <= master;
+
+   end process;
+
+   U_IB_DMA : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -129,34 +109,13 @@ begin
          -- Slave Port
          sAxisClk    => axilClk,
          sAxisRst    => axilReset,
-         sAxisMaster => udpObMaster,
+         sAxisMaster => udpRxMaster,
          sAxisSlave  => udpObSlave,
          -- Master Port
          mAxisClk    => dmaClk,
          mAxisRst    => dmaReset,
-         mAxisMaster => dmaIbMasters(0),
-         mAxisSlave  => dmaIbSlaves(0));
-
-   U_AxiStreamMux : entity surf.AxiStreamMux
-      generic map (
-         TPD_G                => TPD_G,
-         PIPE_STAGES_G        => 1,
-         NUM_SLAVES_G         => 2,
-         MODE_G               => "ROUTED",
-         TDEST_ROUTES_G       => MUX_ROUTES_C,
-         ILEAVE_EN_G          => true,
-         ILEAVE_ON_NOTVALID_G => true,
-         ILEAVE_REARB_G       => 128)
-      port map (
-         -- Clock and reset
-         axisClk      => dmaClk,
-         axisRst      => dmaReset,
-         -- Slaves
-         sAxisMasters => dmaIbMasters,
-         sAxisSlaves  => dmaIbSlaves,
-         -- Master
-         mAxisMaster  => dmaIbMaster,
-         mAxisSlave   => dmaIbSlave);
+         mAxisMaster => dmaIbMaster,
+         mAxisSlave  => dmaIbSlave);
 
    -----------------------------------------------------------------
    --             DMA Path: DMA->APP
@@ -172,7 +131,7 @@ begin
          FIFO_ADDR_WIDTH_G   => 5,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => dmaClk,
@@ -182,7 +141,7 @@ begin
          -- Master Port
          mAxisClk    => axilClk,
          mAxisRst    => axilReset,
-         mAxisMaster => rssiIbMaster,
-         mAxisSlave  => rssiIbSlave);
+         mAxisMaster => udpIbMaster,
+         mAxisSlave  => udpIbSlave);
 
 end mapping;

@@ -46,10 +46,10 @@ entity Hardware is
       -- DMA Interface
       dmaClk          : in  sl;
       dmaRst          : in  sl;
-      dmaObMasters    : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      dmaObSlaves     : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      dmaIbMasters    : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
-      dmaIbSlaves     : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
+      dmaObMasters    : in  AxiStreamMasterArray(NUM_RSSI_C downto 0);
+      dmaObSlaves     : out AxiStreamSlaveArray(NUM_RSSI_C downto 0);
+      dmaIbMasters    : out AxiStreamMasterArray(NUM_RSSI_C downto 0);
+      dmaIbSlaves     : in  AxiStreamSlaveArray(NUM_RSSI_C downto 0);
       ---------------------
       --  Hardware Ports
       ---------------------    
@@ -123,33 +123,48 @@ begin
    -- DMA ASYNC FIFOs
    ------------------
    GEN_DMA : for i in NUM_RSSI_C-1 downto 0 generate
-      U_DmaAsyncFifo : entity work.DmaAsyncFifo
+      U_DataPath : entity work.DataDmaAsyncFifo
          generic map (
             TPD_G => TPD_G)
          port map (
             -- Clocks and Resets
-            axilClk      => axilClk,
-            axilRst      => axilReset,
-            dmaClk       => dmaClk,
-            dmaRst       => dmaRst,
+            axilClk     => axilClk,
+            axilRst     => axilReset,
+            dmaClk      => dmaClk,
+            dmaRst      => dmaRst,
             -- UDP Config Interface (axilClk domain)
-            udpDest      => udpObDest,
+            udpDest     => udpObDest,
             -- DMA Interface (dmaClk domain)
-            dmaObMaster  => dmaObMasters(i),
-            dmaObSlave   => dmaObSlaves(i),
-            dmaIbMaster  => dmaIbMasters(i),
-            dmaIbSlave   => dmaIbSlaves(i),
+            dmaObMaster => dmaObMasters(i),
+            dmaObSlave  => dmaObSlaves(i),
+            dmaIbMaster => dmaIbMasters(i),
+            dmaIbSlave  => dmaIbSlaves(i),
             -- UDP Interface (axilClk domain)
-            udpIbMaster  => udpIbMasters(i),
-            udpIbSlave   => udpIbSlaves(i),
-            udpObMaster  => udpObMasters(i),
-            udpObSlave   => udpObSlaves(i),
-            -- RSSI Interface (axilClk domain)
-            rssiIbMaster => rssiIbMasters(i),
-            rssiIbSlave  => rssiIbSlaves(i),
-            rssiObMaster => rssiObMasters(i),
-            rssiObSlave  => rssiObSlaves(i));
+            udpIbMaster => udpIbMasters(i),
+            udpIbSlave  => udpIbSlaves(i),
+            udpObMaster => udpObMasters(i),
+            udpObSlave  => udpObSlaves(i));
    end generate GEN_DMA;
+
+   U_RegPath : entity work.RegDmaAsyncFifo
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- Clocks and Resets
+         axilClk       => axilClk,
+         axilRst       => axilReset,
+         dmaClk        => dmaClk,
+         dmaRst        => dmaRst,
+         -- DMA Interface (dmaClk domain)
+         dmaObMaster   => dmaObMasters(NUM_RSSI_C),
+         dmaObSlave    => dmaObSlaves(NUM_RSSI_C),
+         dmaIbMaster   => dmaIbMasters(NUM_RSSI_C),
+         dmaIbSlave    => dmaIbSlaves(NUM_RSSI_C),
+         -- RSSI Interface (axilClk domain)
+         rssiIbMasters => rssiIbMasters,
+         rssiIbSlaves  => rssiIbSlaves,
+         rssiObMasters => rssiObMasters,
+         rssiObSlaves  => rssiObSlaves);
 
    ---------------------
    -- AXI-Lite Crossbar
