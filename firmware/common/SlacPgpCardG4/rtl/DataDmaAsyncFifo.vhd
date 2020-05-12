@@ -28,27 +28,27 @@ entity DataDmaAsyncFifo is
       TPD_G : time := 1 ns);
    port (
       -- Clocks and Resets
-      axilClk      : in  sl;
-      axilRst      : in  sl;
-      dmaClk       : in  sl;
-      dmaRst       : in  sl;
+      axilClk     : in  sl;
+      axilRst     : in  sl;
+      dmaClk      : in  sl;
+      dmaRst      : in  sl;
       -- UDP Config Interface (axilClk domain)
-      udpDest      : in  slv(7 downto 0);
+      udpDest     : in  slv(7 downto 0);
       -- DMA Interface (dmaClk domain)
-      dmaObMaster  : in  AxiStreamMasterType;
-      dmaObSlave   : out AxiStreamSlaveType;
-      dmaIbMaster  : out AxiStreamMasterType;
-      dmaIbSlave   : in  AxiStreamSlaveType;
+      dmaObMaster : in  AxiStreamMasterType;
+      dmaObSlave  : out AxiStreamSlaveType;
+      dmaIbMaster : out AxiStreamMasterType;
+      dmaIbSlave  : in  AxiStreamSlaveType;
       -- UDP Interface (axilClk domain)
-      udpIbMaster  : out AxiStreamMasterType;
-      udpIbSlave   : in  AxiStreamSlaveType;
-      udpObMaster  : in  AxiStreamMasterType;
-      udpObSlave   : out AxiStreamSlaveType);
+      udpIbMaster : out AxiStreamMasterType;
+      udpIbSlave  : in  AxiStreamSlaveType;
+      udpObMaster : in  AxiStreamMasterType;
+      udpObSlave  : out AxiStreamSlaveType);
 end DataDmaAsyncFifo;
 
 architecture mapping of DataDmaAsyncFifo is
 
-   signal udpRxMaster  : AxiStreamMasterType;
+   signal udpRxMaster : AxiStreamMasterType;
 
    signal axilReset : sl;
    signal dmaReset  : sl;
@@ -98,10 +98,12 @@ begin
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         MEMORY_TYPE_G       => "distributed",
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 5,
+         FIFO_ADDR_WIDTH_G   => 9,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
@@ -125,10 +127,12 @@ begin
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         MEMORY_TYPE_G       => "distributed",
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 5,
+         FIFO_ADDR_WIDTH_G   => 9,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)

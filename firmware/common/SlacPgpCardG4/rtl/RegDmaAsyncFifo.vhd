@@ -159,10 +159,12 @@ begin
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         MEMORY_TYPE_G       => "distributed",
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 5,
+         FIFO_ADDR_WIDTH_G   => 9,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
@@ -186,10 +188,12 @@ begin
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 1,
+         PIPE_STAGES_G       => 1,
          -- FIFO configurations
-         MEMORY_TYPE_G       => "distributed",
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 5,
+         FIFO_ADDR_WIDTH_G   => 9,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => APP_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => APP_AXIS_CONFIG_C)
