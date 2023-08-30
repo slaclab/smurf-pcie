@@ -5,11 +5,11 @@
 -- Description: Example using 10G-BASER Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -115,14 +115,14 @@ begin
       port map (
          -- Local Configurations
          localMac            => ethMac(1 downto 0),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk              => dmaClk(1 downto 0),
          dmaRst              => dmaRst(1 downto 0),
          dmaIbMasters        => rxMasters(1 downto 0),
          dmaIbSlaves         => rxSlaves(1 downto 0),
          dmaObMasters        => txMasters(1 downto 0),
          dmaObSlaves         => txSlaves(1 downto 0),
-         -- Slave AXI-Lite Interface 
+         -- Slave AXI-Lite Interface
          axiLiteClk          => dmaClk(1 downto 0),
          axiLiteRst          => dmaRst(1 downto 0),
          axiLiteReadMasters  => phyReadMasters(1 downto 0),
@@ -155,14 +155,14 @@ begin
       port map (
          -- Local Configurations
          localMac            => ethMac(5 downto 2),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk              => dmaClk(5 downto 2),
          dmaRst              => dmaRst(5 downto 2),
          dmaIbMasters        => rxMasters(5 downto 2),
          dmaIbSlaves         => rxSlaves(5 downto 2),
          dmaObMasters        => txMasters(5 downto 2),
          dmaObSlaves         => txSlaves(5 downto 2),
-         -- Slave AXI-Lite Interface 
+         -- Slave AXI-Lite Interface
          axiLiteClk          => dmaClk(5 downto 2),
          axiLiteRst          => dmaRst(5 downto 2),
          axiLiteReadMasters  => phyReadMasters(5 downto 2),
