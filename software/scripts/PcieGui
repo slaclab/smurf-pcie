@@ -8,78 +8,80 @@
 # copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
-import setupLibPaths
+import os
 import sys
 import argparse
-import pyrogue as pr
-import pyrogue.gui
-import rogue.hardware.axi
-import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
+import importlib
+import rogue
+
+if __name__ == "__main__":
 
 #################################################################
 
-# Convert str to bool
-argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
+    # Convert str to bool
+    argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
 
-# Set the argument parser
-parser = argparse.ArgumentParser()
+    # Set the argument parser
+    parser = argparse.ArgumentParser()
 
-# Add arguments
-parser.add_argument(
-    "--dev",
-    type     = str,
-    required = False,
-    default  = '/dev/datadev_0',
-    help     = "path to device",
-)
+    # Add arguments
+    parser.add_argument(
+        "--dev",
+        type     = str,
+        required = False,
+        default  = '/dev/datadev_0',
+        help     = "path to device",
+    )
 
-parser.add_argument(
-    "--pollEn",
-    type     = argBool,
-    required = False,
-    default  = True,
-    help     = "auto-polling",
-)
+    parser.add_argument(
+        "--pollEn",
+        type     = argBool,
+        required = False,
+        default  = True,
+        help     = "Enable auto-polling",
+    )
 
-parser.add_argument(
-    "--initRead",
-    type     = argBool,
-    required = False,
-    default  = True,
-    help     = "Enable read all variables at start",
-)
+    parser.add_argument(
+        "--initRead",
+        type     = argBool,
+        required = False,
+        default  = True,
+        help     = "Enable read all variables at start",
+    )
 
-# Get the arguments
-args = parser.parse_args()
+    # Get the arguments
+    args = parser.parse_args()
 
-#################################################################
+    #################################################################
 
-# Set base
-base = pr.Root(name='pcie',description='')
+    # First see if submodule packages are already in the python path
+    try:
+        # Load the packages
+        import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
 
-# Create the stream interface
-memMap = rogue.hardware.axi.AxiMemMap(args.dev)
+        print( 'Running anaconda software' )
 
-# Add Base Device
-base.add(smurf.Core(memBase=memMap,expand=True))
+    # Otherwise assume it is relative in a standard development directory structure
+    except:
+        # Load the packages
+        import setupLibPaths
+        import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
 
-# Start the system
-base.start()
+        print( 'Running local git clone software' )
 
-# Print the AxiVersion Summary
-base.Core.AxiPcieCore.AxiVersion.printStatus()
+    #################################################################
+    import pyrogue.pydm
 
-# Create GUI
-appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop()
-guiTop.addTree(base)
-guiTop.resize(800, 800)
+    with smurf.Root(
+        dev      = args.dev,
+        pollEn   = args.pollEn,
+        initRead = args.initRead,        
+        
+    ) as root:
+        pyrogue.pydm.runPyDM(
+            root  = root,
+            sizeX = 800,
+            sizeY = 800,
+        )
 
-print("Starting GUI...\n");
-
-# Run GUI
-appTop.exec_()
-
-# Close
-base.stop()
-exit()
+    #################################################################
