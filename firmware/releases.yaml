@@ -5,21 +5,16 @@ Targets:
     ImageDir: targets/SmurfKcu1500RssiOffload10GbE/images
     Extensions:
       - mcs   
-  SmurfSlacPgpCardG4RssiOffload10GbE:
-    ImageDir: targets/SmurfSlacPgpCardG4RssiOffload10GbE/images
-    Extensions:
-      - mcs
   Kcu105TenGigE:
     ImageDir: targets/Kcu105TenGigE/images
     Extensions:
-      - bit
+      - mcs
 
 Releases:
   all:
     Primary: True
     Targets:
       - SmurfKcu1500RssiOffload10GbE
-      - SmurfSlacPgpCardG4RssiOffload10GbE
       - Kcu105TenGigE
     Types:
       - Firmware-Only
