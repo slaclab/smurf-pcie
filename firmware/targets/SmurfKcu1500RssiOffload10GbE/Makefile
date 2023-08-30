@@ -1,3 +1,5 @@
+export PARALLEL_SYNTH = 3
+
 # Define target part
 export PRJ_PART = xcku115-flvb2104-2-e
 
