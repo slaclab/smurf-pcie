@@ -5,11 +5,11 @@
 -- Description: DmaAsyncFifo File
 -------------------------------------------------------------------------------
 -- This file is part of 'axi-pcie-core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'axi-pcie-core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'axi-pcie-core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -307,12 +307,12 @@ begin
       masters(1).tDest := obDest;
 
       -- Check if forwarding to primary DMA path
-      if (muxSel = '0') then  -- Used for testing with computer without PCIe bifurcation 
+      if (muxSel = '0') then  -- Used for testing with computer without PCIe bifurcation
          -- Blowoff secondary DMA path
          masters(1).tValid := '0';
          slaves(1).tReady  := '1';
       -- Else forwarding to secondary DMA path
-      else                              -- Default Configuration 
+      else                              -- Default Configuration
          -- Blowoff primary DMA path
          masters(0).tValid := '0';
          slaves(0).tReady  := '1';

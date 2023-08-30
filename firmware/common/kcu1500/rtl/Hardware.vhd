@@ -5,11 +5,11 @@
 -- Description: Hardware File
 -------------------------------------------------------------------------------
 -- This file is part of 'axi-pcie-core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'axi-pcie-core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'axi-pcie-core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,9 +33,9 @@ entity Hardware is
       CLK_FREQUENCY_G : real := 156.25E+6;  -- units of Hz
       AXI_BASE_ADDR_G : slv(31 downto 0));
    port (
-      ------------------------      
+      ------------------------
       --  Top Level Interfaces
-      ------------------------    
+      ------------------------
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -69,7 +69,7 @@ entity Hardware is
       axiRst          : in  sl;
       ---------------------
       --  Hardware Ports
-      ---------------------    
+      ---------------------
       -- QSFP[0] Ports
       qsfp0RefClkP    : in  slv(1 downto 0);
       qsfp0RefClkN    : in  slv(1 downto 0);
@@ -277,14 +277,14 @@ begin
          axilReadSlave   => axilReadSlaves(PHY_INDEX_C),
          axilWriteMaster => axilWriteMasters(PHY_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(PHY_INDEX_C),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          udpIbMasters    => macObMasters,
          udpIbSlaves     => macObSlaves,
          udpObMasters    => macIbMasters,
          udpObSlaves     => macIbSlaves,
          ---------------------
          --  Hardware Ports
-         ---------------------    
+         ---------------------
          -- QSFP[0] Ports
          qsfp0RefClkP    => qsfp0RefClkP,
          qsfp0RefClkN    => qsfp0RefClkN,
@@ -380,12 +380,12 @@ begin
          udpObMuxSel     => udpObMuxSel,
          udpObDest       => udpObDest,
          udpToPhyRoute   => udpToPhyRoute,
-         -- AXI-Lite Interface 
+         -- AXI-Lite Interface
          axilReadMaster  => buffReadMasters(NUM_RSSI_C),
          axilReadSlave   => buffReadSlaves(NUM_RSSI_C),
          axilWriteMaster => buffWriteMasters(NUM_RSSI_C),
          axilWriteSlave  => buffWriteSlaves(NUM_RSSI_C));
-         
+
    DDR_AXIS_MON_IB : entity surf.AxiStreamMonAxiL
       generic map(
          TPD_G            => TPD_G,
@@ -405,7 +405,7 @@ begin
          sAxilWriteMaster => buffWriteMasters(NUM_RSSI_C+1),
          sAxilWriteSlave  => buffWriteSlaves(NUM_RSSI_C+1),
          sAxilReadMaster  => buffReadMasters(NUM_RSSI_C+1),
-         sAxilReadSlave   => buffReadSlaves(NUM_RSSI_C+1));  
+         sAxilReadSlave   => buffReadSlaves(NUM_RSSI_C+1));
 
    DDR_AXIS_MON_OB : entity surf.AxiStreamMonAxiL
       generic map(
@@ -426,6 +426,6 @@ begin
          sAxilWriteMaster => buffWriteMasters(NUM_RSSI_C+2),
          sAxilWriteSlave  => buffWriteSlaves(NUM_RSSI_C+2),
          sAxilReadMaster  => buffReadMasters(NUM_RSSI_C+2),
-         sAxilReadSlave   => buffReadSlaves(NUM_RSSI_C+2));           
+         sAxilReadSlave   => buffReadSlaves(NUM_RSSI_C+2));
 
 end mapping;

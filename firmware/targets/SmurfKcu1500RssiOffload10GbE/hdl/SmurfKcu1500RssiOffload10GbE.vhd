@@ -3,11 +3,11 @@
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- This file is part of 'SMURF PCIE'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SMURF PCIE', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SMURF PCIE', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -34,6 +34,8 @@ entity SmurfKcu1500RssiOffload10GbE is
       ---------------------
       --  Application Ports
       ---------------------
+      vPIn          : in    sl;
+      vNIn          : in    sl;
       -- QSFP[0] Ports
       qsfp0RefClkP  : in    slv(1 downto 0);
       qsfp0RefClkN  : in    slv(1 downto 0);
@@ -57,25 +59,28 @@ entity SmurfKcu1500RssiOffload10GbE is
       --  Core Ports
       --------------
       -- System Ports
-      emcClk        : in    sl;
-      userClkP      : in    sl;
-      userClkN      : in    sl;
+      emcClk       : in    sl;
+      userClkP     : in    sl;
+      userClkN     : in    sl;
+      i2cRstL      : out   sl;
+      i2cScl       : inout sl;
+      i2cSda       : inout sl;
       -- QSFP[0] Ports
-      qsfp0RstL     : out   sl;
-      qsfp0LpMode   : out   sl;
-      qsfp0ModSelL  : out   sl;
-      qsfp0ModPrsL  : in    sl;
+      qsfp0RstL    : out   sl;
+      qsfp0LpMode  : out   sl;
+      qsfp0ModSelL : out   sl;
+      qsfp0ModPrsL : in    sl;
       -- QSFP[1] Ports
-      qsfp1RstL     : out   sl;
-      qsfp1LpMode   : out   sl;
-      qsfp1ModSelL  : out   sl;
-      qsfp1ModPrsL  : in    sl;
-      -- Boot Memory Ports 
-      flashCsL      : out   sl;
-      flashMosi     : out   sl;
-      flashMiso     : in    sl;
-      flashHoldL    : out   sl;
-      flashWp       : out   sl;
+      qsfp1RstL    : out   sl;
+      qsfp1LpMode  : out   sl;
+      qsfp1ModSelL : out   sl;
+      qsfp1ModPrsL : in    sl;
+      -- Boot Memory Ports
+      flashCsL     : out   sl;
+      flashMosi    : out   sl;
+      flashMiso    : in    sl;
+      flashHoldL   : out   sl;
+      flashWp      : out   sl;
       -- PCIe Ports
       pciRstL       : in    sl;
       pciRefClkP    : in    sl;
@@ -84,7 +89,7 @@ entity SmurfKcu1500RssiOffload10GbE is
       pciRxN        : in    slv(7 downto 0);
       pciTxP        : out   slv(7 downto 0);
       pciTxN        : out   slv(7 downto 0);
-      -- Extended PCIe Ports 
+      -- Extended PCIe Ports
       pciExtRefClkP : in    sl;
       pciExtRefClkN : in    sl;
       pciExtRxP     : in    slv(7 downto 0);
@@ -101,20 +106,20 @@ architecture top_level of SmurfKcu1500RssiOffload10GbE is
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := (
       0               => (
-         baseAddr     => x"0008_0000",
-         addrBits     => 19,
-         connectivity => x"FFFF"),
-      1               => (
          baseAddr     => x"0010_0000",
          addrBits     => 20,
          connectivity => x"FFFF"),
-      2               => (
+      1               => (
          baseAddr     => x"0020_0000",
-         addrBits     => 21,
+         addrBits     => 20,
+         connectivity => x"FFFF"),
+      2               => (
+         baseAddr     => x"0030_0000",
+         addrBits     => 20,
          connectivity => x"FFFF"),
       3               => (
          baseAddr     => x"0040_0000",
-         addrBits     => 22,
+         addrBits     => 20,
          connectivity => x"FFFF"),
       4               => (
          baseAddr     => x"0080_0000",
@@ -208,7 +213,7 @@ begin
 
    -----------------
    -- MIG[0] IP Core
-   -----------------         
+   -----------------
    U_Mig0 : entity axi_pcie_core.Mig0
       generic map (
          TPD_G => TPD_G)
@@ -229,7 +234,7 @@ begin
 
    -----------------
    -- MIG[2] IP Core
-   -----------------         
+   -----------------
    U_Mig2 : entity axi_pcie_core.Mig2
       generic map (
          TPD_G => TPD_G)
@@ -256,7 +261,7 @@ begin
          TPD_G => TPD_G)
       port map (
          extRst         => dmaPriRst,
-         -- AXI MEM Interface 
+         -- AXI MEM Interface
          axiClk         => ddrClk(0),
          axiRst         => ddrRst(0),
          axiWriteMaster => ddrWriteMasters(0),
@@ -279,9 +284,9 @@ begin
          DMA_AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
          DMA_SIZE_G        => NUM_RSSI_C)
       port map (
-         ------------------------      
+         ------------------------
          --  Top Level Interfaces
-         ------------------------        
+         ------------------------
          userClk156     => userClk156,
          -- DMA Interfaces
          dmaClk         => dmaPriClk,
@@ -299,28 +304,31 @@ begin
          appWriteSlave  => bar0WriteSlaves(0),
          --------------
          --  Core Ports
-         --------------   
+         --------------
          -- System Ports
-         emcClk         => emcClk,
-         userClkP       => userClkP,
-         userClkN       => userClkN,
+         emcClk          => emcClk,
+         userClkP        => userClkP,
+         userClkN        => userClkN,
+         i2cRstL         => i2cRstL,
+         i2cScl          => i2cScl,
+         i2cSda          => i2cSda,
          -- QSFP[0] Ports
-         qsfp0RstL      => qsfp0RstL,
-         qsfp0LpMode    => qsfp0LpMode,
-         qsfp0ModSelL   => qsfp0ModSelL,
-         qsfp0ModPrsL   => qsfp0ModPrsL,
+         qsfp0RstL       => qsfp0RstL,
+         qsfp0LpMode     => qsfp0LpMode,
+         qsfp0ModSelL    => qsfp0ModSelL,
+         qsfp0ModPrsL    => qsfp0ModPrsL,
          -- QSFP[1] Ports
-         qsfp1RstL      => qsfp1RstL,
-         qsfp1LpMode    => qsfp1LpMode,
-         qsfp1ModSelL   => qsfp1ModSelL,
-         qsfp1ModPrsL   => qsfp1ModPrsL,
-         -- Boot Memory Ports 
-         flashCsL       => flashCsL,
-         flashMosi      => flashMosi,
-         flashMiso      => flashMiso,
-         flashHoldL     => flashHoldL,
-         flashWp        => flashWp,
-         -- PCIe Ports 
+         qsfp1RstL       => qsfp1RstL,
+         qsfp1LpMode     => qsfp1LpMode,
+         qsfp1ModSelL    => qsfp1ModSelL,
+         qsfp1ModPrsL    => qsfp1ModPrsL,
+         -- Boot Memory Ports
+         flashCsL        => flashCsL,
+         flashMosi       => flashMosi,
+         flashMiso       => flashMiso,
+         flashHoldL      => flashHoldL,
+         flashWp         => flashWp,
+         -- PCIe Ports
          pciRstL        => pciRstL,
          pciRefClkP     => pciRefClkP,
          pciRefClkN     => pciRefClkN,
@@ -336,9 +344,9 @@ begin
          DMA_AXIS_CONFIG_G => APP_AXIS_CONFIG_C,
          DMA_SIZE_G        => NUM_RSSI_C)
       port map (
-         ------------------------      
+         ------------------------
          --  Top Level Interfaces
-         ------------------------        
+         ------------------------
          -- DMA Interfaces
          dmaClk         => dmaSecClk,
          dmaRst         => dmaSecRst,
@@ -355,8 +363,8 @@ begin
          appWriteSlave  => bar0WriteSlaves(1),
          --------------
          --  Core Ports
-         --------------   
-         -- Extended PCIe Ports 
+         --------------
+         -- Extended PCIe Ports
          pciRstL        => pciRstL,
          pciExtRefClkP  => pciExtRefClkP,
          pciExtRefClkN  => pciExtRefClkN,
@@ -386,6 +394,22 @@ begin
          mAxiReadMasters  => axilReadMasters,
          mAxiReadSlaves   => axilReadSlaves);
 
+      --------------------------
+      -- AXI-Lite: SYSMON Module
+      --------------------------
+      U_SysMon : entity work.Sysmon
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            axiReadMaster  => axilReadMasters(0),
+            axiReadSlave   => axilReadSlaves(0),
+            axiWriteMaster => axilWriteMasters(0),
+            axiWriteSlave  => axilWriteSlaves(0),
+            axiClk         => axilClk,
+            axiRst         => axilReset,
+            vPIn           => vPIn,
+            vNIn           => vNIn);
+
    ------------------
    -- RSSI/ETH Module
    ------------------
@@ -395,9 +419,9 @@ begin
          CLK_FREQUENCY_G => CLK_FREQUENCY_C,
          AXI_BASE_ADDR_G => AXIL_CONFIG_C(4).baseAddr)
       port map (
-         ------------------------      
+         ------------------------
          --  Top Level Interfaces
-         ------------------------    
+         ------------------------
          -- AXI-Lite Interface (axilClk domain)
          axilClk         => axilClk,
          axilRst         => axilReset,
@@ -431,7 +455,7 @@ begin
          axiRst          => axiReset,
          ------------------
          --  Hardware Ports
-         ------------------       
+         ------------------
          -- QSFP[0] Ports
          qsfp0RefClkP    => qsfp0RefClkP,
          qsfp0RefClkN    => qsfp0RefClkN,
