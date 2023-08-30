@@ -73,6 +73,7 @@ if __name__ == "__main__":
     import pyrogue.pydm
 
     with smurf.Root(
+        name     = 'pcie', # Legacy name
         dev      = args.dev,
         pollEn   = args.pollEn,
         initRead = args.initRead,        
