@@ -2,14 +2,14 @@
 -- File       : EthConfig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC PGP Gen3 Card'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC PGP Gen3 Card', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC PGP Gen3 Card', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -80,9 +80,9 @@ begin
          rstIn  => axilRst,
          rstOut => axilReset);
 
-   --------------------- 
+   ---------------------
    -- AXI Lite Interface
-   --------------------- 
+   ---------------------
    comb : process (axilReadMaster, axilReset, axilWriteMaster, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;

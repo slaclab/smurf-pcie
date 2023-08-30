@@ -2,14 +2,14 @@
 -- File       : EthLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC PGP Gen3 Card'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC PGP Gen3 Card', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC PGP Gen3 Card', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ entity EthLane is
       TPD_G              : time     := 1 ns;
       CLK_FREQUENCY_G    : real     := 156.25E+6;  -- units of Hz
       MAX_SEG_SIZE_G     : positive := 8192;       -- Jumbo frame chucking
-      WINDOW_ADDR_SIZE_G : positive := 4;          -- 16 buffers (2^4)      
+      WINDOW_ADDR_SIZE_G : positive := 4;          -- 16 buffers (2^4)
       AXI_BASE_ADDR_G    : slv(31 downto 0));
    port (
       -- RSSI Interface (axilClk domain)
@@ -244,7 +244,7 @@ begin
          MAX_SEG_SIZE_G      => MAX_SEG_SIZE_G,  -- Using Jumbo frames
          SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_G/8),
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
-         TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds 
+         TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds
          SERVER_G            => false,           -- false = Client mode
          RETRANSMIT_ENABLE_G => true,
          WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_G,
