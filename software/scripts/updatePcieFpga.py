@@ -1,1 +1,1 @@
-../../firmware/submodules/axi-pcie-core/python/axipcie/updateFpga.py
+../../firmware/submodules/axi-pcie-core/scripts/updatePcieFpga

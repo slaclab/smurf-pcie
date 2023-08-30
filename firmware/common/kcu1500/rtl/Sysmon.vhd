@@ -1,16 +1,13 @@
 -------------------------------------------------------------------------------
--- File       : SystemManagementWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-30
--- Last update: 2019-06-27
 -------------------------------------------------------------------------------
--- Description:
+-- Description: Wrapper on the sysmon with AXI-Lite Interface
 -------------------------------------------------------------------------------
--- This file is part of 'Example Project Firmware'.
+-- This file is part of 'Simple-10GbE-RUDP-KCU105-Example'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
 -- top-level directory of this distribution and at:
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
--- No part of 'Example Project Firmware', including this file,
+-- No part of 'Simple-10GbE-RUDP-KCU105-Example', including this file,
 -- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
@@ -22,7 +19,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
-entity SystemManagementWrapper is
+entity Sysmon is
    generic (
       TPD_G : time := 1 ns);
    port (
@@ -34,9 +31,9 @@ entity SystemManagementWrapper is
       axiWriteSlave  : out AxiLiteWriteSlaveType;
       vPIn           : in  sl;
       vNIn           : in  sl);
-end entity SystemManagementWrapper;
+end entity Sysmon;
 
-architecture mapping of SystemManagementWrapper is
+architecture mapping of Sysmon is
 
    component SystemManagementCore
       port (
@@ -76,7 +73,7 @@ begin
 
    axiRstL <= not axiRst;
 
-   SystemManagementCore_Inst : SystemManagementCore
+   U_SysmonIpCore : SystemManagementCore
       port map (
          s_axi_aclk    => axiClk,
          s_axi_aresetn => axiRstL,

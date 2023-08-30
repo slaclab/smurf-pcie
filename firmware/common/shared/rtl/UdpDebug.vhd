@@ -5,11 +5,11 @@
 -- Description: UdpDebug File
 -------------------------------------------------------------------------------
 -- This file is part of 'axi-pcie-core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'axi-pcie-core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'axi-pcie-core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ entity UdpDebug is
       udpObMuxSel     : out sl;
       udpObDest       : out slv(7 downto 0);
       udpToPhyRoute   : out Slv8Array(NUM_RSSI_C-1 downto 0);  -- UserClk Domain
-      -- AXI-Lite Interface 
+      -- AXI-Lite Interface
       axilReadMaster  : in  AxiLiteReadMasterType;
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
@@ -65,9 +65,9 @@ architecture mapping of UdpDebug is
 
 begin
 
-   --------------------- 
+   ---------------------
    -- AXI Lite Interface
-   --------------------- 
+   ---------------------
    comb : process (axiRst, axilReadMaster, axilWriteMaster, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
