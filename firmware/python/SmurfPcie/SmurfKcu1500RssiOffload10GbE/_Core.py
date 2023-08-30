@@ -18,6 +18,7 @@ import surf.ethernet.ten_gig    as ethPhy
 import surf.ethernet.udp        as udp
 import surf.protocols.rssi      as rssi
 import surf.axi                 as axi  
+import surf.xilinx              as xil
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE  as smurf
 
 ##############################################################################
@@ -126,8 +127,14 @@ class Core(pr.Device):
         self.add(pcie.AxiPcieCore(            
             offset      = 0x00000000, 
             numDmaLanes = 6,
+            boardType   = 'XilinxKcu1500',
             expand      = True,
         ))  
+
+        self.add(xil.AxiSysMonUltraScale(
+            name    = 'SysMon',
+            offset  = 0x0010_0000,
+        ))
 
         self.add(EthPhyGrp(            
             offset      = 0x00860000, 
