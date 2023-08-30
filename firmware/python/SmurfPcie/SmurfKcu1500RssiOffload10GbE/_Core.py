@@ -18,7 +18,7 @@ import surf.ethernet.ten_gig    as ethPhy
 import surf.ethernet.udp        as udp
 import surf.protocols.rssi      as rssi
 import surf.axi                 as axi  
-import SmurfKcu1500RssiOffload  as smurf
+import SmurfPcie.SmurfKcu1500RssiOffload10GbE  as smurf
 
 ##############################################################################
 
