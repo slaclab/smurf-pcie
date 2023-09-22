@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# This file is part of the 'Development Board Examples'. It is subject to 
-# the license terms in the LICENSE.txt file found in the top-level directory 
-# of this distribution and at: 
-#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the 'Development Board Examples', including this file, may be 
-# copied, modified, propagated, or distributed except according to the terms 
+# This file is part of the 'Development Board Examples'. It is subject to
+# the license terms in the LICENSE.txt file found in the top-level directory
+# of this distribution and at:
+#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+# No part of the 'Development Board Examples', including this file, may be
+# copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
@@ -25,20 +25,20 @@ parser = argparse.ArgumentParser()
 
 # Add arguments
 parser.add_argument(
-    "--dev", 
+    "--dev",
     type     = str,
     required = False,
     default  = '/dev/datadev_0',
     help     = "path to device",
-) 
+)
 
 parser.add_argument(
-    "--yaml", 
+    "--yaml",
     type     = str,
     required = False,
     default  = 'config/pcie_rssi_config.yml',
     help     = "path to YAML configuration",
-) 
+)
 
 # Get the arguments
 args = parser.parse_args()
@@ -46,7 +46,7 @@ args = parser.parse_args()
 #################################################################
 
 # Set base
-base = pr.Root(name='pcie',description='')    
+base = pr.Root(name='pcie',description='')
 
 # Create the stream interface
 memMap = rogue.hardware.axi.AxiMemMap(args.dev)
@@ -65,8 +65,9 @@ base.Core.AxiPcieCore.AxiVersion.printStatus()
 
 # Load the YAML file
 print( 'Loading %s YAML file' % args.yaml);
-base.ReadConfig(args.yaml) 
-    
+base.LoadConfig(args.yaml)
+
 # Close
 base.stop()
-exit()   
+exit()
+
