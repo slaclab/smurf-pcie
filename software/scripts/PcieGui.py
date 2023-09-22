@@ -55,7 +55,7 @@ args = parser.parse_args()
 #################################################################
 
 # Set base
-base = pr.Root(name='pcie',description='')    
+base = pr.Root(name='pcie',description='', pollEn=args.pollEn,initRead=args.initRead,serverPort=9102)
 
 # Create the stream interface
 memMap = rogue.hardware.axi.AxiMemMap(args.dev)
@@ -64,21 +64,14 @@ memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 base.add(smurf.Core(memBase=memMap,expand=True))
 
 # Start the system
-base.start(pollEn=args.pollEn,initRead=args.initRead,zmqPort=None)
+base.start()
 
 # Print the AxiVersion Summary
 base.Core.AxiPcieCore.AxiVersion.printStatus()
 
 # Create GUI
-appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop()
-guiTop.addTree(base)
-guiTop.resize(800, 1200)
-
-print("Starting GUI...\n");
-
-# Run GUI
-appTop.exec_()    
+import pyrogue.pydm
+pyrogue.pydm.runPyDM(root=base)
     
 # Close
 base.stop()
