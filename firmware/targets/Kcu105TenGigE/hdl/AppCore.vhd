@@ -5,11 +5,11 @@
 -- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ entity AppCore is
       rst            : in  sl;
       -- ETH Configurations
       ethMac         : in  slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
-      ethIp          : in  slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)     
+      ethIp          : in  slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
       phyWriteMaster : out AxiLiteWriteMasterType;
       phyWriteSlave  : in  AxiLiteWriteSlaveType;
       phyReadMaster  : out AxiLiteReadMasterType;

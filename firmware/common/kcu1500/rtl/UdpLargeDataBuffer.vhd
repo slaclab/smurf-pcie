@@ -2,14 +2,14 @@
 -- File       : UdpLargeDataBuffer.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'PGP PCIe APP DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'PGP PCIe APP DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'PGP PCIe APP DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -492,7 +492,7 @@ begin
             S01_AXI_RLAST        => ddrReadSlaves(1).rlast,
             S01_AXI_RVALID       => ddrReadSlaves(1).rvalid,
             S01_AXI_RREADY       => ddrReadMasters(1).rready,
-            -- MASTER         
+            -- MASTER
             M00_AXI_ARESET_OUT_N => open,
             M00_AXI_ACLK         => ddrClk,
             M00_AXI_AWID         => ddrWriteMaster.awid(3 downto 0),

@@ -2,14 +2,14 @@
 -- File       : EthPortMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ entity EthPortMapping is
       rst              : in  sl;
       -- ETH Configurations
       ethMac           : in  slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
-      ethIp            : in  slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)           
+      ethIp            : in  slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
       -- ETH interface
       txMaster         : out AxiStreamMasterType;
       txSlave          : in  AxiStreamSlaveType;
@@ -124,7 +124,7 @@ begin
 
    ---------------------------
    -- AXI-Lite Crossbar Module
-   ---------------------------         
+   ---------------------------
    U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -230,7 +230,7 @@ begin
          axilWriteSlave    => commWriteSlaves(0));
 
    ---------------------------------------
-   -- TDEST = 0x0: Register access control   
+   -- TDEST = 0x0: Register access control
    ---------------------------------------
    U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
@@ -239,7 +239,7 @@ begin
          GEN_SYNC_FIFO_G     => true,
          AXI_STREAM_CONFIG_G => AXIS_CONFIG_C(0))
       port map (
-         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         -- Streaming Slave (Rx) Interface (sAxisClk domain)
          sAxisClk         => clk,
          sAxisRst         => rst,
          sAxisMaster      => rssiObMasters(0),
@@ -288,7 +288,7 @@ begin
    mbTxSlave        <= rssiIbSlaves(3);
 
    ------------------------------
-   -- Terminate Unused interfaces  
+   -- Terminate Unused interfaces
    ------------------------------
    rssiObSlaves(3) <= AXI_STREAM_SLAVE_FORCE_C;
    rxCtrl          <= AXI_STREAM_CTRL_UNUSED_C;

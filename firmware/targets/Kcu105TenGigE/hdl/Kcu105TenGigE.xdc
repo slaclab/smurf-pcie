@@ -98,7 +98,19 @@ create_clock -name sfpClkP -period  6.400 [get_ports {sfpClkP}]
 set_clock_groups -asynchronous -group [get_clocks sfpClkP] -group [get_clocks -of_objects [get_pins {U_FMC/GEN_LANE[*].TenGigEthGthUltraScale_Inst/U_TenGigEthRst/CLK156_BUFG_GT/O}]]
 set_clock_groups -asynchronous -group [get_clocks sfpClkP] -group [get_clocks -of_objects [get_pins {U_SFP/GEN_LANE[*].TenGigEthGthUltraScale_Inst/U_TenGigEthRst/CLK156_BUFG_GT/O}]]
 
-# BITSTREAM Configurations
-set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design] 
-set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1 [current_design]
-set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No [current_design]
+##############################################################################
+# BITSTREAM: .bit file Configuration
+##############################################################################
+
+set_property CONFIG_VOLTAGE 1.8                      [current_design]
+set_property CFGBVS GND                              [current_design]
+set_property BITSTREAM.GENERAL.COMPRESS TRUE         [current_design]
+set_property CONFIG_MODE SPIx8                       [current_design]
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 8         [current_design]
+set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN div-1 [current_design]
+set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES      [current_design]
+set_property BITSTREAM.CONFIG.UNUSEDPIN Pullup       [current_design]
+set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes     [current_design]
+set_property BITSTREAM.STARTUP.LCK_CYCLE NoWait      [current_design]
+set_property BITSTREAM.STARTUP.MATCH_CYCLE NoWait    [current_design]
+
