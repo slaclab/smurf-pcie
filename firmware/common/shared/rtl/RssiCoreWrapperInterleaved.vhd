@@ -2,14 +2,14 @@
 -- File       : RssiCoreWrapperInterleaved.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Wrapper for RSSI + AXIS packetizer 
+-- Description: Wrapper for RSSI + AXIS packetizer
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ entity RssiCoreWrapperInterleaved is
       TPD_G                : time                 := 1 ns;
       CLK_FREQUENCY_G      : real                 := 100.0E+6;  -- In units of Hz
       TIMEOUT_UNIT_G       : real                 := 1.0E-3;  -- In units of seconds
-      SERVER_G             : boolean              := true;  -- Module is server or client 
+      SERVER_G             : boolean              := true;  -- Module is server or client
       RETRANSMIT_ENABLE_G  : boolean              := true;  -- Enable/Disable retransmissions in tx module
       WINDOW_ADDR_SIZE_G   : positive             := 3;  -- 2^WINDOW_ADDR_SIZE_G  = Max number of segments in buffer
       SEGMENT_ADDR_SIZE_G  : positive             := 7;  -- 2^SEGMENT_ADDR_SIZE_G = Number of 64 bit wide data words
@@ -55,7 +55,7 @@ entity RssiCoreWrapperInterleaved is
       MAX_NUM_OUTS_SEG_G   : positive             := 8;  --   <=(2**WINDOW_ADDR_SIZE_G)
       MAX_SEG_SIZE_G       : positive             := 1024;  -- <= (2**SEGMENT_ADDR_SIZE_G)*8 Number of bytes
       -- RSSI Timeouts
-      ACK_TOUT_G           : positive             := 25;  -- unit depends on TIMEOUT_UNIT_G 
+      ACK_TOUT_G           : positive             := 25;  -- unit depends on TIMEOUT_UNIT_G
       RETRANS_TOUT_G       : positive             := 50;  -- unit depends on TIMEOUT_UNIT_G  (Recommended >= MAX_NUM_OUTS_SEG_G*Data segment transmission time)
       NULL_TOUT_G          : positive             := 200;  -- unit depends on TIMEOUT_UNIT_G  (Recommended >= 4*RETRANS_TOUT_G)
       -- Counters

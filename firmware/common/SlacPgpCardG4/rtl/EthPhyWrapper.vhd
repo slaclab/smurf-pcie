@@ -5,11 +5,11 @@
 -- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the
--- top-level directory of this distribution and at:
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
--- No part of 'SLAC Firmware Standard Library', including this file,
--- may be copied, modified, propagated, or distributed except according to
+-- It is subject to the license terms in the LICENSE.txt file found in the 
+-- top-level directory of this distribution and at: 
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+-- No part of 'SLAC Firmware Standard Library', including this file, 
+-- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -39,12 +39,12 @@ entity EthPhyWrapper is
       localMac        : out Slv48Array(NUM_RSSI_C-1 downto 0);
       localIp         : out Slv32Array(NUM_RSSI_C-1 downto 0);
       udpToPhyRoute   : in  Slv8Array(NUM_RSSI_C-1 downto 0);
-      -- Streaming DMA Interface
+      -- Streaming DMA Interface 
       udpIbMasters    : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
       udpIbSlaves     : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
       udpObMasters    : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
       udpObSlaves     : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      -- Slave AXI-Lite Interface
+      -- Slave AXI-Lite Interface 
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
@@ -53,17 +53,14 @@ entity EthPhyWrapper is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       ---------------------
       --  Hardware Ports
-      ---------------------
-      -- QSFP[0] Ports
-      qsfp0RefClkP    : in  slv(1 downto 0);
-      qsfp0RefClkN    : in  slv(1 downto 0);
+      ---------------------    
+      -- QSFP[1:0] Ports
+      qsfpRefClkP     : in  sl;
+      qsfpRefClkN     : in  sl;
       qsfp0RxP        : in  slv(3 downto 0);
       qsfp0RxN        : in  slv(3 downto 0);
       qsfp0TxP        : out slv(3 downto 0);
       qsfp0TxN        : out slv(3 downto 0);
-      -- QSFP[1] Ports
-      qsfp1RefClkP    : in  slv(1 downto 0);
-      qsfp1RefClkN    : in  slv(1 downto 0);
       qsfp1RxP        : in  slv(3 downto 0);
       qsfp1RxN        : in  slv(3 downto 0);
       qsfp1TxP        : out slv(3 downto 0);
@@ -71,7 +68,6 @@ entity EthPhyWrapper is
 end EthPhyWrapper;
 
 architecture mapping of EthPhyWrapper is
-
 
    constant NUM_AXI_MASTERS_C : natural := 16;
 
@@ -92,20 +88,13 @@ architecture mapping of EthPhyWrapper is
 
    signal axilReset : sl;
 
-   signal gtTxPreCursor  : Slv5Array(7 downto 0);
-   signal gtTxPostCursor : Slv5Array(7 downto 0);
-   signal gtTxDiffCtrl   : Slv4Array(7 downto 0);
-
-   signal phyToUdpRoute : Slv8Array(7 downto 0);
-
    signal dmaClk     : slv(7 downto 0);
    signal dmaRst     : slv(7 downto 0);
    signal axiLiteClk : slv(7 downto 0);
    signal axiLiteRst : slv(7 downto 0);
 
-   signal refClk                  : slv(1 downto 0);
-   attribute dont_touch           : string;
-   attribute dont_touch of refClk : signal is "TRUE";
+   signal gtRefClk     : sl;
+   signal gtRefClkBufg : sl;
 
 begin
 
@@ -116,7 +105,7 @@ begin
    axiLiteRst <= (others => axilReset);
 
    -------------------------------
-   -- TODO: Add routing logic here
+   -- TODO: Add routing logic here 
    -------------------------------
    localMac <= mac(NUM_RSSI_C-1 downto 0);
    localIp  <= ip(NUM_RSSI_C-1 downto 0);
@@ -126,74 +115,6 @@ begin
 
    phyIbMasters(NUM_RSSI_C-1 downto 0) <= udpObMasters;
    udpObSlaves                         <= phyIbSlaves(NUM_RSSI_C-1 downto 0);
-
-   -- ROUTE_TABLE : process (udpToPhyRoute) is
-   -- variable route : Slv8Array(7 downto 0);
-   -- begin
-   -- -- Init
-   -- route := (others => x"FF");
-
-   -- -- Create the PHY-to-UDP route table
-   -- for i in NUM_RSSI_C-1 downto 0 loop
-   -- route(conv_integer(udpToPhyRoute(i))) := toSlv(i, 8);
-   -- end loop;
-
-   -- -- Outputs
-   -- phyToUdpRoute <= route;
-
-   -- end process;
-
-   -- process(axilClk)
-   -- begin
-   -- if rising_edge(axilClk) then
-   -- for i in 7 downto 0 loop
-   -- if phyToUdpRoute(i) /= x"FF" then
-   -- localMac(conv_integer(phyToUdpRoute(i))) <= mac(i) after TPD_G;
-   -- localIp(conv_integer(phyToUdpRoute(i)))  <= ip(i)  after TPD_G;
-   -- end if;
-   -- end loop;
-   -- end if;
-   -- end process;
-
-   -- U_IbRouter : entity work.AxiStreamRouter
-   -- generic map (
-   -- TPD_G                 => TPD_G,
-   -- NUM_SLAVES_G          => 8,
-   -- NUM_MASTERS_G         => NUM_RSSI_C,
-   -- SLAVES_PIPE_STAGES_G  => 1,
-   -- MASTERS_PIPE_STAGES_G => 1)
-   -- port map (
-   -- -- Clock and reset
-   -- axisClk      => axilClk,
-   -- axisRst      => axilReset,
-   -- -- Routing Configuration
-   -- routeConfig  => phyToUdpRoute,
-   -- -- Slave Interfaces
-   -- sAxisMasters => phyObMasters,
-   -- sAxisSlaves  => phyObSlaves,
-   -- -- Master Interfaces
-   -- mAxisMasters => udpIbMasters,
-   -- mAxisSlaves  => udpIbSlaves);
-
-   -- U_ObRouter : entity work.AxiStreamRouter
-   -- generic map (
-   -- TPD_G                 => TPD_G,
-   -- NUM_SLAVES_G          => NUM_RSSI_C,
-   -- NUM_MASTERS_G         => 8,
-   -- SLAVES_PIPE_STAGES_G  => 1,
-   -- MASTERS_PIPE_STAGES_G => 1)
-   -- port map (
-   -- -- Clock and reset
-   -- axisClk      => axilClk,
-   -- axisRst      => axilReset,
-   -- -- Routing Configuration
-   -- routeConfig  => udpToPhyRoute,
-   -- -- Slave Interfaces
-   -- sAxisMasters => udpObMasters,
-   -- sAxisSlaves  => udpObSlaves,
-   -- -- Master Interfaces
-   -- mAxisMasters => phyIbMasters,
-   -- mAxisSlaves  => phyIbSlaves);
 
    -----------------
    -- Reset Pipeline
@@ -228,26 +149,27 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ----------------
-   -- 10GigE Module
+   -- 10GigE Module 
    ----------------
    U_QSFP0 : entity surf.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
          NUM_LANE_G    => 4,
          EN_AXI_REG_G  => true,
+         EXT_REF_G     => false,        -- false: Use gtClkP/gtClkN
          -- AXI Streaming Configurations
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
          localMac            => mac(3 downto 0),
-         -- Streaming DMA Interface
+         -- Streaming DMA Interface 
          dmaClk              => dmaClk(3 downto 0),
          dmaRst              => dmaRst(3 downto 0),
          dmaIbMasters        => phyObMasters(3 downto 0),
          dmaIbSlaves         => phyObSlaves(3 downto 0),
          dmaObMasters        => phyIbMasters(3 downto 0),
          dmaObSlaves         => phyIbSlaves(3 downto 0),
-         -- Slave AXI-Lite Interface
+         -- Slave AXI-Lite Interface 
          axiLiteClk          => axiLiteClk(3 downto 0),
          axiLiteRst          => axiLiteRst(3 downto 0),
          axiLiteReadMasters  => axilReadMasters(3 downto 0),
@@ -256,13 +178,11 @@ begin
          axiLiteWriteSlaves  => axilWriteSlaves(3 downto 0),
          -- Misc. Signals
          extRst              => axilReset,
-         -- Transceiver Debug Interface
---         gtTxPreCursor       => gtTxPreCursor(3 downto 0),
---         gtTxPostCursor      => gtTxPostCursor(3 downto 0),
---         gtTxDiffCtrl        => gtTxDiffCtrl(3 downto 0),
          -- MGT Clock Port
-         gtClkP              => qsfp0RefClkP(0),
-         gtClkN              => qsfp0RefClkN(0),
+         gtClkP              => qsfpRefClkP,
+         gtClkN              => qsfpRefClkN,
+         gtClk               => gtRefClk,
+         coreClk             => gtRefClkBufg,
          -- MGT Ports
          gtTxP               => qsfp0TxP,
          gtTxN               => qsfp0TxN,
@@ -274,19 +194,20 @@ begin
          TPD_G         => TPD_G,
          NUM_LANE_G    => 4,
          EN_AXI_REG_G  => true,
+         EXT_REF_G     => true,         -- true: Use gtRefClk/gtRefClkBufg
          -- AXI Streaming Configurations
          AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
          localMac            => mac(7 downto 4),
-         -- Streaming DMA Interface
+         -- Streaming DMA Interface 
          dmaClk              => dmaClk(7 downto 4),
          dmaRst              => dmaRst(7 downto 4),
          dmaIbMasters        => phyObMasters(7 downto 4),
          dmaIbSlaves         => phyObSlaves(7 downto 4),
          dmaObMasters        => phyIbMasters(7 downto 4),
          dmaObSlaves         => phyIbSlaves(7 downto 4),
-         -- Slave AXI-Lite Interface
+         -- Slave AXI-Lite Interface 
          axiLiteClk          => axiLiteClk(7 downto 4),
          axiLiteRst          => axiLiteRst(7 downto 4),
          axiLiteReadMasters  => axilReadMasters(7 downto 4),
@@ -295,81 +216,14 @@ begin
          axiLiteWriteSlaves  => axilWriteSlaves(7 downto 4),
          -- Misc. Signals
          extRst              => axilReset,
-         -- Transceiver Debug Interface
---         gtTxPreCursor       => gtTxPreCursor(7 downto 4),
---         gtTxPostCursor      => gtTxPostCursor(7 downto 4),
---         gtTxDiffCtrl        => gtTxDiffCtrl(7 downto 4),
          -- MGT Clock Port
-         gtClkP              => qsfp1RefClkP(0),
-         gtClkN              => qsfp1RefClkN(0),
+         gtRefClk            => gtRefClk,
+         gtRefClkBufg        => gtRefClkBufg,
          -- MGT Ports
          gtTxP               => qsfp1TxP,
          gtTxN               => qsfp1TxN,
          gtRxP               => qsfp1RxP,
          gtRxN               => qsfp1RxN);
-
-   -- U_QSFP1 : entity surf.TenGigEthGthUltraScaleWrapper
-   -- generic map (
-   -- TPD_G         => TPD_G,
-   -- NUM_LANE_G    => 2,
-   -- EN_AXI_REG_G  => true,
-   -- -- AXI Streaming Configurations
-   -- AXIS_CONFIG_G => (others => EMAC_AXIS_CONFIG_C))
-   -- port map (
-   -- -- Local Configurations
-   -- localMac            => mac(5 downto 4),
-   -- -- Streaming DMA Interface
-   -- dmaClk              => dmaClk(5 downto 4),
-   -- dmaRst              => dmaRst(5 downto 4),
-   -- dmaIbMasters        => phyObMasters(5 downto 4),
-   -- dmaIbSlaves         => phyObSlaves(5 downto 4),
-   -- dmaObMasters        => phyIbMasters(5 downto 4),
-   -- dmaObSlaves         => phyIbSlaves(5 downto 4),
-   -- -- Slave AXI-Lite Interface
-   -- axiLiteClk          => axiLiteClk(5 downto 4),
-   -- axiLiteRst          => axiLiteRst(5 downto 4),
-   -- axiLiteReadMasters  => axilReadMasters(5 downto 4),
-   -- axiLiteReadSlaves   => axilReadSlaves(5 downto 4),
-   -- axiLiteWriteMasters => axilWriteMasters(5 downto 4),
-   -- axiLiteWriteSlaves  => axilWriteSlaves(5 downto 4),
-   -- -- Misc. Signals
-   -- extRst              => axilReset,
-   -- -- MGT Clock Port
-   -- gtClkP              => qsfp1RefClkP(0),
-   -- gtClkN              => qsfp1RefClkN(0),
-   -- -- MGT Ports
-   -- gtTxP               => qsfp1TxP(1 downto 0),
-   -- gtTxN               => qsfp1TxN(1 downto 0),
-   -- gtRxP               => qsfp1RxP(1 downto 0),
-   -- gtRxN               => qsfp1RxN(1 downto 0));
-
-   -- U_GTH_TERM : entity surf.Gthe3ChannelDummy
-   -- generic map (
-   -- TPD_G   => TPD_G,
-   -- WIDTH_G => 2)
-   -- port map (
-   -- refClk => axilRst,
-   -- gtTxP  => qsfp1TxP(3 downto 2),
-   -- gtTxN  => qsfp1TxN(3 downto 2),
-   -- gtRxP  => qsfp1RxP(3 downto 2),
-   -- gtRxN  => qsfp1RxN(3 downto 2));
-
-   --------------------
-   -- Unused GTH Clocks
-   --------------------
-   U_QsfpRef0 : IBUFDS_GTE3
-      port map (
-         I   => qsfp0RefClkP(1),
-         IB  => qsfp0RefClkN(1),
-         CEB => '0',
-         O   => refClk(0));
-
-   U_QsfpRef1 : IBUFDS_GTE3
-      port map (
-         I   => qsfp1RefClkP(1),
-         IB  => qsfp1RefClkN(1),
-         CEB => '0',
-         O   => refClk(1));
 
    GEN_VEC : for i in 7 downto 0 generate
 
@@ -379,9 +233,9 @@ begin
          port map (
             localIp         => ip(i),
             localMac        => mac(i),
-            gtTxPreCursor   => gtTxPreCursor(i),
-            gtTxPostCursor  => gtTxPostCursor(i),
-            gtTxDiffCtrl    => gtTxDiffCtrl(i),
+            gtTxPreCursor   => open,
+            gtTxPostCursor  => open,
+            gtTxDiffCtrl    => open,
             -- AXI-Lite Register Interface (axilClk domain)
             axilClk         => axilClk,
             axilRst         => axilReset,

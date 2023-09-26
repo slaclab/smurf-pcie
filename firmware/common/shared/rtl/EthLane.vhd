@@ -2,14 +2,14 @@
 -- File       : EthLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC PGP Gen3 Card'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC PGP Gen3 Card', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC PGP Gen3 Card', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -28,9 +28,11 @@ use work.AppPkg.all;
 
 entity EthLane is
    generic (
-      TPD_G           : time := 1 ns;
-      CLK_FREQUENCY_G : real := 156.25E+6;        -- units of Hz
-      AXI_BASE_ADDR_G : slv(31 downto 0));
+      TPD_G              : time     := 1 ns;
+      CLK_FREQUENCY_G    : real     := 156.25E+6;  -- units of Hz
+      MAX_SEG_SIZE_G     : positive := 8192;       -- Jumbo frame chucking
+      WINDOW_ADDR_SIZE_G : positive := 4;          -- 16 buffers (2^4)
+      AXI_BASE_ADDR_G    : slv(31 downto 0));
    port (
       -- RSSI Interface (axilClk domain)
       rssiIbMaster    : in  AxiStreamMasterType;
@@ -40,9 +42,9 @@ entity EthLane is
       -- UDP Interface (axiClk/axilClk domain)
       axiClk          : in  sl;
       axiRst          : in  sl;
-      udpIbMaster     : in  AxiStreamMasterType;  -- (axilClk domain)
+      udpIbMaster     : in  AxiStreamMasterType;   -- (axilClk domain)
       udpIbSlave      : out AxiStreamSlaveType;
-      udpObMaster     : out AxiStreamMasterType;  -- (axiClk domain)
+      udpObMaster     : out AxiStreamMasterType;   -- (axiClk domain)
       udpObSlave      : in  AxiStreamSlaveType;
       -- PHY/MAC Interface (axilClk domain)
       macObMaster     : in  AxiStreamMasterType;
@@ -62,10 +64,7 @@ end EthLane;
 
 architecture mapping of EthLane is
 
-   constant MAX_SEG_SIZE_C     : positive := 8192;  -- Jumbo frame chucking
-   -- constant WINDOW_ADDR_SIZE_C : positive := 3;     -- 8 buffers (2^3)
-   constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
-   constant NUM_AXI_MASTERS_C  : natural  := 3;
+   constant NUM_AXI_MASTERS_C : natural := 3;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 16, 12);
 
@@ -242,14 +241,14 @@ begin
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
          APP_ILEAVE_EN_G     => true,
-         MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
-         SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
+         MAX_SEG_SIZE_G      => MAX_SEG_SIZE_G,  -- Using Jumbo frames
+         SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_G/8),
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
-         TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds 
+         TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds
          SERVER_G            => false,           -- false = Client mode
          RETRANSMIT_ENABLE_G => true,
-         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
-         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
+         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_G,
+         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_G),
          MAX_RETRANS_CNT_G   => 16,
          MAX_CUM_ACK_CNT_G   => 2,
          APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,

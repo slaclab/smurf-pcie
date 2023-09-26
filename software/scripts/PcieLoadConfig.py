@@ -8,7 +8,7 @@
 # copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
-
+import setupLibPaths
 import sys
 import argparse
 import pyrogue as pr
@@ -55,7 +55,7 @@ memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 base.add(smurf.Core(memBase=memMap))
 
 # Start the system
-base.start(pollEn=True,initRead=True)
+base.start()
 
 # Print the AxiVersion Summary
 base.Core.AxiPcieCore.AxiVersion.printStatus()
@@ -70,4 +70,3 @@ base.LoadConfig(args.yaml)
 # Close
 base.stop()
 exit()
-

@@ -1,6 +1,3 @@
-*.save
-*.orig
-
 # SVN files
 .svn*
 
@@ -17,6 +14,13 @@
 *.pyc
 *.bin
 *.ld
+*.dat
+*.htm
+*.log
+
+# Matlab
+*.autosave
+*.slxc
 
 # OS files
 .DS_Store
@@ -26,21 +30,27 @@
 .Trashes
 ehthumbs.db
 Thumps.db
+*.swp
 build.info
 
-# Vivado Build
+# Build directories 
 build*
+images*
+bin*
+.Xil*
+.obj*
+.ipynb_checkpoints*
+*.jou
 
-# Requires a force (-f) git add
+# Only .bit.gz and .mcs.gz should be committed to git
 *.bit
 *.mcs
 *.gz
 *.ltx
 *.hdf
-
-# Sysgen
-.Xil/
-*.r2015b
-*.autosave
-*slprj/
-*__pycache__/
+*.vho
+*.zip
+*.xsa
+*.pdi
+*.bif
+*.elf

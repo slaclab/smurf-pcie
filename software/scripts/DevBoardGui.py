@@ -10,21 +10,20 @@
 # Description:
 # Rogue interface to DEV board
 #-----------------------------------------------------------------------------
-# This file is part of the 'Development Board Examples'. It is subject to 
-# the license terms in the LICENSE.txt file found in the top-level directory 
-# of this distribution and at: 
-#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the 'Development Board Examples', including this file, may be 
-# copied, modified, propagated, or distributed except according to the terms 
+# This file is part of the 'Development Board Examples'. It is subject to
+# the license terms in the LICENSE.txt file found in the top-level directory
+# of this distribution and at:
+#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+# No part of the 'Development Board Examples', including this file, may be
+# copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
-
+import setupLibPaths
 import pyrogue as pr
 import SmurfPcie.DevBoard as devBoard
 import pyrogue.gui
 import pyrogue.protocols
 import pyrogue.utilities.prbs
-import rogue.hardware.pgp
 import rogue.hardware.axi
 import sys
 import argparse
@@ -46,70 +45,70 @@ parser = argparse.ArgumentParser()
 # Add arguments
 
 parser.add_argument(
-    "--pollEn", 
+    "--pollEn",
     type     = argBool,
     required = False,
     default  = True,
     help     = "auto-polling",
-)  
+)
 
 parser.add_argument(
-    "--initRead", 
+    "--initRead",
     type     = argBool,
     required = False,
     default  = True,
     help     = "Enable read all variables at start",
-)  
+)
 
 parser.add_argument(
-    "--loopback", 
+    "--loopback",
     type     = argBool,
     required = False,
     default  = False,
     help     = "SW loopback of PRBS stream",
-)  
+)
 
 parser.add_argument(
-    "--swRx", 
-    type     = argBool,
-    required = False,
-    default  = True,
-    help     = "SW loopback of PRBS stream",
-)  
-
-parser.add_argument(
-    "--swTx", 
+    "--swRx",
     type     = argBool,
     required = False,
     default  = False,
     help     = "SW loopback of PRBS stream",
-)  
+)
 
 parser.add_argument(
-    "--lane", 
+    "--swTx",
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "SW loopback of PRBS stream",
+)
+
+parser.add_argument(
+    "--lane",
     type     = int,
     required = False,
     default  = 0,
     help     = "DMA Lane",
-) 
+)
 
 parser.add_argument(
-    "--allLane", 
+    "--allLane",
     type     = int,
     required = False,
     default  = 0,
     help     = "load all the lanes",
-) 
+)
 
 parser.add_argument(
-    "--ip", 
+    "--ip",
     type     = str,
     required = False,
     default  = '',
     help     = '',
 )
 
-parser.add_argument('--html', help='Use html for tables', action="store_true") 
+parser.add_argument('--html', help='Use html for tables', action="store_true")
 # Get the arguments
 args = parser.parse_args()
 
@@ -124,16 +123,11 @@ rootTop = devBoard.TopLevel(
     lane        = args.lane,
     allLane     = args.allLane,
 )
-    
-#################################################################    
+
+#################################################################
 
 # Start the system
-rootTop.start(
-    pollEn   = args.pollEn,
-    initRead = args.initRead,
-    timeout  = 2.0,
-    zmqPort  = None,
-)
+rootTop.start()
 
 # # Print the AxiVersion Summary
 # rootTop.Fpga.AxiVersion.printStatus()
@@ -142,14 +136,14 @@ rootTop.start(
 appTop = pr.gui.application(sys.argv)
 guiTop = pr.gui.GuiTop()
 guiTop.addTree(rootTop)
-guiTop.resize(800, 1200)
+guiTop.resize(800, 800)
 
 print("Starting GUI...\n");
 
 # Run gui
 appTop.exec_()
 
-#################################################################    
+#################################################################
 
 # Stop mesh after gui exits
 rootTop.stop()
