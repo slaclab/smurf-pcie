@@ -8,12 +8,13 @@
 # copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
-import setupLibPaths
+
 import sys
 import argparse
 import pyrogue as pr
+import pyrogue.gui
 import rogue.hardware.axi
-import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
+import SmurfKcu1500RssiOffload as smurf
 
 #################################################################
 
@@ -33,11 +34,27 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--yaml",
+    "--pollEn",
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "auto-polling",
+)
+
+parser.add_argument(
+    "--initRead",
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "Enable read all variables at start",
+)
+
+parser.add_argument(
+    "--prefix",
     type     = str,
     required = False,
-    default  = 'config/pcie_rssi_config.yml',
-    help     = "path to YAML configuration",
+    default  = 'pcie_test0',
+    help     = "Epics prefix",
 )
 
 # Get the arguments
@@ -46,27 +63,35 @@ args = parser.parse_args()
 #################################################################
 
 # Set base
-base = pr.Root(name='pcie',description='')
+base = pr.Root(name='pcie',description='', pollEn=args.pollEn,initRead=args.initRead,serverPort=9102)
 
 # Create the stream interface
 memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 
 # Add Base Device
-base.add(smurf.Core(memBase=memMap))
+base.add(smurf.Core(memBase=memMap,expand=True))
 
 # Start the system
 base.start()
 
+# Add epics
+from pyrogue.protocols import epics
+epics = epics.EpicsCaServer(base=args.prefix, root=base)
+print(f"Starting EPICS server using prefix \"{args.prefix}\"")
+epics.start()
+epics.dump()
+
 # Print the AxiVersion Summary
 base.Core.AxiPcieCore.AxiVersion.printStatus()
 
-# # Reset the Application Firmware
-# base.Core.AxiPcieCore.AxiVersion.UserRst()
+# Create GUI
+#import pyrogue.pydm
+#pyrogue.pydm.runPyDM(root=base)
 
-# Load the YAML file
-print( 'Loading %s YAML file' % args.yaml);
-base.LoadConfig(args.yaml)
+print("Running without GUI...")
+pyrogue.waitCntrlC()
 
 # Close
+epics.stop()
 base.stop()
 exit()
