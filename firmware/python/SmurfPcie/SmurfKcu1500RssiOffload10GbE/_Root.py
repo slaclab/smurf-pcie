@@ -8,12 +8,13 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
+import pyrogue
 import rogue.hardware.axi
+import pyrogue.protcols.epicsV4
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
 
-class Root(pr.Root):
-    def __init__(self,dev='/dev/datadev_0',**kwargs):
+class Root(pyrogue.Root):
+    def __init__(self,dev='/dev/datadev_0', epicsBase=None, **kwargs):
         super().__init__(**kwargs)
 
         self.memMap = rogue.hardware.axi.AxiMemMap(dev)
@@ -22,3 +23,8 @@ class Root(pr.Root):
             memBase = self.memMap,
             expand  = True,
         ))
+
+        if epicsBase is not None:
+            pvserv = pyrogue.protocols.epicsV4.EpicsPvServer(base=epicsBase, root=self,incGroups=None,excGroups=None)
+            self.addProtocol(pvserv)
+
