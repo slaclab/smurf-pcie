@@ -49,6 +49,14 @@ if __name__ == "__main__":
         help     = "Enable read all variables at start",
     )
 
+    parser.add_argument(
+        "--epicsBase",
+        type     = str,
+        required = False,
+        default  = None,
+        help     = "Optional epics base to enable epics V4",
+    )
+
     # Get the arguments
     args = parser.parse_args()
 
@@ -73,11 +81,11 @@ if __name__ == "__main__":
     import pyrogue.pydm
 
     with smurf.Root(
-        name     = 'pcie', # Legacy name
-        dev      = args.dev,
-        pollEn   = args.pollEn,
-        initRead = args.initRead,        
-        
+        name      = 'pcie', # Legacy name
+        dev       = args.dev,
+        pollEn    = args.pollEn,
+        initRead  = args.initRead,
+        epicsBase = args.epicsBase
     ) as root:
         pyrogue.pydm.runPyDM(
             root  = root,
