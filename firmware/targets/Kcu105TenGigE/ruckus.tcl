@@ -9,7 +9,7 @@ loadSource      -dir "$::DIR_PATH/hdl"
 loadConstraints -dir "$::DIR_PATH/hdl"
 
 loadSource -path "$::DIR_PATH/ip/SystemManagementCore.dcp"
-# loadIpCore  -path "$::DIR_PATH/ip/SystemManagementCore.xci" 
+# loadIpCore  -path "$::DIR_PATH/ip/SystemManagementCore.xci"
 
 # Load local SIM source Code
 #set_property top {RssiInterleaveTb} [get_filesets sim_1]

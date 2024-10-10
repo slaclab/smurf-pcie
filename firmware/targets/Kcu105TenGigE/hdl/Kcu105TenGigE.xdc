@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # I/O Port Mapping
@@ -92,7 +92,7 @@ set_property PACKAGE_PIN B5 [get_ports fmcTxN[3]]
 set_property PACKAGE_PIN A4 [get_ports fmcRxP[3]]
 set_property PACKAGE_PIN A3 [get_ports fmcRxN[3]]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name sfpClkP -period  6.400 [get_ports {sfpClkP}]
 
 set_clock_groups -asynchronous -group [get_clocks sfpClkP] -group [get_clocks -of_objects [get_pins {U_FMC/GEN_LANE[*].TenGigEthGthUltraScale_Inst/U_TenGigEthRst/CLK156_BUFG_GT/O}]]
