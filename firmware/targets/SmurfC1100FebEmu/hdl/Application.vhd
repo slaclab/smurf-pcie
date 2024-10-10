@@ -60,7 +60,7 @@ architecture mapping of Application is
 
    constant NUM_LANES_C : positive := 6;
 
-   constant ETH_MAC_C : Slv48Array(AXIS_SIZE_C-1 downto 0) := (
+   constant ETH_MAC_C : Slv48Array(NUM_LANES_C-1 downto 0) := (
       0 => x"00FFFF_564400",            -- 00:44:56:FF:FF:00
       1 => x"01FFFF_564400",            -- 00:44:56:FF:FF:01
       2 => x"02FFFF_564400",            -- 00:44:56:FF:FF:02
@@ -68,7 +68,7 @@ architecture mapping of Application is
       4 => x"04FFFF_564400",            -- 00:44:56:FF:FF:04
       5 => x"05FFFF_564400");           -- 00:44:56:FF:FF:05
 
-   constant ETH_IP_C : Slv32Array(AXIS_SIZE_C-1 downto 0) := (
+   constant ETH_IP_C : Slv32Array(NUM_LANES_C-1 downto 0) := (
       0 => x"0A_02_A8_C0",              -- 192.168.2.10
       1 => x"0B_02_A8_C0",              -- 192.168.2.11
       2 => x"0C_02_A8_C0",              -- 192.168.2.12
@@ -92,7 +92,13 @@ architecture mapping of Application is
    signal dbgReadSlaves   : AxiLiteReadSlaveArray(NUM_LANES_C-1 downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
 
+   signal axilClks : slv(NUM_LANES_C-1 downto 0);
+   signal axilRsts : slv(NUM_LANES_C-1 downto 0);
+
 begin
+
+   axilClks <= (others => axilClk);
+   axilRsts <= (others => axilRst);
 
    ------------------
    -- 10 GigE Modules
@@ -106,8 +112,8 @@ begin
          -- Local Configurations
          localMac            => ETH_MAC_C(3 downto 0),
          -- Streaming DMA Interface
-         dmaClk              => axilClk,
-         dmaRst              => axilRst,
+         dmaClk              => axilClks(3 downto 0),
+         dmaRst              => axilRsts(3 downto 0),
          dmaIbMasters        => obMacMasters(3 downto 0),
          dmaIbSlaves         => obMacSlaves(3 downto 0),
          dmaObMasters        => ibMacMasters(3 downto 0),
@@ -115,8 +121,8 @@ begin
          -- Misc. Signals
          extRst              => axilRst,
          -- Slave AXI-Lite Interface
-         axiLiteClk          => axilClk,
-         axiLiteRst          => axilRst,
+         axiLiteClk          => axilClks(3 downto 0),
+         axiLiteRst          => axilRsts(3 downto 0),
          axiLiteReadMasters  => phyReadMasters(3 downto 0),
          axiLiteReadSlaves   => phyReadSlaves(3 downto 0),
          axiLiteWriteMasters => phyWriteMasters(3 downto 0),
@@ -139,8 +145,8 @@ begin
          -- Local Configurations
          localMac            => ETH_MAC_C(5 downto 4),
          -- Streaming DMA Interface
-         dmaClk              => axilClk,
-         dmaRst              => axilRst,
+         dmaClk              => axilClks(5 downto 4),
+         dmaRst              => axilRsts(5 downto 4),
          dmaIbMasters        => obMacMasters(5 downto 4),
          dmaIbSlaves         => obMacSlaves(5 downto 4),
          dmaObMasters        => ibMacMasters(5 downto 4),
@@ -148,8 +154,8 @@ begin
          -- Misc. Signals
          extRst              => axilRst,
          -- Slave AXI-Lite Interface
-         axiLiteClk          => axilClk,
-         axiLiteRst          => axilRst,
+         axiLiteClk          => axilClks(5 downto 4),
+         axiLiteRst          => axilRsts(5 downto 4),
          axiLiteReadMasters  => phyReadMasters(5 downto 4),
          axiLiteReadSlaves   => phyReadSlaves(5 downto 4),
          axiLiteWriteMasters => phyWriteMasters(5 downto 4),
@@ -158,10 +164,10 @@ begin
          gtClkP              => qsfp1RefClkP,
          gtClkN              => qsfp1RefClkN,
          -- MGT Ports
-         gtTxP               => qsfp1TxP,
-         gtTxN               => qsfp1TxN,
-         gtRxP               => qsfp1RxP,
-         gtRxN               => qsfp1RxN);
+         gtTxP               => qsfp1TxP(1 downto 0),
+         gtTxN               => qsfp1TxN(1 downto 0),
+         gtRxP               => qsfp1RxP(1 downto 0),
+         gtRxN               => qsfp1RxN(1 downto 0));
 
    --------------------
    -- Unused QSFP Links
@@ -219,9 +225,12 @@ begin
             TPD_G        => TPD_G,
             BUILD_INFO_G => BUILD_INFO_G)
          port map (
+            -- Clock and Reset
+            axilClk        => axilClk,
+            axilRst        => axilRst,
             -- Local Configurations
-            localMac       => ETH_MAC_C(i),
-            localIp        => ETH_IP_C(i),
+            ethMac         => ETH_MAC_C(i),
+            ethIp          => ETH_IP_C(i),
             -- ETH PHY AXI Stream Interfaces
             obMacMaster    => obMacMasters(i),
             obMacSlave     => obMacSlaves(i),

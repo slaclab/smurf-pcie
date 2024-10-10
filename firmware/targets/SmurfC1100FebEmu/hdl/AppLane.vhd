@@ -22,8 +22,8 @@ use surf.EthMacPkg.all;
 
 entity AppLane is
    generic (
-      TPD_G             : time := 1 ns;
-      BUILD_INFO_G      : BuildInfoType);
+      TPD_G        : time := 1 ns;
+      BUILD_INFO_G : BuildInfoType);
    port (
       -- Clock and Reset
       axilClk        : in  sl;
@@ -53,21 +53,21 @@ architecture mapping of AppLane is
    ---------------------------------------------------------------------------
    -- UDP constants and signals
    ---------------------------------------------------------------------------
-   
+
    constant AXIS_8BYTE_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
 
    constant NUM_SERVERS_C  : integer                                 := 2;
-   constant SERVER_PORTS_C : PositiveArray(NUM_SERVERS_C-1 downto 0) := (0 => 8198,1 => 8195);
+   constant SERVER_PORTS_C : PositiveArray(NUM_SERVERS_C-1 downto 0) := (0 => 8198, 1 => 8195);
 
    signal ibServerMasters : AxiStreamMasterArray(NUM_SERVERS_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
-   signal ibServerSlaves  : AxiStreamSlaveArray(NUM_SERVERS_C-1 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal ibServerSlaves  : AxiStreamSlaveArray(NUM_SERVERS_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
    signal obServerMasters : AxiStreamMasterArray(NUM_SERVERS_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
-   signal obServerSlaves  : AxiStreamSlaveArray(NUM_SERVERS_C-1 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal obServerSlaves  : AxiStreamSlaveArray(NUM_SERVERS_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
    ---------------------------------------------------------------------------
    -- RSSI constants and signals
    ---------------------------------------------------------------------------
-      
+
    constant APP_STREAMS_C      : positive := 6;
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 4;       -- 16 buffers (2^4)
@@ -85,26 +85,29 @@ architecture mapping of AppLane is
    signal rssiIbMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal rssiIbSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
    signal rssiObMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
-   signal rssiObSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0   := (others => AXI_STREAM_SLAVE_FORCE_C);
-      
+   signal rssiObSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+
    ---------------------------------------------------------------------------
    -- AXI-Lite constants and signals
    ---------------------------------------------------------------------------
-   
-   constant VERSION_INDEX_C : natural := 0;
-   constant PHY_INDEX_C  : natural := 1;
-   constant UDP_INDEX_C  : natural := 2;
-   constant RSSI_INDEX_C  : natural := 3;
 
-   constant NUM_AXIL_MASTERS_C : positive := 4;
+   constant VERSION_INDEX_C    : natural  := 0;
+   constant PHY_INDEX_C        : natural  := 1;
+   constant UDP_INDEX_C        : natural  := 2;
+   constant RSSI_INDEX_C       : natural  := 3;
+   constant UDP_TX_INDEX_C     : natural  := 4;
+   constant UDP_RX_INDEX_C     : natural  := 5;
+   constant RSSI_TX_INDEX_C    : natural  := 6;
+   constant RSSI_RX_INDEX_C    : natural  := 7;
+   constant NUM_AXIL_MASTERS_C : positive := 8;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, x"0000_0000", 31, 16);
 
-   signal   mAxilReadMaster  : in  AxiLiteReadMasterType;
-   signal   mAxilReadSlave   : out AxiLiteReadSlaveType;
-   signal   mAxilWriteMaster : in  AxiLiteWriteMasterType;
-    signal  mAxilWriteSlave  : out AxiLiteWriteSlaveType;
-    
+   signal mAxilReadMaster  : AxiLiteReadMasterType;
+   signal mAxilReadSlave   : AxiLiteReadSlaveType;
+   signal mAxilWriteMaster : AxiLiteWriteMasterType;
+   signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
+
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
@@ -142,9 +145,9 @@ begin
    ---------------------------
    U_AxiVersion : entity surf.AxiVersion
       generic map (
-         TPD_G           => TPD_G,
-         CLK_PERIOD_G    => (1.0/156.25E+6),
-         BUILD_INFO_G    => BUILD_INFO_G)
+         TPD_G        => TPD_G,
+         CLK_PERIOD_G => (1.0/156.25E+6),
+         BUILD_INFO_G => BUILD_INFO_G)
       port map (
          axiReadMaster  => axilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => axilReadSlaves(VERSION_INDEX_C),
@@ -158,9 +161,9 @@ begin
    -------------------------------------
    phyWriteMaster               <= axilWriteMasters(PHY_INDEX_C);
    axilWriteSlaves(PHY_INDEX_C) <= phyWriteSlave;
-   
-   phyReadMaster                <= axilReadMasters(PHY_INDEX_C);
-   axilReadSlaves(PHY_INDEX_C)  <= phyReadSlave;
+
+   phyReadMaster               <= axilReadMasters(PHY_INDEX_C);
+   axilReadSlaves(PHY_INDEX_C) <= phyReadSlave;
 
    ----------------------
    -- IPv4/ARP/UDP Engine
@@ -184,7 +187,7 @@ begin
          localMac        => ethMac,
          localIp         => ethIp,
          -- Interface to Ethernet Media Access Controller (MAC)
-         obMacMaster     => obMacSlave,
+         obMacMaster     => obMacMaster,
          obMacSlave      => obMacSlave,
          ibMacMaster     => ibMacMaster,
          ibMacSlave      => ibMacSlave,
@@ -201,10 +204,10 @@ begin
          -- Clock and Reset
          clk             => axilClk,
          rst             => axilRst);
-         
+
    --------------
    -- RSSI Server
-   --------------         
+   --------------
    U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G                => TPD_G,
@@ -213,7 +216,7 @@ begin
          MEMORY_TYPE_G        => "ultra",
          APP_ILEAVE_EN_G      => true,  -- true = AxiStreamPacketizer2
          -- ILEAVE_ON_NOTVALID_G => true,
-         ILEAVE_ON_NOTVALID_G => false, -- Might be a bug in the AxiStreamPacketizer2 when (ILEAVE_ON_NOTVALID_G=true): LLR - 05MAY2019
+         ILEAVE_ON_NOTVALID_G => false,  -- Might be a bug in the AxiStreamPacketizer2 when (ILEAVE_ON_NOTVALID_G=true): LLR - 05MAY2019
          MAX_SEG_SIZE_G       => MAX_SEG_SIZE_C,  -- Using Jumbo frames
          SEGMENT_ADDR_SIZE_G  => bitSize(MAX_SEG_SIZE_C/8),
          APP_STREAMS_G        => APP_STREAMS_C,
@@ -224,7 +227,7 @@ begin
             MEM_DATA_IDX_C    => X"04",  -- TDEST 4 routed to stream 0 (MEM)
             RAW_DATA_IDX_C    => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
             APP_ASYNC_IDX_C   => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
-         CLK_FREQUENCY_G      => AXI_CLK_FREQ_C,
+         CLK_FREQUENCY_G      => 156.25E+6,
          TIMEOUT_UNIT_G       => TIMEOUT_C,
          SERVER_G             => true,
          RETRANSMIT_ENABLE_G  => true,
@@ -256,8 +259,8 @@ begin
          axilReadMaster    => axilReadMasters(RSSI_INDEX_C),
          axilReadSlave     => axilReadSlaves(RSSI_INDEX_C),
          axilWriteMaster   => axilWriteMasters(RSSI_INDEX_C),
-         axilWriteSlave    => axilWriteSlaves(RSSI_INDEX_C));         
-         
+         axilWriteSlave    => axilWriteSlaves(RSSI_INDEX_C));
+
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
    ------------------------------------------------
@@ -284,8 +287,8 @@ begin
          mAxilReadMaster  => mAxilReadMaster,
          mAxilReadSlave   => mAxilReadSlave,
          mAxilWriteMaster => mAxilWriteMaster,
-         mAxilWriteSlave  => mAxilWriteSlave);         
-         
+         mAxilWriteSlave  => mAxilWriteSlave);
+
    -------------------
    -- Raw UDP PRBS TX
    -------------------
@@ -303,10 +306,10 @@ begin
          mAxisSlave      => ibServerSlaves(1),
          locClk          => axilClk,
          locRst          => axilRst,
-         axilReadMaster  => mAxilReadMasters(UDP_PRBS_TX_INDEX_C),
-         axilReadSlave   => mAxilReadSlaves(UDP_PRBS_TX_INDEX_C),
-         axilWriteMaster => mAxilWriteMasters(UDP_PRBS_TX_INDEX_C),
-         axilWriteSlave  => mAxilWriteSlaves(UDP_PRBS_TX_INDEX_C));
+         axilReadMaster  => axilReadMasters(UDP_TX_INDEX_C),
+         axilReadSlave   => axilReadSlaves(UDP_TX_INDEX_C),
+         axilWriteMaster => axilWriteMasters(UDP_TX_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(UDP_TX_INDEX_C));
 
    -------------------
    -- Raw UDP PRBS RX
@@ -325,11 +328,11 @@ begin
          sAxisSlave     => obServerSlaves(1),
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => mAxilReadMasters(UDP_PRBS_RX_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(UDP_PRBS_RX_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(UDP_PRBS_RX_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(UDP_PRBS_RX_INDEX_C));            
-         
+         axiReadMaster  => axilReadMasters(UDP_RX_INDEX_C),
+         axiReadSlave   => axilReadSlaves(UDP_RX_INDEX_C),
+         axiWriteMaster => axilWriteMasters(UDP_RX_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(UDP_RX_INDEX_C));
+
    ---------------
    -- RSSI PRBS TX
    ---------------
@@ -347,10 +350,10 @@ begin
          mAxisSlave      => rssiIbSlaves(BSA_ASYNC_IDX_C),
          locClk          => axilClk,
          locRst          => axilRst,
-         axilReadMaster  => mAxilReadMasters(RSSI_PRBS_TX_INDEX_C),
-         axilReadSlave   => mAxilReadSlaves(RSSI_PRBS_TX_INDEX_C),
-         axilWriteMaster => mAxilWriteMasters(RSSI_PRBS_TX_INDEX_C),
-         axilWriteSlave  => mAxilWriteSlaves(RSSI_PRBS_TX_INDEX_C));
+         axilReadMaster  => axilReadMasters(RSSI_TX_INDEX_C),
+         axilReadSlave   => axilReadSlaves(RSSI_TX_INDEX_C),
+         axilWriteMaster => axilWriteMasters(RSSI_TX_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(RSSI_TX_INDEX_C));
 
    ---------------
    -- RSSI PRBS RX
@@ -368,9 +371,9 @@ begin
          sAxisSlave     => rssiObSlaves(BSA_ASYNC_IDX_C),
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => mAxilReadMasters(RSSI_PRBS_RX_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(RSSI_PRBS_RX_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(RSSI_PRBS_RX_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(RSSI_PRBS_RX_INDEX_C));         
+         axiReadMaster  => axilReadMasters(RSSI_RX_INDEX_C),
+         axiReadSlave   => axilReadSlaves(RSSI_RX_INDEX_C),
+         axiWriteMaster => axilWriteMasters(RSSI_RX_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(RSSI_RX_INDEX_C));
 
 end mapping;
