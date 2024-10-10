@@ -1,28 +1,21 @@
 # smurf-pcie
 
-# Before you clone the GIT repository
-
-1) Create a github account:
-> https://github.com/
-
-2) Email Ben Reese (https://github.com/bengineerd) your github username and request to be added to the "lcls-hps" github group
-> https://github.com/orgs/slaclab/teams/lcls-hps/repositories
-
-3) On the Linux machine that you will clone the github from, generate a SSH key (if not already done)
-> https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
-
-4) Add a new SSH key to your GitHub account
-> https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
-
-5) Setup for large filesystems on github
-```
-$ git lfs install
-```
+<!--- ######################################################## -->
 
 # Clone the GIT repository
+
+Install git large filesystems (git-lfs) in your .gitconfig (1-time step per unix environment)
+```bash
+$ git lfs install
 ```
-$ git clone --recursive git@github.com:slaclab/smurf-pcie
+Clone the git repo with git-lfs enabled
+```bash
+$ git clone --recursive https://github.com/slaclab/smurf-pcie.git
 ```
+
+Note: `recursive flag` used to initialize all submodules within the clone
+
+<!--- ######################################################## -->
 
 # How to build the firmware
 
