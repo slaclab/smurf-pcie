@@ -17,6 +17,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 library axi_pcie_core;
 
@@ -178,16 +179,14 @@ begin
       generic map (
          TPD_G             => TPD_G,
          BUILD_INFO_G      => BUILD_INFO_G,
-         AXIL_CLK_FREQ_G   => AXIL_CLK_FREQ_C,
-         DMA_AXIS_CONFIG_G => DMA_AXIS_CONFIG_C,
-         DMA_SIZE_G        => DMA_SIZE_C)
+         DMA_AXIS_CONFIG_G => DMA_AXIS_CONFIG_C)
       port map (
          ------------------------
          --  Top Level Interfaces
-         ------------------------      
+         ------------------------
          -- AXI-Lite Clock and Reset
-         axilClk       => axilClk,
-         axilRst       => axilRst,
+         axilClk      => axilClk,
+         axilRst      => axilRst,
          -- DMA Interface (dmaClk domain)
          dmaClk       => dmaClk,
          dmaRst       => dmaRst,
