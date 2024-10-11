@@ -14,8 +14,18 @@ import pyrogue.protocols.epicsV4
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
 
 class Root(pyrogue.Root):
-    def __init__(self,dev='/dev/datadev_0', epicsBase=None, **kwargs):
+    def __init__(self,
+            dev       = '/dev/datadev_0',
+            epicsBase = None,
+            zmqSrvEn  = True,  # Flag to include the ZMQ server
+            **kwargs):
         super().__init__(**kwargs)
+
+        #################################################################
+        if zmqSrvEn:
+            self.zmqServer = pyrogue.interfaces.ZmqServer(root=self, addr='127.0.0.1', port=0)
+            self.addInterface(self.zmqServer)
+        #################################################################
 
         self.memMap = rogue.hardware.axi.AxiMemMap(dev)
 
@@ -27,4 +37,3 @@ class Root(pyrogue.Root):
         if epicsBase is not None:
             pvserv = pyrogue.protocols.epicsV4.EpicsPvServer(base=epicsBase, root=self,incGroups=None,excGroups=None)
             self.addProtocol(pvserv)
-
