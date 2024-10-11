@@ -1,0 +1,8 @@
+Root:
+  Feb[:]:
+    SsiPrbsTx:
+      PacketLength: 0x207 # 8320
+      TrigDly: 19531 # 8 kHz
+      AxiEn: True
+      TxEn: True
+      FwCnt: False

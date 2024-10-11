@@ -1,8 +1,8 @@
-System:
-  Fpga[:]:
+Root:
+  Feb[:]:
     SsiPrbsTx:
       PacketLength: 0x207 # 8320
-      TrigDly: 0xF42 # 40 kHz
+      TrigDly: 0x61A # 100 kHz
       AxiEn: True
       TxEn: True
       FwCnt: False
