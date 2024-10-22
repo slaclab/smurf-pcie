@@ -1,13 +1,14 @@
 ##############################################################################
-## This file is part of 'Simple-10GbE-RUDP-KCU105-Example'.
+## This file is part of 'lcls2-pgp-pcie-apps'.
 ## It is subject to the license terms in the LICENSE.txt file found in the
 ## top-level directory of this distribution and at:
 ##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
-## No part of 'Simple-10GbE-RUDP-KCU105-Example', including this file,
+## No part of 'lcls2-pgp-pcie-apps', including this file,
 ## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set format   "mcs"
-set inteface "SPIx8"
-set size     "512"
+set format     "mcs"
+set inteface   "SPIx4"
+set size       "1024"
+set loadbit    "up 0x01002000 ${inputFile}"

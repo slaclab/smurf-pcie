@@ -5,11 +5,11 @@
 -- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -39,12 +39,12 @@ entity EthPhyWrapper is
       localMac        : out Slv48Array(NUM_RSSI_C-1 downto 0);
       localIp         : out Slv32Array(NUM_RSSI_C-1 downto 0);
       udpToPhyRoute   : in  Slv8Array(NUM_RSSI_C-1 downto 0);
-      -- Streaming DMA Interface 
+      -- Streaming DMA Interface
       udpIbMasters    : out AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
       udpIbSlaves     : in  AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
       udpObMasters    : in  AxiStreamMasterArray(NUM_RSSI_C-1 downto 0);
       udpObSlaves     : out AxiStreamSlaveArray(NUM_RSSI_C-1 downto 0);
-      -- Slave AXI-Lite Interface 
+      -- Slave AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
@@ -53,7 +53,7 @@ entity EthPhyWrapper is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       ---------------------
       --  Hardware Ports
-      ---------------------    
+      ---------------------
       -- QSFP[1:0] Ports
       qsfpRefClkP     : in  sl;
       qsfpRefClkN     : in  sl;
@@ -105,7 +105,7 @@ begin
    axiLiteRst <= (others => axilReset);
 
    -------------------------------
-   -- TODO: Add routing logic here 
+   -- TODO: Add routing logic here
    -------------------------------
    localMac <= mac(NUM_RSSI_C-1 downto 0);
    localIp  <= ip(NUM_RSSI_C-1 downto 0);
@@ -149,7 +149,7 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ----------------
-   -- 10GigE Module 
+   -- 10GigE Module
    ----------------
    U_QSFP0 : entity surf.TenGigEthGthUltraScaleWrapper
       generic map (
@@ -162,14 +162,14 @@ begin
       port map (
          -- Local Configurations
          localMac            => mac(3 downto 0),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk              => dmaClk(3 downto 0),
          dmaRst              => dmaRst(3 downto 0),
          dmaIbMasters        => phyObMasters(3 downto 0),
          dmaIbSlaves         => phyObSlaves(3 downto 0),
          dmaObMasters        => phyIbMasters(3 downto 0),
          dmaObSlaves         => phyIbSlaves(3 downto 0),
-         -- Slave AXI-Lite Interface 
+         -- Slave AXI-Lite Interface
          axiLiteClk          => axiLiteClk(3 downto 0),
          axiLiteRst          => axiLiteRst(3 downto 0),
          axiLiteReadMasters  => axilReadMasters(3 downto 0),
@@ -200,14 +200,14 @@ begin
       port map (
          -- Local Configurations
          localMac            => mac(7 downto 4),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk              => dmaClk(7 downto 4),
          dmaRst              => dmaRst(7 downto 4),
          dmaIbMasters        => phyObMasters(7 downto 4),
          dmaIbSlaves         => phyObSlaves(7 downto 4),
          dmaObMasters        => phyIbMasters(7 downto 4),
          dmaObSlaves         => phyIbSlaves(7 downto 4),
-         -- Slave AXI-Lite Interface 
+         -- Slave AXI-Lite Interface
          axiLiteClk          => axiLiteClk(7 downto 4),
          axiLiteRst          => axiLiteRst(7 downto 4),
          axiLiteReadMasters  => axilReadMasters(7 downto 4),

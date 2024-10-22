@@ -1,0 +1,12 @@
+Root:
+  Feb[:]:
+    RawUdpPrbsTx:
+      PacketLength: 519 # 8320
+      TrigDly: 156250 # 1 kHz
+      AxiEn: True
+      TxEn: False # Disabled TX means 0 kHz
+      FwCnt: False
+    RssiPrbsTx:
+      AxiEn: True
+      TxEn: False # Disabled TX
+      FwCnt: False
