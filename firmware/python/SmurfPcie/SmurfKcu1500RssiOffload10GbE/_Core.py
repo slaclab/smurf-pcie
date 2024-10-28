@@ -124,7 +124,8 @@ class Core(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
-        self.add(pcie.AxiPcieCore(
+        # Using "smurf" instead of "axi" as work around for using older rogue version with newer version of SURF
+        self.add(smurf.AxiPcieCore(
             offset      = 0x00000000,
             numDmaLanes = 6,
             boardType   = 'XilinxKcu1500',
