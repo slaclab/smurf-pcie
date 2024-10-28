@@ -14,6 +14,7 @@ import argparse
 import pyrogue as pr
 import rogue.hardware.axi
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
+#import rogue
 
 #################################################################
 
@@ -65,7 +66,10 @@ base.Core.AxiPcieCore.AxiVersion.printStatus()
 
 # Load the YAML file
 print( 'Loading %s YAML file' % args.yaml);
-base.LoadConfig(args.yaml)
+if rogue.Version.greaterThanEqual('3.5.0'):
+    base.LoadConfig(args.yaml)
+else:
+    base.ReadConfig(args.yaml)
 
 # Close
 base.stop()
