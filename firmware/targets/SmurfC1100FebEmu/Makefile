@@ -1,8 +1,10 @@
 # Define target part
-export PRJ_PART = XCKU040-FFVA1156-2-E
+export PRJ_PART = XCU55N-FSVH2892-2L-E
 
-# Using a non-standard target directory structure, 
-# which requires me to define the TOP_DIR path
+# Define target output
+target: prom
+
+# Define TOP_DIR path
 export TOP_DIR = $(abspath $(PWD)/../..)
 
 # Use top level makefile

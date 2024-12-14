@@ -37,7 +37,7 @@ parser.add_argument(
     "--yaml",
     type     = str,
     required = False,
-    default  = 'config/pcie_rssi_config.yml',
+    default  = 'config/SmurfPcieConfig.yml',
     help     = "path to YAML configuration",
 )
 
