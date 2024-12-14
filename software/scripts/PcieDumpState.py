@@ -14,7 +14,6 @@ import argparse
 import pyrogue as pr
 import rogue.hardware.axi
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
-#import rogue
 
 #################################################################
 
@@ -36,9 +35,8 @@ parser.add_argument(
 parser.add_argument(
     "--yaml",
     type     = str,
-    required = False,
-    default  = 'config/SmurfPcieConfig.yml',
-    help     = "path to YAML configuration",
+    required = True,
+    help     = "path to dump YAML configuration state",
 )
 
 # Get the arguments
@@ -61,15 +59,12 @@ base.start()
 # Print the AxiVersion Summary
 base.Core.AxiPcieCore.AxiVersion.printStatus()
 
-# # Reset the Application Firmware
-# base.Core.AxiPcieCore.AxiVersion.UserRst()
+# Force an update to all the SW shadow variables before dump
+base.ReadAll()
 
-# Load the YAML file
-print( 'Loading %s YAML file' % args.yaml);
-if rogue.Version.greaterThanEqual('3.5.0'):
-    base.LoadConfig(args.yaml)
-else:
-    base.ReadConfig(args.yaml)
+# Dump State to a YAML file
+print( f'Dumping {args.yaml} YAML file' );
+base.SaveState(args.yaml)
 
 # Close
 base.stop()
