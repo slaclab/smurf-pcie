@@ -88,7 +88,7 @@ entity RssiCoreWrapperInterleaved is
       axilWriteSlave   : out AxiLiteWriteSlaveType;
       -- Internal statuses
       linkUp           : out sl;
-      statusReg_o      : out slv(6 downto 0));
+      statusReg_o      : out slv(8 downto 0));
 end entity RssiCoreWrapperInterleaved;
 
 architecture mapping of RssiCoreWrapperInterleaved is
@@ -101,7 +101,7 @@ architecture mapping of RssiCoreWrapperInterleaved is
    signal packetizerMasters : AxiStreamMasterArray(1 downto 0);
    signal packetizerSlaves  : AxiStreamSlaveArray(1 downto 0);
 
-   signal statusReg        : slv(6 downto 0);
+   signal statusReg        : slv(8 downto 0);
    signal rssiNotConnected : sl;
    signal rssiConnected    : sl;
 
