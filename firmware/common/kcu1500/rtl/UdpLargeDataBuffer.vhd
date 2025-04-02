@@ -71,13 +71,13 @@ architecture mapping of UdpLargeDataBuffer is
       LEN_BITS_C   => MEM_AXI_CONFIG_C.LEN_BITS_C);
 
    constant AXI_RESIZE_16B_C : AxiConfigType := (
-      ADDR_WIDTH_C => 40,  -- Work around to recycle axi-pcie-core FW
+      ADDR_WIDTH_C => 64,  -- Work around to recycle axi-pcie-core FW
       DATA_BYTES_C => AXI_CONFIG_C.DATA_BYTES_C,
       ID_BITS_C    => AXI_CONFIG_C.ID_BITS_C,
       LEN_BITS_C   => AXI_CONFIG_C.LEN_BITS_C);
 
    constant AXI_RESIZE_64B_C : AxiConfigType := (
-      ADDR_WIDTH_C => 40,  -- Work around to recycle axi-pcie-core FW
+      ADDR_WIDTH_C => 64,  -- Work around to recycle axi-pcie-core FW
       DATA_BYTES_C => MEM_AXI_CONFIG_C.DATA_BYTES_C,
       ID_BITS_C    => MEM_AXI_CONFIG_C.ID_BITS_C,
       LEN_BITS_C   => MEM_AXI_CONFIG_C.LEN_BITS_C);
