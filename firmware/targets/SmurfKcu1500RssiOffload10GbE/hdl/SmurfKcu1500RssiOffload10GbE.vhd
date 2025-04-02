@@ -394,22 +394,6 @@ begin
          mAxiReadMasters  => axilReadMasters,
          mAxiReadSlaves   => axilReadSlaves);
 
-      --------------------------
-      -- AXI-Lite: SYSMON Module
-      --------------------------
-      U_SysMon : entity work.Sysmon
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiReadMaster  => axilReadMasters(0),
-            axiReadSlave   => axilReadSlaves(0),
-            axiWriteMaster => axilWriteMasters(0),
-            axiWriteSlave  => axilWriteSlaves(0),
-            axiClk         => axilClk,
-            axiRst         => axilReset,
-            vPIn           => vPIn,
-            vNIn           => vNIn);
-
    ------------------
    -- RSSI/ETH Module
    ------------------
