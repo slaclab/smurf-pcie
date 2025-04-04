@@ -27,11 +27,24 @@ class Root(pyrogue.Root):
             self.addInterface(self.zmqServer)
         #################################################################
 
+        extDev = f"{dev.rsplit('_', 1)[0]}_{int(dev.rsplit('_', 1)[1]) + 1}"
+
         self.memMap = rogue.hardware.axi.AxiMemMap(dev)
+        self.extMap = rogue.hardware.axi.AxiMemMap(extDev)
 
         self.add(smurf.Core(
             memBase = self.memMap,
             expand  = True,
+        ))
+
+        # Using "smurf" instead of "axi" as work around for using older rogue version with newer version of SURF
+        self.add(smurf.AxiPcieCore(
+            memBase     = self.extMap,
+            name        = 'AxiPcieCoreExt',
+            offset      = 0x00000000,
+            numDmaLanes = 6,
+            boardType   = 'Undefined',
+            expand      = True,
         ))
 
         if epicsBase is not None:
