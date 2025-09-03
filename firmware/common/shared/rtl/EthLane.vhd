@@ -187,23 +187,30 @@ begin
          clk             => axilClk,
          rst             => axilReset);
 
-   U_AxiStreamMux : entity surf.AxiStreamMux
-      generic map (
-         TPD_G         => TPD_G,
-         NUM_SLAVES_G  => 2,
-         PIPE_STAGES_G => 1)
-      port map (
-         -- Clock and reset
-         axisClk         => axilClk,
-         axisRst         => axilReset,
-         -- Slaves
-         sAxisMasters(0) => udpIbMaster,
-         sAxisMasters(1) => keepAliveMaster,
-         sAxisSlaves(0)  => udpIbSlave,
-         sAxisSlaves(1)  => keepAliveSlave,
-         -- Master
-         mAxisMaster     => ibUdpMasters(1),
-         mAxisSlave      => ibUdpSlaves(1));
+--   U_AxiStreamMux : entity surf.AxiStreamMux
+--      generic map (
+--         TPD_G         => TPD_G,
+--         NUM_SLAVES_G  => 2,
+--         PIPE_STAGES_G => 1)
+--      port map (
+--         -- Clock and reset
+--         axisClk         => axilClk,
+--         axisRst         => axilReset,
+--         -- Slaves
+--         sAxisMasters(0) => udpIbMaster,
+--         sAxisMasters(1) => keepAliveMaster,
+--         sAxisSlaves(0)  => udpIbSlave,
+--         sAxisSlaves(1)  => keepAliveSlave,
+--         -- Master
+--         mAxisMaster     => ibUdpMasters(1),
+--         mAxisSlave      => ibUdpSlaves(1));
+
+   -- Bypass the AXIS MUX and connect directly to keep alive messages
+   ibUdpMasters(1) <= keepAliveMaster;
+   keepAliveSlave  <= ibUdpSlaves(1);
+
+   -- DMA outbound for /dev/datadev_1 unused but need to terminate it
+   udpIbSlave <= AXI_STREAM_SLAVE_FORCE_C;
 
    U_SYNC : entity surf.AxiStreamFifoV2
       generic map (
