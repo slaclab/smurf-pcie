@@ -111,10 +111,10 @@ begin
          v.cnt := r.cnt + 1;
       end if;
 
-      -- Only send 1 byte for keep alive
+      -- Only send multi-byte word for keep alive
       v.keepAliveMaster.tUser(SSI_SOF_C) := '1';  -- SOF
       v.keepAliveMaster.tLast            := '1';  -- EOF
-      v.keepAliveMaster.tKeep            := toSlv(1, AXI_STREAM_MAX_TKEEP_WIDTH_C);  -- 1 byte
+      v.keepAliveMaster.tKeep            := (others => '1');
 
       -- Synchronous Reset
       if (axilReset = '1') then
