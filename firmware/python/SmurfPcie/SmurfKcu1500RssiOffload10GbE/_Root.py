@@ -10,7 +10,7 @@
 
 import pyrogue
 import rogue.hardware.axi
-import pyrogue.protcols.epicsV4
+import pyrogue.protocols.epicsV4
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
 
 class Root(pyrogue.Root):
