@@ -132,11 +132,6 @@ class Core(pr.Device):
             expand      = True,
         ))
 
-        self.add(xil.AxiSysMonUltraScale(
-            name    = 'SysMon',
-            offset  = 0x0010_0000,
-        ))
-
         self.add(EthPhyGrp(
             offset      = 0x00860000,
             expand      = True,
