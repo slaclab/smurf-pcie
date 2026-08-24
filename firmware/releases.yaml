@@ -34,6 +34,5 @@ Releases:
     Primary: True
     Targets:
       - SmurfKcu1500RssiOffload10GbE
-      - SmurfC1100FebEmu
     Types:
       - Rogue
