@@ -29,6 +29,7 @@ use work.AppPkg.all;
 entity EthLane is
    generic (
       TPD_G              : time     := 1 ns;
+      MEMORY_TYPE_G      : string   := "block";
       CLK_FREQUENCY_G    : real     := 156.25E+6;  -- units of Hz
       MAX_SEG_SIZE_G     : positive := 8192;       -- Jumbo frame chucking
       WINDOW_ADDR_SIZE_G : positive := 4;          -- 16 buffers (2^4)
@@ -258,6 +259,7 @@ begin
          MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_G),
          MAX_RETRANS_CNT_G   => 16,
          MAX_CUM_ACK_CNT_G   => 2,
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          APP_AXIS_CONFIG_G   => APP_STREAM_CONFIG_C,
          TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C)
       port map (
