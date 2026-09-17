@@ -48,6 +48,10 @@ entity SmurfC1100FebEmu is
       --------------
       --  Core Ports
       --------------
+      -- Card Management Solution (CMS) Interface
+      cmsUartRxd   : in    sl;
+      cmsUartTxd   : out   sl;
+      cmsGpio      : in    slv(3 downto 0);
       -- System Ports
       userClkP     : in    sl;
       userClkN     : in    sl;
@@ -92,6 +96,9 @@ architecture top_level of SmurfC1100FebEmu is
 
    signal userClk : sl;
 
+   signal cmsHbmCatTrip : sl                    := '0';
+   signal cmsHbmTemp    : Slv7Array(1 downto 0) := (others => b"0000000");
+
 begin
 
    ---------------------------
@@ -125,10 +132,11 @@ begin
    -----------------------
    U_Core : entity axi_pcie_core.XilinxVariumC1100Core
       generic map (
-         TPD_G             => TPD_G,
-         BUILD_INFO_G      => BUILD_INFO_G,
-         DMA_AXIS_CONFIG_G => DMA_AXIS_CONFIG_C,
-         DMA_SIZE_G        => DMA_SIZE_C)
+         TPD_G              => TPD_G,
+         BUILD_INFO_G       => BUILD_INFO_G,
+         QSFP_CDR_DISABLE_G => true,  -- TRUE: 25G CDR doesn't work with this line rate (CDR margin is too large)
+         DMA_AXIS_CONFIG_G  => DMA_AXIS_CONFIG_C,
+         DMA_SIZE_G         => DMA_SIZE_C)
       port map (
          ------------------------
          --  Top Level Interfaces
@@ -151,6 +159,12 @@ begin
          --------------
          --  Core Ports
          --------------
+         -- Card Management Solution (CMS) Interface
+         cmsHbmCatTrip  => cmsHbmCatTrip,
+         cmsHbmTemp     => cmsHbmTemp,
+         cmsUartRxd     => cmsUartRxd,
+         cmsUartTxd     => cmsUartTxd,
+         cmsGpio        => cmsGpio,
          -- System Ports
          userClkP       => userClkP,
          userClkN       => userClkN,
