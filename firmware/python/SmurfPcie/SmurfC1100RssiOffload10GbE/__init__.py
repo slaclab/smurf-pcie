@@ -7,8 +7,8 @@
 # may be copied, modified, propagated, or distributed except according to
 # the terms contained in the LICENSE.txt file.
 ##############################################################################
-from SmurfPcie.SmurfKcu1500RssiOffload10GbE._Core      import *
-from SmurfPcie.SmurfKcu1500RssiOffload10GbE._EthConfig import *
-from SmurfPcie.SmurfKcu1500RssiOffload10GbE._UdpConfig import *
-from SmurfPcie.SmurfKcu1500RssiOffload10GbE._UdpDebug  import *
-from SmurfPcie.SmurfKcu1500RssiOffload10GbE._Root      import *
+from SmurfPcie.SmurfC1100RssiOffload10GbE._Core      import *
+from SmurfPcie.SmurfC1100RssiOffload10GbE._EthConfig import *
+from SmurfPcie.SmurfC1100RssiOffload10GbE._UdpConfig import *
+from SmurfPcie.SmurfC1100RssiOffload10GbE._UdpDebug  import *
+from SmurfPcie.SmurfC1100RssiOffload10GbE._Root      import *
