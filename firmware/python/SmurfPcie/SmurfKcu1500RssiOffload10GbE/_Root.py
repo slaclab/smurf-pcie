@@ -9,9 +9,13 @@
 ##############################################################################
 
 import pyrogue
+import rogue
 import rogue.hardware.axi
 import pyrogue.protocols.epicsV4
+import axipcie as pcie
 import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
+
+rogue.Version.minVersion('6.5.0')
 
 class Root(pyrogue.Root):
     def __init__(self,
@@ -37,8 +41,7 @@ class Root(pyrogue.Root):
             expand  = True,
         ))
 
-        # Using "smurf" instead of "axi" as work around for using older rogue version with newer version of SURF
-        self.add(smurf.AxiPcieCore(
+        self.add(pcie.AxiPcieCore(
             memBase     = self.extMap,
             name        = 'AxiPcieCoreExt',
             offset      = 0x00000000,
