@@ -9,16 +9,13 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 import setupLibPaths
-import sys
 import argparse
 import pyrogue as pr
 import rogue.hardware.axi
-import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
+import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurfKcu1500
+import SmurfPcie.SmurfC1100RssiOffload10GbE as smurfC1100
 
 #################################################################
-
-# Convert str to bool
-argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
 
 # Set the argument parser
 parser = argparse.ArgumentParser()
@@ -39,6 +36,15 @@ parser.add_argument(
     help     = "path to dump YAML configuration state",
 )
 
+parser.add_argument(
+    "--hwType",
+    type     = str,
+    required = False,
+    default  = 'kcu1500',
+    choices  = ['kcu1500', 'c1100'],
+    help     = "Select the PCIe hardware type",
+)
+
 # Get the arguments
 args = parser.parse_args()
 
@@ -51,7 +57,10 @@ base = pr.Root(name='pcie',description='')
 memMap = rogue.hardware.axi.AxiMemMap(args.dev)
 
 # Add Base Device
-base.add(smurf.Core(memBase=memMap))
+if args.hwType == 'kcu1500':
+    base.add(smurfKcu1500.Core(memBase=memMap))
+else:
+    base.add(smurfC1100.Core(memBase=memMap))
 
 # Start the system
 base.start()
@@ -63,7 +72,7 @@ base.Core.AxiPcieCore.AxiVersion.printStatus()
 base.ReadAll()
 
 # Dump State to a YAML file
-print( f'Dumping {args.yaml} YAML file' );
+print( f'Dumping {args.yaml} YAML file' )
 base.SaveState(args.yaml)
 
 # Close
