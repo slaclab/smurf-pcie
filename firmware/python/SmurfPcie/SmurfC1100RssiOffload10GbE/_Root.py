@@ -15,7 +15,7 @@ import pyrogue.protocols.epicsV4
 import axipcie as pcie
 import SmurfPcie.SmurfC1100RssiOffload10GbE as smurf
 
-rogue.Version.minVersion('6.5.0')
+rogue.Version.minVersion('6.15.0')
 
 class Root(pyrogue.Root):
     def __init__(self,
