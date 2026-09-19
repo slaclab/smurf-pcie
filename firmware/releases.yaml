@@ -15,17 +15,21 @@ RogueScripts:
   - ../software/scripts/PcieGui
 
 CondaDependencies:
-  - rogue=v6.5.0
+  - rogue=v6.15.0
   - surf
   - axi_pcie_core
 
 Targets:
-  SmurfKcu1500RssiOffload10GbE:
-    ImageDir: targets/SmurfKcu1500RssiOffload10GbE/images
-    Extensions:
-      - mcs
   SmurfC1100FebEmu:
     ImageDir: targets/SmurfC1100FebEmu/images
+    Extensions:
+      - mcs
+  SmurfC1100RssiOffload10GbE:
+    ImageDir: targets/SmurfC1100RssiOffload10GbE/images
+    Extensions:
+      - mcs
+  SmurfKcu1500RssiOffload10GbE:
+    ImageDir: targets/SmurfKcu1500RssiOffload10GbE/images
     Extensions:
       - mcs
 
@@ -33,6 +37,7 @@ Releases:
   all:
     Primary: True
     Targets:
+      - SmurfC1100RssiOffload10GbE
       - SmurfKcu1500RssiOffload10GbE
     Types:
       - Rogue

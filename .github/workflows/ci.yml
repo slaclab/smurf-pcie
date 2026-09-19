@@ -32,6 +32,18 @@ jobs:
         with:
           python-version: 3.12
 
+      # Catches syntax errors and undefined names in the PyRogue drivers and
+      # host scripts. Restricted to the critical checks so that the SLAC
+      # aligned-assignment style is not flagged. updatePcieFpga.py is excluded
+      # because it symlinks into a submodule that is not checked out here.
+      - name: Python Syntax And Critical Error Checking
+        run: |
+          python -m pip install flake8
+          python -m compileall -f firmware/python software/scripts
+          flake8 --count --select=E9,F63,F7,F82 --show-source \
+                 --extend-exclude=updatePcieFpga.py \
+                 firmware/python software/scripts
+
 # ----------------------------------------------------------------------------
 
   gen_release:

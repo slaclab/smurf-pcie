@@ -13,7 +13,7 @@ import rogue
 import rogue.hardware.axi
 import pyrogue.protocols.epicsV4
 import axipcie as pcie
-import SmurfPcie.SmurfKcu1500RssiOffload10GbE as smurf
+import SmurfPcie.SmurfC1100RssiOffload10GbE as smurf
 
 rogue.Version.minVersion('6.15.0')
 
@@ -45,7 +45,7 @@ class Root(pyrogue.Root):
             memBase     = self.extMap,
             name        = 'AxiPcieCoreExt',
             offset      = 0x00000000,
-            numDmaLanes = 6,
+            numDmaLanes = 8,
             boardType   = 'Undefined',
             expand      = True,
         ))
